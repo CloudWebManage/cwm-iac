@@ -13,7 +13,7 @@ spec:
       - ServerSideApply=true
   source:
     repoURL: git@github.com:CloudWebManage/cwm-iac.git
-    targetRevision: master
+    targetRevision: main
     path: apps/monitoring
     plugin:
       name: uumpa
