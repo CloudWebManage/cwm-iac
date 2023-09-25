@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- install.yaml
+- ingress-https.yaml
+- ingress-grpc.yaml
+- uumpa-plugin-configmap.yaml
+- argocd-repo-server-rbac.yaml
+
+patchesStrategicMerge:
+- argocd-cm.yaml
+- argocd-cmd-params-cm.yaml
+- patch-argocd-server-role.yaml
+- patch-argocd-server-cluster-role.yaml
+- patch-argocd-application-controller-deployment.yaml
+- patch-argocd-applicationset-controller-deployment.yaml
+- patch-argocd-dex-server-deployment.yaml
+- patch-argocd-notifications-controller-deployment.yaml
+- patch-argocd-redis-deployment.yaml
+- patch-argocd-repo-server-deployment.yaml
+- patch-argocd-server-deployment.yaml

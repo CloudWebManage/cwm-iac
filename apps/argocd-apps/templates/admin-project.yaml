@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: admin
+spec:
+  destinations:
+    - name: '*'
+      namespace: '*'
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - git@github.com:CloudWebManage/cwm-worker-cluster.git
+    - git@github.com:CloudWebManage/cwm-iac.git
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

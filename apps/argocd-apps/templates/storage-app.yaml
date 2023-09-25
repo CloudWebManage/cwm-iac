@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: storage
+spec:
+  destination:
+    namespace: storage
+    server: 'https://kubernetes.default.svc'
+  project: admin
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: git@github.com:CloudWebManage/cwm-iac.git
+    targetRevision: master
+    path: apps/storage
+    plugin:
+      name: cwmc
+      env:
+        - name: HELM_ARGS
+          value: --include-crds

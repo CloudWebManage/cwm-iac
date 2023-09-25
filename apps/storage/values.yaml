@@ -1,0 +1,13 @@
+nfs-subdir-external-provisioner:
+  nfs:
+    server: ~nfs_ip~
+    path: "/root"
+  storageClass:
+    name: nfs-client
+  tolerations:
+    - key: cwmc-role
+      value: operator
+      effect: NoSchedule
+    - key: cwmc-role
+      value: monitoring
+      effect: NoSchedule
