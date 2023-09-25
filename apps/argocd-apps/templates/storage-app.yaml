@@ -15,7 +15,7 @@ spec:
     targetRevision: main
     path: apps/storage
     plugin:
-      name: cwmc
+      name: uumpa
       env:
         - name: HELM_ARGS
           value: --include-crds

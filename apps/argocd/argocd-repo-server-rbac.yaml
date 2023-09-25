@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: argocd-repo-server
 rules:
-  - apiGroups: [""]
+  - apiGroups: ["", "apps"]
     resources: ["secrets", "configmaps", "namespaces", "deployments", "pods"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
 ---
