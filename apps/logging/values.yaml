@@ -15,6 +15,12 @@ loki:
       - key: cwmc-role
         value: monitoring
         effect: NoSchedule
+    extraVolumes:
+      - name: storage
+        emptiDir: {}
+    extraVolumeMounts:
+      - name: storage
+        mountPath: /var/loki
     persistence:
       enabled: false
       # loki has problems running on nfs, see https://github.com/grafana/loki/issues/9482#issuecomment-1735265034
