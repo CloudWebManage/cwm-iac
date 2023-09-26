@@ -9,7 +9,7 @@ spec:
       containers:
         - name: uumpa
           command: ["/var/run/argocd/argocd-cmp-server"]
-          image: ghcr.io/orihoch/uumpa-argocd-plugin/plugin:e733fd5720894fdb595241bd9c333b1e5da0aeea
+          image: ghcr.io/orihoch/uumpa-argocd-plugin/plugin:7a2d885d4e28a1dbaceb99d854e03af085a870a6
           env:
             - name: CLUSTER_NAME
               value: "${CLUSTER_NAME}"
