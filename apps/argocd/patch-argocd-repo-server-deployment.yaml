@@ -9,7 +9,7 @@ spec:
       containers:
         - name: uumpa
           command: ["/var/run/argocd/argocd-cmp-server"]
-          image: ghcr.io/orihoch/uumpa-argocd-plugin/plugin:3ea19a4da6579c07c7b82d4900de7b766783452e
+          image: ghcr.io/orihoch/uumpa-argocd-plugin/plugin:6eeb27e8ae4dd338edcf55cfcb2ebee42b9bf946
           env:
             - name: CLUSTER_NAME
               value: "${CLUSTER_NAME}"
@@ -30,6 +30,8 @@ spec:
                 secretKeyRef:
                   name: vault-approle
                   key: secret_id
+            - name: VAULT_PATH
+              value: "v1/kv/data/${CLUSTER_NAME}"
           securityContext:
             runAsNonRoot: true
             runAsUser: 999
