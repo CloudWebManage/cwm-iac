@@ -17,7 +17,7 @@ loki:
         effect: NoSchedule
     extraVolumes:
       - name: storage
-        emptiDir: {}
+        emptyDir: {}
     extraVolumeMounts:
       - name: storage
         mountPath: /var/loki
