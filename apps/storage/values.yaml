@@ -1,6 +1,6 @@
 nfs-subdir-external-provisioner:
   nfs:
-    server: ~nfs_ip~
+    server: ~nfs_ssh_key.ip~
     path: "/root"
   storageClass:
     name: nfs-client
