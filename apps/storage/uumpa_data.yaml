@@ -3,5 +3,5 @@
     name: nfs-ssh-key
 - nfs_initialized:
     type: configmap
-    name: nfs_initializaed
+    name: nfs-initializaed
     key: initialized
