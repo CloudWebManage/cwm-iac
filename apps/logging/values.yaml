@@ -16,8 +16,10 @@ loki:
         value: monitoring
         effect: NoSchedule
     persistence:
-      storageClass: nfs-client
-      enableStatefulSetAutoDeletePVC: false
+      enabled: false
+      # loki has problems running on nfs, see https://github.com/grafana/loki/issues/9482#issuecomment-1735265034
+      # storageClass: nfs-client
+      # enableStatefulSetAutoDeletePVC: false
   grafana-agent-operator:
     tolerations:
       - key: cwmc-role
