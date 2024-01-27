@@ -36,6 +36,15 @@ kubectl -n argocd create secret generic vault-approle \
   --from-literal=addr=VAULT_ADDR
 ```
 
+Create a Secret with additional cwm secrets (replace the placeholders):
+
+```
+kubectl -n argocd create secret generic cwm \
+  --from-literal=GITHUB_TOKEN=<vault: github_kamatera_machine_user/github_token_repo_permissions> \
+  --from-literal=GLOBAL_VALUES_URL=<vault: cwm-worker-cluster-global-secrets/github_api_global_values_url> \
+  --from-literal=CLUSTER_VALUES_URL_TEMPLATE=<vault: cwm-worker-cluster-global-secrets/github_api_cluster_values_url_template>
+```
+
 Proceed to the "Deploy" section below, then save the auto-generated Argocd admin password in Vault:
 
 ```

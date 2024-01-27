@@ -36,6 +36,9 @@ spec:
                   key: secret_id
             - name: ARGOCD_ENV_VAULT_PATH
               value: "kv/data/${CLUSTER_NAME}"
+          envFrom:
+            - secretRef:
+                name: cwm
           securityContext:
             runAsNonRoot: true
             runAsUser: 999
