@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+permissions: write-all
+
 jobs:
   argocd_plugin:
     runs-on: ubuntu-22.04
