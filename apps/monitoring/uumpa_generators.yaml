@@ -5,6 +5,7 @@
     user: ~grafana_admin_credentials.user~
     password: ~grafana_admin_credentials.password~
 - plugin: uumpa_argocd_plugin.plugins.vault
+  name: vault
   path: monitoring/grafana
   data:
     url: https://~grafana_admin_credentials.domain~
@@ -19,6 +20,7 @@
     password: ~alertmanager_httpauth.password~
     auth: ~alertmanager_httpauth.auth~
 - plugin: uumpa_argocd_plugin.plugins.vault
+  name: vault
   path: monitoring/alertmanager
   data:
     url: https://~alertmanager_httpauth.domain~
@@ -33,6 +35,7 @@
     password: ~prometheus_httpauth.password~
     auth: ~prometheus_httpauth.auth~
 - plugin: uumpa_argocd_plugin.plugins.vault
+  name: vault
   path: monitoring/prometheus
   data:
     url: https://~prometheus_httpauth.domain~
