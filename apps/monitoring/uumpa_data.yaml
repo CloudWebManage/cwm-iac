@@ -17,7 +17,7 @@
 
 - prometheus_httpauth:
     type: secret
-    name: alertmanager-httpauth
+    name: prometheus-httpauth
 - prometheus_httpauth.domain: prometheus.~CWMC_DOMAIN~
 - if: not prometheus_httpauth.user or not prometheus_httpauth.password or not prometheus_httpauth.auth
   prometheus_httpauth.user: {type: password, length: 6}
