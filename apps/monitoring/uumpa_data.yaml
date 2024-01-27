@@ -2,30 +2,30 @@
     type: secret
     name: grafana-admin-credentials
 - grafana_admin_credentials.domain: grafana.~CWMC_DOMAIN~
-  grafana_admin_credentials_changed: false
+  grafana_admin_credentials_changed: ""
 - if: not grafana_admin_credentials.user or not grafana_admin_credentials.password
   grafana_admin_credentials.user: {type: password, length: 6}
   grafana_admin_credentials.password: {type: password, length: 18}
-  grafana_admin_credentials_changed: true
+  grafana_admin_credentials_changed: "yes"
 
 - alertmanager_httpauth:
     type: secret
     name: alertmanager-httpauth
 - alertmanager_httpauth.domain: alertmanager.~CWMC_DOMAIN~
-  alertmanager_httpauth_changed: false
+  alertmanager_httpauth_changed: ""
 - if: not alertmanager_httpauth.user or not alertmanager_httpauth.password or not alertmanager_httpauth.auth
   alertmanager_httpauth.user: {type: password, length: 6}
   alertmanager_httpauth.password: {type: password, length: 18}
   alertmanager_httpauth.auth: {type: httpauth, user: ~alertmanager_httpauth.user~, password: ~alertmanager_httpauth.password~}
-  alertmanager_httpauth_changed: true
+  alertmanager_httpauth_changed: "yes"
 
 - prometheus_httpauth:
     type: secret
     name: prometheus-httpauth
 - prometheus_httpauth.domain: prometheus.~CWMC_DOMAIN~
-  prometheus_httpauth_changed: false
+  prometheus_httpauth_changed: ""
 - if: not prometheus_httpauth.user or not prometheus_httpauth.password or not prometheus_httpauth.auth
   prometheus_httpauth.user: {type: password, length: 6}
   prometheus_httpauth.password: {type: password, length: 18}
   prometheus_httpauth.auth: {type: httpauth, user: ~prometheus_httpauth.user~, password: ~prometheus_httpauth.password~}
-  prometheus_httpauth_changed: true
+  prometheus_httpauth_changed: "yes"
