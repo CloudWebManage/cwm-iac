@@ -1,3 +1,3 @@
-FROM ghcr.io/orihoch/uumpa-argocd-plugin/plugin:1aca881ff2607d39164f5107b99e49e4935a65c6
+FROM ghcr.io/orihoch/uumpa-argocd-plugin/plugin:49cbd92542fe3db9a338b27251443a6a9d977deb
 COPY . /opt/cwm-worker-argocd-plugin
 RUN pip3 install -e /opt/cwm-worker-argocd-plugin
