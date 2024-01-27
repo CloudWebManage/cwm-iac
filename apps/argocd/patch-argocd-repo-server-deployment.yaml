@@ -9,8 +9,12 @@ spec:
       containers:
         - name: uumpa
           command: ["/var/run/argocd/argocd-cmp-server"]
-          image: ghcr.io/orihoch/uumpa-argocd-plugin/plugin:5db488b17c4346e3a43ea9736a807c81cf4074b0
+          image: ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-v1
           env:
+            - name: ARGOCD_ENV_INIT_PLUGIN_FUNCTIONS
+              value: "cwm_worker_cluster_argocd_plugin:init"
+            - name: ARGOCD_ENV_GENERATE_TEMPLATE_PLUGIN_FUNCTIONS
+              value: "cwm_worker_cluster_argocd_plugin:generate_template"
             - name: CLUSTER_NAME
               value: "${CLUSTER_NAME}"
             - name: CWMC_DOMAIN

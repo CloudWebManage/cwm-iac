@@ -1,0 +1,22 @@
+on:
+  push:
+    paths:
+      - argocd_plugin/**
+    branches:
+      - main
+
+jobs:
+  argocd_plugin:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+        docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} &&\
+        docker build -t ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-${{ github.sha }} . &&\
+        docker push ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-${{ github.sha }} &&\
+        sed -i "s|image: ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-.*|image: ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-${{ github.sha }}|g" apps/argocd/patch-argocd-repo-server-deployment.yaml &&\
+        git config --global user.email "cwm-iac-ci@localhost" &&\
+        git config --global user.name "cwm-iac-ci" &&\
+        git add apps/argocd/patch-argocd-repo-server-deployment.yaml &&\
+        git commit -m "update argocd plugin image" &&\
+        git push
