@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cwm
+spec:
+  destinations:
+    - name: '*'
+      namespace: '*'
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - git@github.com:CloudWebManage/cwm-worker-ingress.git
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
