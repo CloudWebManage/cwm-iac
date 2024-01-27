@@ -10,10 +10,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - ~redis_commander_domain~
+        - ~rediscommander_httpauth.domain~
       secretName: redis-commander-tls
   rules:
-    - host: ~redis_commander_domain~
+    - host: ~rediscommander_httpauth.domain~
       http:
         paths:
           - path: /
