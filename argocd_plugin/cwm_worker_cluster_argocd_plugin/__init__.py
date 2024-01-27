@@ -27,7 +27,7 @@ def generate_template(cmd, cwd, data):
     cwm_app = os.environ.get('ARGOCD_ENV_CWM_APP')
     cluster_name = os.environ.get('CLUSTER_NAME')
     if cwm_app and cluster_name:
-        cmd += add_cluster_values(cwm_app, cluster_name, cwd)
+        cmd = ' '.join([cmd, *add_cluster_values(cwm_app, cluster_name, cwd)])
     return cmd, cwd
 
 
