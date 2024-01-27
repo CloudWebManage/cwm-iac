@@ -9,6 +9,7 @@ spec:
       server: https://kubernetes.default.svc
   sourceRepos:
     - https://github.com/CloudWebManage/cwm-worker-ingress
+    - https://github.com/CloudWebManage/cwm-iac
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
