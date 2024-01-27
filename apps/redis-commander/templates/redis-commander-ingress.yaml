@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redis-commander
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/auth-secret: redis-commander-httpauth
+    nginx.ingress.kubernetes.io/auth-type: basic
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ~redis_commander_domain~
+      secretName: redis-commander-tls
+  rules:
+    - host: ~redis_commander_domain~
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: redis-commander
+                port:
+                  number: 8081

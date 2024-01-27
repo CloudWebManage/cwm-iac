@@ -1,0 +1,10 @@
+- rediscommander_httpauth:
+    type: secret
+    name: redis-commander-httpauth
+- rediscommander_httpauth.domain: redis-commander.~CWMC_DOMAIN~
+  rediscommander_httpauth_changed: ""
+- if: not rediscommander_httpauth.user or not rediscommander_httpauth.password or not rediscommander_httpauth.auth
+  rediscommander_httpauth.user: {type: password, length: 6}
+  rediscommander_httpauth.password: {type: password, length: 18}
+  rediscommander_httpauth.auth: {type: httpauth, user: ~rediscommander_httpauth.user~, password: ~rediscommander_httpauth.password~}
+  rediscommander_httpauth_changed: "yes"
