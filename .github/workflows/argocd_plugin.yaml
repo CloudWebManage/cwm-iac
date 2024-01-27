@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: |
-        docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} &&\
+        docker login ghcr.io -u cloudwebmanage -p ${{ secrets.GITHUB_TOKEN }} &&\
         docker build -t ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-${{ github.sha }} argocd_plugin &&\
         docker push ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-${{ github.sha }} &&\
         sed -i "s|image: ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-.*|image: ghcr.io/cloudwebmanage/cwm-iac:argocd-plugin-${{ github.sha }}|g" apps/argocd/patch-argocd-repo-server-deployment.yaml &&\
