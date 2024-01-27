@@ -19,7 +19,7 @@
     password: ~prometheus_httpauth.password~
     auth: ~prometheus_httpauth.auth~
 
-- if: grafana_httpauth_changed or alertmanager_httpauth_changed or prometheus_httpauth_changed
+- if: grafana_admin_credentials_changed or alertmanager_httpauth_changed or prometheus_httpauth_changed
   plugin: uumpa_argocd_plugin.plugins.vault
   name: vault
   vault:
