@@ -11,7 +11,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
   source:
-    repoURL: git@github.com:CloudWebManage/cwm-worker-ingress.git
+    repoURL: https://github.com/CloudWebManage/cwm-worker-ingress
     targetRevision: main
     path: helm
     plugin:

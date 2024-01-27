@@ -8,7 +8,7 @@ spec:
       namespace: '*'
       server: https://kubernetes.default.svc
   sourceRepos:
-    - git@github.com:CloudWebManage/cwm-worker-ingress.git
+    - https://github.com/CloudWebManage/cwm-worker-ingress
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
