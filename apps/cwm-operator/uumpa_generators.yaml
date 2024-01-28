@@ -1,0 +1,4 @@
+- type: secret
+  name: global
+  data:
+    CWM_API_URL: "~global_secrets.cwm_api_url~"

@@ -1,0 +1,3 @@
+- global_secrets:
+    plugin: uumpa_argocd_plugin.plugins.vault
+    path: cwm-worker-cluster-global-secrets

@@ -28,4 +28,7 @@ spec:
           - name: {{ $key | quote }}
             value: {{ $value | quote }}
           {{- end }}
+          envFrom:
+            - secretRef:
+                name: global
 {{- end }}
