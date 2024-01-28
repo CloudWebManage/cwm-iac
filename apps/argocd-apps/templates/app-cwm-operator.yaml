@@ -19,3 +19,5 @@ spec:
       env:
         - name: CWM_APP
           value: cwm-operator
+        - name: VAULT_PATH
+          value: "kv/data"
