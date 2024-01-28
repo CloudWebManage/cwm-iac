@@ -26,8 +26,8 @@ spec:
           resources: {{ merge (default $.root.Values.resources.default dict) (default (index $.root.Values.resources $.name) dict) | toYaml | nindent 12 }}
           env:
           {{- range $key, $value := merge (default $.root.Values.env.default dict) (default (index $.root.Values.env $.name) dict) }}
-          - name: {{ $key | quote }}
-            value: {{ $value | quote }}
+          - name: {{ $key | squote }}
+            value: {{ $value | squote }}
           {{- end }}
           envFrom:
             - secretRef:
