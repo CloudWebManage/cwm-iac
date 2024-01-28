@@ -16,6 +16,7 @@ spec:
       labels:
         app: {{ $.name | quote }}
     spec:
+      serviceAccountName: cwm-worker-operator
       tolerations: {{ toYaml (default (index $.root.Values.tolerations $.name) $.root.Values.tolerations.default) | nindent 8 }}
       containers:
         - name: {{ $.name | quote }}
