@@ -1,6 +1,4 @@
-{{ /*
-{{- include "daemon.deployment" (dict "root" $ "name" "nodes-checker") }}
-*/ }}
+{{/* {{- include "daemon.deployment" (dict "root" $ "name" "nodes-checker") }} */}}
 {{- define "daemon.deployment" }}
 apiVersion: apps/v1
 kind: Deployment
