@@ -4,3 +4,10 @@
     CWM_API_URL: "~global_secrets.cwm_api_url~"
     CWM_API_KEY: "~global_secrets.cwm_api_key~"
     CWM_API_SECRET: "~global_secrets.cwm_api_secret~"
+
+- type: secret
+  name: nodes-checker
+  data:
+    AWS_ACCESS_KEY_ID: "~global_secrets.AWS_ACCESS_KEY_ID~"
+    AWS_SECRET_ACCESS_KEY: "~global_secrets.AWS_SECRET_ACCESS_KEY~"
+    AWS_ROUTE53_HOSTEDZONE_ID: "~global_secrets.AWS_ROUTE53_HOSTEDZONE_ID~"

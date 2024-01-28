@@ -32,4 +32,6 @@ spec:
           envFrom:
             - secretRef:
                 name: global
+            - secretRef:
+                name: {{ $.name | quote }}
 {{- end }}
