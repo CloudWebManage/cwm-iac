@@ -30,8 +30,8 @@ spec:
               value: "true"
           {{- end }}
           {{- range $key, $value := merge (default $.root.Values.env.default dict) (default (index $.root.Values.env $.name) dict) }}
-          - name: {{ $key | squote }}
-            value: {{ $value | squote }}
+            - name: {{ $key | squote }}
+              value: {{ $value | squote }}
           {{- end }}
           envFrom:
             - secretRef:
