@@ -1,3 +1,5 @@
+revisionHistoryLimit: 2
+terminationGracePeriodSeconds: 30
 resources:
   default:
     requests:
@@ -6,4 +8,33 @@ resources:
     limits:
       memory: "200Mi"
 imagePullPolicy: {}
-env: {}
+env:
+  default:
+    INTERNAL_REDIS_HOST: cwm-worker-operator-redis-internal
+    INTERNAL_REDIS_DB: "0"
+    METRICS_REDIS_HOST: cwm-worker-operator-redis-metrics
+    METRICS_REDIS_DB: "0"
+
+internalRedis:
+  image: redis@sha256:09c33840ec47815dc0351f1eca3befe741d7105b3e95bc8fdb9a7e4985b9e1e5
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "50Mi"
+    limits:
+      memory: "200Mi"
+  persistence:
+    enabled: true
+
+metricsRedis:
+  image: redis@sha256:09c33840ec47815dc0351f1eca3befe741d7105b3e95bc8fdb9a7e4985b9e1e5
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "50Mi"
+    limits:
+      memory: "200Mi"
+  persistence:
+    enabled: true
