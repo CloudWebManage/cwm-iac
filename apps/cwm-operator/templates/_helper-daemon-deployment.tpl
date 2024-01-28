@@ -25,6 +25,10 @@ spec:
           imagePullPolicy: {{ default (index $.root.Values.imagePullPolicy $.name) $.root.Values.imagePullPolicy.default }}
           resources: {{ merge (default $.root.Values.resources.default dict) (default (index $.root.Values.resources $.name) dict) | toYaml | nindent 12 }}
           env:
+          {{- if $.root.Values.debug }}
+            - name: DEBUG
+              value: "true"
+          {{- end }}
           {{- range $key, $value := merge (default $.root.Values.env.default dict) (default (index $.root.Values.env $.name) dict) }}
           - name: {{ $key | squote }}
             value: {{ $value | squote }}
