@@ -27,7 +27,7 @@ spec:
           env:
           {{- if $.root.Values.debug }}
             - name: DEBUG
-              value: "true"
+              value: "yes"
           {{- end }}
           {{- range $key, $value := merge (default $.root.Values.env.default dict) (default (index $.root.Values.env $.name) dict) }}
             - name: {{ $key | squote }}
