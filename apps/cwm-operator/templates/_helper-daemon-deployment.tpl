@@ -16,11 +16,12 @@ spec:
       labels:
         app: {{ $.name | quote }}
     spec:
+      tolerations: {{ toYaml (default (index $.root.Values.tolerations $.name) $.root.Values.tolerations.default) | nindent 8 }}
       containers:
         - name: {{ $.name | quote }}
           image: ghcr.io/cloudwebmanage/cwm-worker-operator/cwm_worker_operator:latest
           args: [{{ $.name | quote }}, "start_daemon"]
-          imagePullPolicy: {{ default $.root.Values.imagePullPolicy.default (index $.root.Values.imagePullPolicy $.name) }}
+          imagePullPolicy: {{ default (index $.root.Values.imagePullPolicy $.name) $.root.Values.imagePullPolicy.default }}
           resources: {{ merge (default $.root.Values.resources.default dict) (default (index $.root.Values.resources $.name) dict) | toYaml | nindent 12 }}
           env:
           {{- range $key, $value := merge (default $.root.Values.env.default dict) (default (index $.root.Values.env $.name) dict) }}
