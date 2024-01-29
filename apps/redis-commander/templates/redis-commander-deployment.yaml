@@ -32,4 +32,4 @@ spec:
             memory: "200Mi"
         env:
         - name: REDIS_HOSTS
-          value: "ingress:cwm-worker-ingress-operator-redis.cwm-worker-ingress:6379:0"
+          value: "ingress:cwm-worker-ingress-operator-redis.cwm-worker-ingress:6379:0,internal:cwm-worker-operator-redis-internal.cwm-operator:6379:0,metrics:cwm-worker-operator-redis-metrics.cwm-operator:6379:0"
