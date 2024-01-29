@@ -15,3 +15,10 @@
 - type: secret
   name: initializer
   data: {}
+
+- plugin: uumpa_argocd_plugin.plugins.vault
+  name: vault
+  vault:
+    operator/minio-operator:
+      url: https://~minio-console-domain~
+      jwt: ~minio-console-jwt-secret~

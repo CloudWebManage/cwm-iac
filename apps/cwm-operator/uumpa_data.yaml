@@ -3,3 +3,8 @@
     path: cwm-worker-cluster-global-secrets
 
 - minio-console-domain: mc.~CWMC_DOMAIN~
+- minio-console-jwt-secret:
+    type: secret
+    namespace: minio-operator
+    name: console-sa-secret
+    key: token
