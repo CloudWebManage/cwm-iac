@@ -7,3 +7,17 @@ resources:
 patchesStrategicMerge:
 - patch-node-server-daemonset.yaml
 - patch-controller-deployment.yaml
+
+patches:
+  - target:
+      kind: Deployment
+      name: controller
+    patch: |-
+      - op: remove
+        path: /status
+  - target:
+      kind: DaemonSet
+      name: node-server
+    patch: |-
+      - op: remove
+        path: /status

@@ -14,12 +14,3 @@ spec:
     repoURL: https://github.com/CloudWebManage/cwm-iac
     targetRevision: main
     path: apps/directpv
-  ignoreDifferences:
-  - group: apps
-    kind: Deployment
-    jsonPointers:
-    - /status
-  - group: apps
-    kind: Daemonset
-    jsonPointers:
-    - /status
