@@ -2,4 +2,4 @@
     plugin: uumpa_argocd_plugin.plugins.vault
     path: cwm-worker-cluster-global-secrets
 
-- minio-console-domain: minio-conosle.~CWMC_DOMAIN~
+- minio-console-domain: minio-console.~CWMC_DOMAIN~
