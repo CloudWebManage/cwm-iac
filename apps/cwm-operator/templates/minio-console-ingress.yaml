@@ -12,7 +12,7 @@ spec:
   tls:
     - hosts:
         - ~minio-console-domain~
-      secretName: minio-console-tls
+      secretName: minioconsole-tls
   rules:
     - host: ~minio-console-domain~
       http:
