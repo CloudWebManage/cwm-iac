@@ -1,3 +1,3 @@
 {{- include "daemon.deployment" (dict "root" $ "name" "nodes-checker") }}
-----------
+---
 {{- include "daemon.deployment" (dict "root" $ "name" "initializer") }}
