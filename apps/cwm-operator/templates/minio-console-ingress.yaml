@@ -1,18 +1,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: minio-console
+  name: console
   namespace: minio-operator
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
-{{/*    nginx.ingress.kubernetes.io/auth-secret: redis-commander-httpauth*/}}
-{{/*    nginx.ingress.kubernetes.io/auth-type: basic*/}}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
         - ~minio-console-domain~
-      secretName: minioconsole-tls
+      secretName: console-tls
   rules:
     - host: ~minio-console-domain~
       http:
