@@ -8,5 +8,8 @@ spec:
     spec:
       tolerations:
         - key: cwmc-role
-          value: worker
+          value: operator
+          effect: NoSchedule
+        - key: cwmc-role
+          value: monitoring
           effect: NoSchedule
