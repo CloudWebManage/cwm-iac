@@ -10,6 +10,9 @@ spec:
         - key: cwmc-role
           value: monitoring
           effect: NoSchedule
+        - key: cwmc-role
+          value: worker
+          effect: NoSchedule
       containers:
         - name: controller
           ports:
