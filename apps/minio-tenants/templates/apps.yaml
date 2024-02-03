@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .name | quote }}
+  name: minio-tenant-{{ .name }}
 spec:
   destination:
     namespace: minio-tenant-{{ .name }}
