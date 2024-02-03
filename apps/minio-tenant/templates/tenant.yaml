@@ -18,24 +18,6 @@ spec:
       value: https://{{ .Values.config.minioConsoleDomain }}
     - name: MINIO_SERVER_URL
       value: https://{{ .Values.config.minioDomain }}
-    - name: MINIO_POLICY_PLUGIN_URL
-      value: http://localhost/
-    - name: MINIO_IDENTITY_OPENID_CONFIG_URL
-      value: http://localhost/.well-known/openid-configuration
-  sideCars:
-    containers:
-      - name: auth
-        image: {{ .Values.config.authImage }}
-        env:
-          - name: PYTHONUNBUFFERED
-            value: "1"
-        command:
-          - gunicorn
-          - "-k"
-          - "uvicorn.workers.UvicornWorker"
-          - "-c"
-          - "/usr/local/src/cwm-worker-operator/cwm_worker_operator/minio_auth_plugin/gunicorn_conf.py"
-          - "cwm_worker_operator.minio_auth_plugin.app:app"
   pools:
     {{ range .Values.config.pools }}
     - name: {{ .name }}
