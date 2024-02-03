@@ -22,6 +22,8 @@ spec:
       value: http://localhost/
     - name: MINIO_IDENTITY_PLUGIN_URL
       value: http://localhost/
+    - name: MINIO_IDENTITY_PLUGIN_ROLE_POLICY
+      value: consoleAdmin
   sideCars:
     containers:
       - name: auth
