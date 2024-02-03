@@ -1,0 +1,40 @@
+apiVersion: minio.min.io/v2
+kind: Tenant
+metadata:
+  name: tenant
+spec:
+  configuration:
+    name: env-configuration
+  credsSecret:
+    name: creds
+  image: {{ .Values.config.minioImage }}
+  mountPath: /export
+  requestAutoCert: false
+  env:
+    - name: MINIO_DOMAIN
+      value: {{ .Values.config.minioDomain | quote }}
+    - name: MINIO_BROWSER_REDIRECT_URL
+      value: {{ .Values.config.minioConsoleDomain | quote }}
+    - name: MINIO_SERVER_URL
+      value: {{ .Values.config.minioDomain | quote }}
+  pools:
+    {{ range .Values.config.pools }}
+    - name: {{ .name }}
+      servers: {{ .servers }}
+      volumesPerServer: {{ .volumesPerServer }}
+      tolerations:
+        - effect: NoSchedule
+          key: cwmc-role
+          operator: Equal
+          value: worker
+      volumeClaimTemplate:
+        metadata:
+          name: data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .volumeSize | quote }}
+          storageClassName: directpv-min-io
+      {{ end }}

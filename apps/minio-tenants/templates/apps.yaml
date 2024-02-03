@@ -1,0 +1,25 @@
+{{ range .Values.tenants }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .name | quote }}
+spec:
+  destination:
+    namespace: minio-tenant-{{ .name }}
+    server: 'https://kubernetes.default.svc'
+  project: cwm
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: https://github.com/CloudWebManage/cwm-iac
+    targetRevision: main
+    path: apps/minio-tenant
+    plugin:
+      name: uumpa
+      env:
+        - name: TENANT_NAME
+          value: {{ .name | quote }}
+        - name: HELM_ARGS
+          value: --set-json {{ printf "config=%s" (toJson .config) | quote }}
+{{ end }}
