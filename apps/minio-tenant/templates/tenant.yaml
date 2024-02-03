@@ -17,6 +17,8 @@ spec:
       value: https://{{ .Values.config.minioConsoleDomain }}
     - name: MINIO_SERVER_URL
       value: https://{{ .Values.config.minioDomain }}
+    - name: MINIO_POLICY_PLUGIN_URL
+      value: http://localhost/
   sideCars:
     containers:
       - name: auth
