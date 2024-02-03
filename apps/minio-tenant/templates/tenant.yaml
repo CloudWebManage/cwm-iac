@@ -25,6 +25,9 @@ spec:
     containers:
       - name: auth
         image: {{ .Values.config.authImage }}
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
         command:
           - gunicorn
           - "-k"
