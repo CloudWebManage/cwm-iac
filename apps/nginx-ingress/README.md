@@ -8,4 +8,6 @@ Deploy
 
 ```
 kubectl kustomize apps/nginx-ingress | kubectl apply -f -
+kubectl delete -n ingress-nginx deployment/ingress-nginx-controller
+apps/nginx-ingress/render_daemonset.py | kubectl apply -f -
 ```
