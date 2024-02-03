@@ -10,6 +10,7 @@ spec:
   image: {{ .Values.config.minioImage }}
   mountPath: /export
   requestAutoCert: false
+  podManagementPolicy: {{ .Values.config.minioPodManagementPolicy }}
   env:
     - name: MINIO_DOMAIN
       value: {{ .Values.config.minioDomain | quote }}
