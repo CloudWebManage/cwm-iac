@@ -20,7 +20,7 @@ spec:
             path: "/"
             backend:
               service:
-                name: minio
+                name: cwm-minio
                 port:
                   number: 80
     - host: {{ .Values.config.minioConsoleDomain | quote }}
@@ -30,6 +30,6 @@ spec:
             path: "/"
             backend:
               service:
-                name: tenant-console
+                name: cwm-minio-console
                 port:
                   number: 9090
