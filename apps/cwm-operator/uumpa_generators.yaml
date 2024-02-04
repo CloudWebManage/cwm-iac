@@ -16,6 +16,18 @@
   name: initializer
   data: {}
 
+- type: secret
+  name: deployer
+  data: {}
+
+- type: secret
+  name: waiter
+  data: {}
+
+- type: secret
+  name: updater
+  data: {}
+
 - plugin: uumpa_argocd_plugin.plugins.vault
   name: vault
   vault:
