@@ -11,6 +11,7 @@ spec:
   mountPath: /export
   requestAutoCert: false
   podManagementPolicy: {{ .Values.config.minioPodManagementPolicy }}
+  prometheusOperator: true
   env:
     - name: MINIO_DOMAIN
       value: {{ .Values.config.minioDomain | quote }}
