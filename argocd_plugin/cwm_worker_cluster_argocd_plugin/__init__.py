@@ -31,6 +31,17 @@ def generate_template(cmd, cwd, data):
     return cmd, cwd
 
 
+def process_value(key, value, data):
+    if value['type'] == 'prometheus_additional_scrape_configs_json':
+        from .monitoring import get_minio_prometheus_scrape_configs_json
+        data[key] = get_minio_prometheus_scrape_configs_json()
+    else:
+        raise ValueError(f'Unknown type: {value["type"]}')
+
+
 if __name__ == '__main__':
-    res = add_cluster_values('cwm-worker-ingress', 'cwmc-eu-v2test', '.')
-    print(res)
+    # res = add_cluster_values('cwm-worker-ingress', 'cwmc-eu-v2test', '.')
+    # print(res)
+    data = {}
+    process_value('prometheus_scrape_configs', {'type': 'prometheus_additional_scrape_configs_json'}, data)
+    print(data)
