@@ -58,3 +58,12 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
+    template:
+      pod:
+        tolerations:
+        - key: cwmc-role
+          value: operator
+          effect: NoSchedule
+        - key: cwmc-role
+          value: monitoring
+          effect: NoSchedule
