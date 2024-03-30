@@ -29,6 +29,7 @@ spec:
         type: persistent-claim
         size: 100Gi
         deleteClaim: false
+        storageClass: nfs-client
     template:
       pod:
         tolerations:
@@ -44,6 +45,7 @@ spec:
       type: persistent-claim
       size: 100Gi
       deleteClaim: false
+      storageClass: nfs-client
     template:
       pod:
         tolerations:
