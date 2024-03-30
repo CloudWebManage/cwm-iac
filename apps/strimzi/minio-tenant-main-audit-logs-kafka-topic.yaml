@@ -1,0 +1,8 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: minio-tenant-main-audit-logs
+  labels:
+    strimzi.io/cluster: minio-audit
+spec:
+  topicName: minio-tenant-main-audit-logs
