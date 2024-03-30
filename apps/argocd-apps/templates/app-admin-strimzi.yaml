@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: storage
+spec:
+  destination:
+    namespace: strimzi
+    server: 'https://kubernetes.default.svc'
+  project: admin
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: git@github.com:CloudWebManage/cwm-iac.git
+    targetRevision: main
+    path: apps/strimzi
