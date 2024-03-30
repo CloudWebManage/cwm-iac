@@ -29,12 +29,30 @@ spec:
         type: persistent-claim
         size: 100Gi
         deleteClaim: false
+    template:
+      pod:
+        tolerations:
+        - key: cwmc-role
+          value: operator
+          effect: NoSchedule
+        - key: cwmc-role
+          value: monitoring
+          effect: NoSchedule
   zookeeper:
     replicas: 1
     storage:
       type: persistent-claim
       size: 100Gi
       deleteClaim: false
+    template:
+      pod:
+        tolerations:
+        - key: cwmc-role
+          value: operator
+          effect: NoSchedule
+        - key: cwmc-role
+          value: monitoring
+          effect: NoSchedule
   entityOperator:
     topicOperator: {}
     userOperator: {}
