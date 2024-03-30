@@ -5,6 +5,7 @@ resources:
 - strimzi-namespace.yaml
 - strimzi-cluster-operator-0.40.0.yaml
 - minio-audit-kafka.yaml
+- minio-tenant-main-audit-logs-kafka-topic.yaml
 
 patchesStrategicMerge:
 - patch-strimzi-cluster-operator-deployment.yaml
