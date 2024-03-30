@@ -29,3 +29,7 @@
   prometheus_httpauth.password: {type: password, length: 18}
   prometheus_httpauth.auth: {type: httpauth, user: ~prometheus_httpauth.user~, password: ~prometheus_httpauth.password~}
   prometheus_httpauth_changed: "yes"
+
+- prometheus_additional_scrape_configs_json:
+    plugin: cwm_worker_cluster_argocd_plugin
+    type: prometheus_additional_scrape_configs_json

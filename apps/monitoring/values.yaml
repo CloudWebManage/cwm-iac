@@ -90,6 +90,7 @@ kube-prometheus-stack:
           hosts:
             - ~prometheus_httpauth.domain~
     prometheusSpec:
+      additionalScrapeConfigs: ~prometheus_additional_scrape_configs_json~
       tolerations:
         - key: cwmc-role
           value: monitoring
