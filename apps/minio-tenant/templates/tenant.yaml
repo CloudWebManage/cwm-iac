@@ -21,7 +21,7 @@ spec:
     - name: MINIO_AUDIT_KAFKA_ENABLE
       value: "on"
     - name: MINIO_AUDIT_KAFKA_BROKERS
-      value: "http://minio-audit-kafka-brokers.strimzi.svc.cluster.local:9092"
+      value: "minio-audit-kafka-brokers.strimzi.svc.cluster.local:9092"
     - name: MINIO_AUDIT_KAFKA_TOPIC
       value: "minio-tenant-main-audit-logs"
     # TODO: see https://min.io/docs/minio/linux/reference/minio-server/settings/metrics-and-logging.html#envvar.MINIO_AUDIT_KAFKA_QUEUE_DIR / https://min.io/docs/minio/linux/reference/minio-server/settings/metrics-and-logging.html#envvar.MINIO_AUDIT_KAFKA_QUEUE_SIZE
@@ -32,7 +32,7 @@ spec:
     - name: MINIO_NOTIFY_KAFKA_ENABLE_MAIN
       value: "on"
     - name: MINIO_NOTIFY_KAFKA_BROKERS_MAIN
-      value: "http://minio-notify-kafka-brokers.strimzi.svc.cluster.local:9092"
+      value: "minio-notify-kafka-brokers.strimzi.svc.cluster.local:9092"
     - name: MINIO_NOTIFY_KAFKA_TOPIC_MAIN
       value: "minio-tenant-main-notify"
     # TODO see https://min.io/docs/minio/linux/administration/monitoring/publish-events-to-kafka.html#add-the-kafka-endpoint-to-minio
