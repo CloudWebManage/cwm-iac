@@ -32,7 +32,7 @@ spec:
     - name: MINIO_NOTIFY_KAFKA_ENABLE_MAIN
       value: "on"
     - name: MINIO_NOTIFY_KAFKA_BROKERS_MAIN
-      value: "minio-notify-kafka-brokers.strimzi.svc.cluster.local:9092"
+      value: "minio-audit-kafka-brokers.strimzi.svc.cluster.local:9092"
     - name: MINIO_NOTIFY_KAFKA_TOPIC_MAIN
       value: "minio-tenant-main-notify"
     # TODO see https://min.io/docs/minio/linux/administration/monitoring/publish-events-to-kafka.html#add-the-kafka-endpoint-to-minio
