@@ -29,6 +29,17 @@ spec:
     #   value: ""
     # - name: MINIO_AUDIT_KAFKA_QUEUE_SIZE
     #   value: ""
+    - name: MINIO_NOTIFY_KAFKA_ENABLE_MAIN
+      value: "on"
+    - name: MINIO_NOTIFY_KAFKA_BROKERS_MAIN
+      value: "http://minio-notify-kafka-brokers.strimzi.svc.cluster.local:9092"
+    - name: MINIO_NOTIFY_KAFKA_TOPIC_MAIN
+      value: "minio-tenant-main-notify"
+    # TODO see https://min.io/docs/minio/linux/administration/monitoring/publish-events-to-kafka.html#add-the-kafka-endpoint-to-minio
+    # - name: MINIO_NOTIFY_KAFKA_QUEUE_DIR_MAIN
+    #   value: ""
+    # - name: MINIO_NOTIFY_KAFKA_QUEUE_SIZE_MAIN
+    #   value: ""
   pools:
     {{ range .Values.config.pools }}
     - name: {{ .name }}
