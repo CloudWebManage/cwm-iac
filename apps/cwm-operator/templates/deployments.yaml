@@ -8,3 +8,5 @@
 ---
 {{- include "daemon.deployment" (dict "root" $ "name" "updater") }}
 ---
+{{- include "daemon.deployment" (dict "root" $ "name" "kafka_streamer") }}
+---
