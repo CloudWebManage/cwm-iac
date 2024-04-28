@@ -30,7 +30,8 @@
 
 - type: secret
   name: kafka-streamer
-  data: {}
+  data:
+    DEBUG_VERBOSITY: "10"
 
 - plugin: uumpa_argocd_plugin.plugins.vault
   name: vault
