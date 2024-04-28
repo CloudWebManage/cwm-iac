@@ -28,6 +28,10 @@
   name: updater
   data: {}
 
+- type: secret
+  name: kafka-streamer
+  data: {}
+
 - plugin: uumpa_argocd_plugin.plugins.vault
   name: vault
   vault:
