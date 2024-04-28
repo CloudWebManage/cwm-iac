@@ -8,6 +8,8 @@ metadata:
     app: {{ $.name | quote }}
 spec:
   replicas: 1
+  deploymentStrategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ $.name | quote }}
