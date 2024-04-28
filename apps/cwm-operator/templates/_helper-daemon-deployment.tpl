@@ -8,7 +8,7 @@ metadata:
     app: {{ $.name | quote }}
 spec:
   replicas: 1
-  deploymentStrategy:
+  strategy:
     type: Recreate
   selector:
     matchLabels:
