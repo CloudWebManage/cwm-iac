@@ -18,6 +18,8 @@ spec:
       labels:
         app: {{ $.name | quote }}
     spec:
+      terminationGracePeriodSeconds: 240
+      enableServiceLinks: false
       serviceAccountName: cwm-worker-operator
       tolerations: {{ toYaml (default (index $.root.Values.tolerations $.name) $.root.Values.tolerations.default) | nindent 8 }}
       containers:
