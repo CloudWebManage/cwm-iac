@@ -32,6 +32,10 @@
   name: kafka-streamer
   data: {}
 
+- type: secret
+  name: deleter
+  data: {}
+
 - plugin: uumpa_argocd_plugin.plugins.vault
   name: vault
   vault:
