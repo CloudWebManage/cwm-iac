@@ -98,8 +98,23 @@ resource "null_resource" "rke2_install_workers" {
       set -euo pipefail
       ${local.servers_ssh_command[each.key]} "mkdir -p /etc/rancher/rke2"
       echo "${self.triggers.config}" | ${local.servers_ssh_command[each.key]} "cat > /etc/rancher/rke2/config.yaml"
+      ${local.servers_ssh_command[local.controlplane1_server_name]} "cat /var/lib/rancher/rke2/server/node-token" \
+          | ${local.servers_ssh_command[each.key]} "cat > /etc/rancher/rke2/node-token"
       ${local.servers_ssh_command[each.key]} "${self.triggers.command}"
     EOT
     interpreter = ["bash", "-c"]
+  }
+}
+
+resource "null_resource" "admin_kubeconfig" {
+  depends_on = [null_resource.rke2_install_controlplane1]
+  triggers = {
+    counter = 1
+  }
+  provisioner "local-exec" {
+    command = <<-EOT
+      ${local.servers_ssh_command[local.controlplane1_server_name]} "cat /etc/rancher/rke2/rke2.yaml" > ${var.admin_kubeconfig_path} &&\
+      sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' ${var.admin_kubeconfig_path}
+    EOT
   }
 }

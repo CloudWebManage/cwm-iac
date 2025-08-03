@@ -1,2 +1,0 @@
--r ../../uumpa-argocd-plugin/requirements.txt
--r requirements.txt

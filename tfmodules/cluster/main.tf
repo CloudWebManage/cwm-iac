@@ -69,3 +69,7 @@ variable "private_network_name" {
 variable "rke2_version" {
   type = string
 }
+
+variable "admin_kubeconfig_path" {
+  type = string
+}
