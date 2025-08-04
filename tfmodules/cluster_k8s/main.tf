@@ -3,6 +3,9 @@ terraform {
     kubernetes = {
       source  = "hashicorp/kubernetes"
     }
+    null = {
+      source  = "hashicorp/null"
+    }
   }
 }
 
@@ -44,4 +47,15 @@ variable "letsencrypt_email" {
 
 variable "force_reinstall_counters" {
   type = map(number)
+}
+
+variable "directpv_version" {
+  type = string
+}
+
+variable "workers" {
+  type = map(object({
+    worker-role          = string  # minio - used for running the minio tenants
+                                   # system - used for all other system workloads
+  }))
 }

@@ -5,6 +5,33 @@ resource "kubernetes_namespace" "argocd" {
 }
 
 locals {
+  argocd_patch_deploymens = join("\n", [for o in [
+    {name: "argocd-applicationset-controller"},
+    {name: "argocd-dex-server"},
+    {name: "argocd-notifications-controller"},
+    {name: "argocd-redis"},
+    {name: "argocd-repo-server"},
+    {name: "argocd-server"},
+    {name: "argocd-application-controller", kind: "StatefulSet"},
+  ] : <<-EOT
+    - target:
+        kind: ${lookup(o, "kind", "Deployment")}
+        name: ${o.name}
+      patch: |
+        apiVersion: apps/v1
+        kind: ${lookup(o, "kind", "Deployment")}
+        metadata:
+          name: ${o.name}
+        spec:
+          template:
+            spec:
+              tolerations:
+              - key: "cwm-iac-worker-role"
+                operator: "Equal"
+                value: "system"
+                effect: "NoExecute"
+  EOT
+  ])
   argocd_kustomization_yaml = <<-EOT
     apiVersion: kustomize.config.k8s.io/v1beta1
     kind: Kustomization
@@ -23,6 +50,7 @@ locals {
           name: argocd-cmd-params-cm
         data:
           server.insecure: "true"
+    ${local.argocd_patch_deploymens}
   EOT
 }
 

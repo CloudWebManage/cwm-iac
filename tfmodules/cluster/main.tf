@@ -50,7 +50,11 @@ variable "ssh_pubkey" {
 
 variable "servers" {
   type = map(object({
-    role          = string
+    role          = string  # bastion - the bastion node, used for SSH access to the cluster
+                            # controlplane1 - the first control plane node, currently we don't support additional control plane nodes
+                            # worker - worker nodes, used for running workloads, must also have worker-role set
+    worker-role      = optional(string)  # minio - used for running the minio tenants
+                                         # system - used for all other system workloads
     billing_cycle = optional(string)
     cpu_cores     = number
     cpu_type      = string
@@ -59,6 +63,7 @@ variable "servers" {
     managed       = optional(bool)
     monthly_traffic_package = optional(string)
     ram_mb        = number
+    kamatera_server_name = optional(string)  # Optional override for the Kamatera server name
   }))
 }
 

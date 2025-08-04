@@ -10,6 +10,11 @@ resource "null_resource" "download_tools" {
         curl -L -o "$DATA_PATH/kubectl-$KUBE_VERSION" "https://dl.k8s.io/release/$KUBE_VERSION/bin/linux/amd64/kubectl"
         chmod +x "$DATA_PATH/kubectl-$KUBE_VERSION"
       fi
+      if ! [ -f "$DATA_PATH/kubectl-directpv-${var.directpv_version}" ]; then
+        curl -L -o "$DATA_PATH/kubectl-directpv-${var.directpv_version}" \
+          https://github.com/minio/directpv/releases/download/v${var.directpv_version}/kubectl-directpv_${var.directpv_version}_linux_amd64
+        chmod +x "$DATA_PATH/kubectl-directpv-${var.directpv_version}"
+      fi
     EOT
   }
   provisioner "local-exec" {
@@ -20,4 +25,5 @@ resource "null_resource" "download_tools" {
 
 locals {
   kubectl = "KUBECONFIG=${var.kubeconfig_path} ${var.tools_data_path}/kubectl-${var.kube_version}"
+  kubectl_directpv = "KUBECONFIG=${var.kubeconfig_path} ${var.tools_data_path}/kubectl-directpv-${var.directpv_version}"
 }

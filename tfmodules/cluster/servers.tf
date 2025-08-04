@@ -2,7 +2,7 @@ resource "kamatera_server" "servers" {
   for_each = var.servers
   datacenter_id = var.datacenter_id
   image_id = var.image_id
-  name = "${var.name_prefix}-${each.key}"
+  name = each.value.kamatera_server_name != null ? each.value.kamatera_server_name : "${var.name_prefix}-${each.key}"
   allow_recreate = true
   billing_cycle = each.value.billing_cycle != null ? each.value.billing_cycle : var.default_billing_cycle
   cpu_cores = each.value.cpu_cores
