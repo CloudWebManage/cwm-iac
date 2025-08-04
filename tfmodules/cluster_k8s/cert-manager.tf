@@ -73,6 +73,18 @@ resource "kubernetes_manifest" "certmanager_cluster_issuer" {
             http01 = {
               ingress = {
                 ingressClassName: "nginx"
+                podTemplate = {
+                  spec = {
+                    tolerations = [
+                      {
+                        key      = "cwm-iac-worker-role"
+                        operator = "Equal"
+                        value    = "system"
+                        effect   = "NoExecute"
+                      }
+                    ]
+                  }
+                }
               }
             }
           }

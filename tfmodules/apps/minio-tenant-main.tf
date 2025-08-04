@@ -31,7 +31,17 @@ locals {
     tenant = {
       ingress = {
         api = {
-          enabled = false
+          enabled = true
+          annotations = {
+            "cert-manager.io/cluster-issuer" = "letsencrypt"
+          }
+          host = "minio-tenant-main-api.${var.ingress_star_domain}"
+          tls = [
+            {
+              hosts = ["minio-tenant-main-api.${var.ingress_star_domain}"]
+              secretName = "minio-tenant-main-api-tls"
+            }
+          ]
         }
         console = {
           enabled = true
@@ -56,12 +66,16 @@ locals {
           name = kubernetes_secret.minio-tenant-main-env-config.metadata[0].name
           existingSecret = true
         }
+        certificate = {
+          requestAutoCert = false
+        }
         pools = [
           {
             name = "pool-1"
             servers = 1
             volumesPerServer = 1
             volumeSize = "999Gi"
+            storageClassName = "directpv-min-io"
             tolerations = [
               {
                 key = "cwm-iac-worker-role"
@@ -97,4 +111,14 @@ resource "kubernetes_manifest" "minio-tenant-main-app" {
           valuesObject: ${jsonencode(local.minio_tenant_main_values)}
   EOT
   )
+}
+
+output "minio_tenant_main" {
+  value = {
+    api_url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
+    console_url = "https://minio-tenant-main-console.${var.ingress_star_domain}"
+    admin_username = random_password.minio-tenant-main-root-user.result
+    admin_password = random_password.minio-tenant-main-root-password.result
+  }
+  sensitive = true
 }
