@@ -117,6 +117,7 @@ resource "null_resource" "rke2_install_workers" {
 }
 
 module "local_files_admin_kubeconfig" {
+  count = local.controlplane1_server_name == "" ? 0 : 1
   depends_on = [null_resource.rke2_install_controlplane1]
   source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
   # source = "../../../cwm-iac/tfmodules/local_files"
