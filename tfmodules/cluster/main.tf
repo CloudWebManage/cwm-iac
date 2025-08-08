@@ -9,6 +9,12 @@ terraform {
     null = {
       source  = "hashicorp/null"
     }
+    local = {
+      source  = "hashicorp/local"
+    }
+    external = {
+      source  = "hashicorp/external"
+    }
   }
 }
 
@@ -53,6 +59,7 @@ variable "servers" {
     role          = string  # bastion - the bastion node, used for SSH access to the cluster
                             # controlplane1 - the first control plane node, currently we don't support additional control plane nodes
                             # worker - worker nodes, used for running workloads, must also have worker-role set
+                            # standalone - a standalone server, not part of the kubernetes cluster
     worker-role      = optional(string)  # minio - used for running the minio tenants
                                          # system - used for all other system workloads
     billing_cycle = optional(string)
@@ -77,4 +84,26 @@ variable "rke2_version" {
 
 variable "admin_kubeconfig_path" {
   type = string
+}
+
+variable "data_path" {
+  type = string
+}
+
+variable "bootstrap_all" {
+  type = bool
+  default = false
+}
+
+variable "bootstrap" {
+  type = map(string)
+  default = {}
+}
+
+variable "local_files_terraform_remote_state" {
+  type = object({
+    backend = string
+    config = map(string)
+    output = string
+  })
 }

@@ -38,3 +38,11 @@ locals {
     for name, server in var.servers : name if server.role == "bastion"
   ][0]
 }
+
+output "server_private_ips" {
+  value = local.server_private_ip
+}
+
+output "server_public_ips" {
+  value = local.server_public_ip
+}

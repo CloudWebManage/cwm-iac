@@ -1,6 +1,6 @@
 resource "null_resource" "rke2_node_settings" {
-  for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
-  depends_on = [null_resource.init_ssh_servers]
+  for_each = {for name, server in var.servers : name => server if !contains(["bastion", "standalone"], server.role)}
+  depends_on = [null_resource.init_ssh_servers, module.local_files_ssh_known_hosts_servers]
   triggers = {
     command = <<-EOF
       set -euo pipefail
@@ -32,26 +32,34 @@ resource "null_resource" "rke2_node_settings" {
 }
 
 locals {
-  controlplane1_server_name = [for name, server in var.servers : name if server.role == "controlplane1"][0]
-  controlplane1_private_ip = local.server_private_ip[local.controlplane1_server_name]
-  controlplane1_public_ip = local.server_public_ip[local.controlplane1_server_name]
+  controlplane1_servers = [for name, server in var.servers : name if server.role == "controlplane1"]
+  controlplane1_server_name = length(local.controlplane1_servers) > 0 ? local.controlplane1_servers[0] : ""
+  controlplane1_private_ip = length(local.controlplane1_servers) > 0 ? local.server_private_ip[local.controlplane1_server_name] : ""
+  controlplane1_public_ip = length(local.controlplane1_servers) > 0 ? local.server_public_ip[local.controlplane1_server_name] : ""
 }
 
-resource "null_resource" "rke2_install_controlplane1" {
-  depends_on = [null_resource.rke2_node_settings]
-  triggers = {
-    config = <<-EOF
-      node-name: controlplane1
-      node-ip: ${local.controlplane1_private_ip}
-      node-external-ip: ${local.controlplane1_public_ip}
-      advertise-address: ${local.controlplane1_private_ip}
-      tls-san:
-        - 0.0.0.0
-        - ${local.controlplane1_private_ip}
-        - ${local.controlplane1_public_ip}
-      etcd-snapshot-retention: 14  # snapshot every 12 hours, total of 1 week
-    EOF
-    command = <<-EOF
+output "controlplane1_node_name" {
+  value = local.controlplane1_server_name
+}
+
+locals {
+  controlplane1_ssh_command = local.controlplane1_server_name != "" ? local.servers_ssh_command[local.controlplane1_server_name] : ""
+  rke2_install_controlplane1_config = <<-EOF
+    node-name: controlplane1
+    node-ip: ${local.controlplane1_private_ip}
+    node-external-ip: ${local.controlplane1_public_ip}
+    advertise-address: ${local.controlplane1_private_ip}
+    tls-san:
+      - 0.0.0.0
+      - ${local.controlplane1_private_ip}
+      - ${local.controlplane1_public_ip}
+    etcd-snapshot-retention: 14  # snapshot every 12 hours, total of 1 week
+  EOF
+  rke2_install_controlplane1_command = <<-EOT
+    set -euo pipefail
+    ${local.controlplane1_ssh_command} "mkdir -p /etc/rancher/rke2"
+    echo "${local.rke2_install_controlplane1_config}" | ${local.controlplane1_ssh_command} "cat > /etc/rancher/rke2/config.yaml"
+    ${local.controlplane1_ssh_command} "
       curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION=${var.rke2_version} sh - &&\
       if systemctl is-active --quiet rke2-server.service; then
         systemctl restart rke2-server.service
@@ -59,15 +67,17 @@ resource "null_resource" "rke2_install_controlplane1" {
         systemctl enable rke2-server.service &&\
         systemctl start rke2-server.service
       fi
-    EOF
+    "
+  EOT
+}
+
+resource "null_resource" "rke2_install_controlplane1" {
+  depends_on = [null_resource.rke2_node_settings]
+  triggers = {
+    command = local.rke2_install_controlplane1_command
   }
   provisioner "local-exec" {
-    command = <<-EOT
-      set -euo pipefail
-      ${local.servers_ssh_command[local.controlplane1_server_name]} "mkdir -p /etc/rancher/rke2"
-      echo "${self.triggers.config}" | ${local.servers_ssh_command[local.controlplane1_server_name]} "cat > /etc/rancher/rke2/config.yaml"
-      ${local.servers_ssh_command[local.controlplane1_server_name]} "${self.triggers.command}"
-    EOT
+    command = local.controlplane1_server_name != "" ? local.rke2_install_controlplane1_command : "echo 'No control plane server found, skipping RKE2 installation.'"
     interpreter = ["bash", "-c"]
   }
 }
@@ -106,15 +116,23 @@ resource "null_resource" "rke2_install_workers" {
   }
 }
 
-resource "null_resource" "admin_kubeconfig" {
+module "local_files_admin_kubeconfig" {
   depends_on = [null_resource.rke2_install_controlplane1]
-  triggers = {
-    counter = 1
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
+  # source = "../../../cwm-iac/tfmodules/local_files"
+  bootstrap_all = var.bootstrap_all
+  commands = {
+    admin_kubeconfig = {
+      command = <<-EOT
+        tempfile=$(mktemp)
+        trap 'rm -f "$tempfile"' EXIT
+        ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$tempfile"
+        sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' "$tempfile"
+        cat $tempfile
+      EOT
+      file_path = var.admin_kubeconfig_path
+      bootstrap = lookup(var.bootstrap, "admin_kubeconfig", false)
+    }
   }
-  provisioner "local-exec" {
-    command = <<-EOT
-      ${local.servers_ssh_command[local.controlplane1_server_name]} "cat /etc/rancher/rke2/rke2.yaml" > ${var.admin_kubeconfig_path} &&\
-      sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' ${var.admin_kubeconfig_path}
-    EOT
-  }
+  terraform_remote_state = var.local_files_terraform_remote_state
 }

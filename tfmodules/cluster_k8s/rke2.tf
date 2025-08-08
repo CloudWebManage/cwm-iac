@@ -96,7 +96,7 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
           tolerations:
             - key: "cwm-iac-worker-role"
               operator: "Equal"
-              value: "system"
+              value: "minio"
               effect: "NoExecute"
           config:
             # this is required for cert-manager, see https://cert-manager.io/docs/releases/release-notes/release-notes-1.18/
@@ -130,8 +130,8 @@ resource "null_resource" "rke2-fix-helm-install-jobs" {
     command = <<-EOT
       set -euo pipefail
       sleep 10
-      for POD in "$(kubectl -n kube-system get pods -oname | grep helm-install)"; do
-        kubectl -n kube-system patch $POD --type=json --patch '[{"op": "add","path": "/spec/tolerations/-","value": {"key": "cwm-iac-worker-role","operator": "Equal","value": "system","effect": "NoExecute"}}]' \
+      for POD in "$(${local.kubectl} -n kube-system get pods -oname | grep helm-install)"; do
+        ${local.kubectl} -n kube-system patch $POD --type=json --patch '[{"op": "add","path": "/spec/tolerations/-","value": {"key": "cwm-iac-worker-role","operator": "Equal","value": "system","effect": "NoExecute"}}]' \
           || true
       done
     EOT
