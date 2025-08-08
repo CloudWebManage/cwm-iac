@@ -28,11 +28,13 @@ variable "terraform_remote_state" {
     backend = string
     config  = map(string)
     output  = string
+    output_subkey = optional(string, "")
   })
   default = {
     backend = ""
     config  = {}
     output  = ""
+    output_subkey = ""
   }
 }
 
@@ -57,7 +59,13 @@ data "terraform_remote_state" "content" {
 
 resource "local_file" "content_bootstrap" {
   filename = var.file_path
-  content = var.bootstrap ? data.external.fetch[0].result.content : data.terraform_remote_state.content[0].outputs[var.terraform_remote_state.output]
+  content = var.bootstrap ?
+    data.external.fetch[0].result.content :
+    (
+      var.terraform_remote_state.output_subkey == "" ?
+        data.terraform_remote_state.content[0].outputs[var.terraform_remote_state.output] :
+        data.terraform_remote_state.content[0].outputs[var.terraform_remote_state.output][var.terraform_remote_state.output_subkey]
+    )
 }
 
 output "content" {
