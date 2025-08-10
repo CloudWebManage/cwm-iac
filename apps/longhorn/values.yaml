@@ -14,7 +14,7 @@ longhorn:
     resizerReplicaCount: 1
     snapshotterReplicaCount: 1
   defaultSettings:
-    taintToleration: cwmc-role=system:NoExecute
+    taintToleration: cwm-iac-worker-role=system:NoExecute
     defaultReplicaCount: 1
     systemManagedComponentsNodeSelector: "cwm-iac-worker-role=system"
   persistence:
