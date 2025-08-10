@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cwm
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ImageCatalog
+    name: postgresql
+    major: 17
+  instances: 1
+  storage:
+    size: 10Gi
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: cwm-postgres-superuser

@@ -59,3 +59,7 @@ variable "workers" {
                                    # system - used for all other system workloads
   }))
 }
+
+variable "servers_ssh_command" {
+  type = map(string)
+}
