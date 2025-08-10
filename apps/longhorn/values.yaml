@@ -5,3 +5,5 @@ longhorn:
         operator: "Equal"
         value: "system"
         effect: "NoExecute"
+  csi:
+    kubeletRootDir: "/var/lib/kubelet"
