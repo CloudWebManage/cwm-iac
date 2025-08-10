@@ -1,0 +1,6 @@
+cloudnative-pg:
+  tolerations:
+    - key: "cwm-iac-worker-role"
+      operator: "Equal"
+      value: "system"
+      effect: "NoExecute"
