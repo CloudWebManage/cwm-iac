@@ -7,3 +7,6 @@ longhorn:
         effect: "NoExecute"
   csi:
     kubeletRootDir: "/var/lib/kubelet"
+  defaultSettings:
+    defaultReplicaCount: 1
+    taintToleration: cwmc-role=system:NoExecute
