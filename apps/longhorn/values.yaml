@@ -8,5 +8,9 @@ longhorn:
   csi:
     kubeletRootDir: "/var/lib/kubelet"
   defaultSettings:
-    defaultReplicaCount: 1
     taintToleration: cwmc-role=system:NoExecute
+  persistence:
+    defaultClassReplicaCount: 1
+    defaultNodeSelector:
+      enable: true
+      selector: "cwm-iac-worker-role=system"
