@@ -7,6 +7,7 @@ spec:
     apiGroup: postgresql.cnpg.io
     kind: ImageCatalog
     name: postgresql
+    namespace: cloudnative-pg
     major: 17
   instances: 1
   storage:
