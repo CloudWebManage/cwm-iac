@@ -1,0 +1,8 @@
+name: longhorn
+version: "0.0.0"
+apiVersion: v2
+
+dependencies:
+  - name: longhorn
+    version: "1.9.1"
+    repository: https://charts.longhorn.io
