@@ -5,10 +5,18 @@ longhorn:
         operator: "Equal"
         value: "system"
         effect: "NoExecute"
+    nodeSelector:
+      "cwm-iac-worker-role": "system"
   csi:
     kubeletRootDir: "/var/lib/kubelet"
+    attacherReplicaCount: 1
+    provisionerReplicaCount: 1
+    resizerReplicaCount: 1
+    snapshotterReplicaCount: 1
   defaultSettings:
     taintToleration: cwmc-role=system:NoExecute
+    defaultReplicaCount: 1
+    systemManagedComponentsNodeSelector: "cwm-iac-worker-role=system"
   persistence:
     defaultClassReplicaCount: 1
     defaultNodeSelector:
