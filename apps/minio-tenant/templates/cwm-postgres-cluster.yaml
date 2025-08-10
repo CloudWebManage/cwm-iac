@@ -1,14 +1,4 @@
 apiVersion: postgresql.cnpg.io/v1
-kind: ImageCatalog
-metadata:
-  name: cwm
-spec:
-  images:
-    # Updated Aug 1, 2025 from https://raw.githubusercontent.com/cloudnative-pg/postgres-containers/main/Debian/ClusterImageCatalog-bookworm.yaml
-    - major: 17
-      image: ghcr.io/cloudnative-pg/postgresql:17.5-20-bookworm@sha256:5f4d5057c1e7e4af27472972ce26d7b8ae10ab838ca2a5baefbfebfd85a50792
----
-apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cwm
@@ -24,3 +14,19 @@ spec:
   enableSuperuserAccess: true
   superuserSecret:
     name: cwm-postgres-superuser
+  affinity:
+    tolerations:
+      - key: cwmc-role
+        operator: Equal
+        value: system
+        effect: NoExecute
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ImageCatalog
+metadata:
+  name: cwm
+spec:
+  images:
+    # Updated Aug 1, 2025 from https://raw.githubusercontent.com/cloudnative-pg/postgres-containers/main/Debian/ClusterImageCatalog-bookworm.yaml
+    - major: 17
+      image: ghcr.io/cloudnative-pg/postgresql:17.5-20-bookworm@sha256:5f4d5057c1e7e4af27472972ce26d7b8ae10ab838ca2a5baefbfebfd85a50792
