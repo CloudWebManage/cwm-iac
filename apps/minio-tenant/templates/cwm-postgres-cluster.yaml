@@ -16,7 +16,7 @@ spec:
     name: cwm-postgres-superuser
   affinity:
     tolerations:
-      - key: cwmc-role
+      - key: cwm-iac-worker-role
         operator: Equal
         value: system
         effect: NoExecute
