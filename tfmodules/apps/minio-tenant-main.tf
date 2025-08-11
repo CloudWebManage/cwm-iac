@@ -140,6 +140,40 @@ resource "kubernetes_manifest" "minio-tenant-main-app" {
   )
 }
 
+resource "kubernetes_ingress_v1" "cwm-minio-api" {
+  metadata {
+    name = "cwm-minio-api"
+    namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+    annotations = {
+      "cert-manager.io/cluster-issuer": "letsencrypt"
+    }
+  }
+  spec {
+    ingress_class_name = "nginx"
+    tls {
+      hosts = ["cwm-minio-api.${var.ingress_star_domain}"]
+      secret_name = "cwm-minio-api-tls"
+    }
+    rule {
+      host = "cwm-minio-api.${var.ingress_star_domain}"
+      http {
+        path {
+          path = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "cwm-minio-api"
+              port {
+                number = 8000
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 output "minio_tenant_main" {
   value = {
     api_url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
