@@ -20,6 +20,7 @@ spec:
       containers:
         - name: api
           image: {{ .Values.cwmMinioApi.image | quote }}
+          imagePullPolicy: Always
           resources: {{ .Values.cwmMinioApi.resources | toYaml | nindent 12 }}
           env:
             - name: DB_CONNSTRING
@@ -27,3 +28,8 @@ spec:
                 secretKeyRef:
                   name: cwm-minio-api-db
                   key: DB_CONNSTRING
+            - name: TENANT_INFO_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: cwm-minio-api-tenant-info
+                  key: tenant_info_json

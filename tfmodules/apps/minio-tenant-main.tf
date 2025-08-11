@@ -140,12 +140,51 @@ resource "kubernetes_manifest" "minio-tenant-main-app" {
   )
 }
 
+resource "random_password" "cwm-minio-api-username" {
+  length = 8
+  special = false
+}
+resource "random_password" "cwm-minio-api-password" {
+  length = 24
+  special = false
+}
+
+module "local_files_cwm_minio_api_htpasswd" {
+  depends_on = [random_password.cwm-minio-api-username, random_password.cwm-minio-api-password]
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
+  # source = "../../../cwm-iac/tfmodules/local_files"
+  commands = {
+    htpasswd = {
+      command   = <<-EOT
+        htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}"
+      EOT
+      file_path = "${var.data_path}/cwm-minio-api/htpasswd"
+    }
+  }
+  terraform_remote_state = var.local_files_terraform_remote_state
+  bootstrap_all = false  # only for first run you should set it to true
+}
+
+resource "kubernetes_secret" "cwm-minio-api-htpasswd" {
+  metadata {
+    name      = "cwm-minio-api-htpasswd"
+    namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+  }
+  type = "Opaque"
+  data = {
+    auth = module.local_files_cwm_minio_api_htpasswd.content["htpasswd"]
+  }
+}
+
 resource "kubernetes_ingress_v1" "cwm-minio-api" {
   metadata {
     name = "cwm-minio-api"
     namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
     annotations = {
       "cert-manager.io/cluster-issuer": "letsencrypt"
+      "nginx.ingress.kubernetes.io/auth-type": "basic"
+      "nginx.ingress.kubernetes.io/auth-secret": "cwm-minio-api-htpasswd"
+      "nginx.ingress.kubernetes.io/auth-realm": "Protected Area"
     }
   }
   spec {
@@ -174,12 +213,35 @@ resource "kubernetes_ingress_v1" "cwm-minio-api" {
   }
 }
 
+resource "kubernetes_secret" "cwm_minio_api_tenant_info" {
+  metadata {
+    name      = "cwm-minio-api-tenant-info"
+    namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+  }
+  type = "Opaque"
+  data = {
+    tenant_info_json = jsonencode({
+      api_url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
+      console_url = "https://minio-tenant-main-console.${var.ingress_star_domain}"
+    })
+  }
+}
+
 output "minio_tenant_main" {
   value = {
     api_url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
     console_url = "https://minio-tenant-main-console.${var.ingress_star_domain}"
     admin_username = random_password.minio-tenant-main-root-user.result
     admin_password = random_password.minio-tenant-main-root-password.result
+  }
+  sensitive = true
+}
+
+output "cwm_minio_api" {
+  value = {
+    api_url = "https://cwm-minio-api.${var.ingress_star_domain}"
+    username = random_password.cwm-minio-api-username.result
+    password = random_password.cwm-minio-api-password.result
   }
   sensitive = true
 }
