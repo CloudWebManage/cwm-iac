@@ -1,3 +1,7 @@
+cwmMinioApi:
+  image: "ghcr.io/cloudwebmanage/cwm-minio-api:latest"
+  resources: {}
+
 tenant:
   # Root key for MinIO Tenant Chart
   tenant:

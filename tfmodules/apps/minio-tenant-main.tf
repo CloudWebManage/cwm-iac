@@ -26,10 +26,6 @@ resource "kubernetes_secret" "minio-tenant-main-env-config" {
   }
 }
 
-resource "random_password" "cwm-postgres-superuser-username-suffix" {
-  length = 4
-}
-
 resource "random_password" "cwm-postgres-superuser-password" {
   length = 16
 }
@@ -41,8 +37,19 @@ resource "kubernetes_secret" "cwm-postgres-superuser" {
   }
   type = "Opaque"
   data = {
-    username = "postgres-${random_password.cwm-postgres-superuser-username-suffix.result}"
+    username = "postgres"
     password = random_password.cwm-postgres-superuser-password.result
+  }
+}
+
+resource "kubernetes_secret" "cwm-minio-api-db" {
+  metadata {
+    name      = "cwm-minio-api-db"
+    namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+  }
+  type = "Opaque"
+  data = {
+    DB_CONNSTRING = "postgresql://postgres:${random_password.minio-tenant-main-root-user.result}@cwm-rw/postgres"
   }
 }
 

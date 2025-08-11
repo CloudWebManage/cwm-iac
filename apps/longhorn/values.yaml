@@ -19,6 +19,3 @@ longhorn:
     systemManagedComponentsNodeSelector: "cwm-iac-worker-role=system"
   persistence:
     defaultClassReplicaCount: 1
-#    defaultNodeSelector:
-#      enable: true
-#      selector: "cwm-iac-worker-role=system"
