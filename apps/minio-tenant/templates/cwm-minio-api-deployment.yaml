@@ -12,6 +12,11 @@ spec:
       labels:
         app: cwm-minio-api
     spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
       containers:
         - name: api
           image: {{ .Values.cwmMinioApi.image | quote }}
