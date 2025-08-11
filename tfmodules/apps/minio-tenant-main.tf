@@ -26,6 +26,19 @@ resource "kubernetes_secret" "minio-tenant-main-env-config" {
   }
 }
 
+resource "kubernetes_secret" "cwm-minio-api-tenant-creds" {
+  metadata {
+    name      = "cwm-minio-api-tenant-creds"
+    namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+  }
+  type = "Opaque"
+  data = {
+    url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
+    accesskey = random_password.minio-tenant-main-root-user.result
+    secretkey = random_password.minio-tenant-main-root-password.result
+  }
+}
+
 resource "random_password" "cwm-postgres-superuser-password" {
   length = 16
 }
