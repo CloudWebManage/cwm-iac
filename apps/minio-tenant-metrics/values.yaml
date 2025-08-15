@@ -1,9 +1,8 @@
 prometheus:
   server:
-    # Enable only the release namespace for monitoring. By default all namespaces are monitored.
-    # If releaseNamespace and namespaces are both set a merged list will be monitored.
-    releaseNamespace: true
+    releaseNamespace: false
 
+    ## this is set from tf module to the minio tenant namespace
     ## namespaces to monitor (instead of monitoring all - clusterwide). Needed if you want to run without Cluster-admin privileges.
     # namespaces:
     #   - yournamespace
@@ -20,7 +19,15 @@ prometheus:
     retention: "2d"
 
     prometheus.yml:
-      scrape_configs: []
+      scrape_configs:
+        - job_name: minio-tenant-main-bucket-api
+          metrics_path: /bucket/api
+          kubernetes_sd_configs:
+            - role: pod
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_cwm_minio_tenant]
+                  action: keep
+                  regex: "true"
 
   alertmanager:
     enabled: false

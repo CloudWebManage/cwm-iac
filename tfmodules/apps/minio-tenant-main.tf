@@ -167,7 +167,7 @@ module "local_files_cwm_minio_api_htpasswd" {
   source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
   # source = "../../../cwm-iac/tfmodules/local_files"
   commands = {
-    htpasswd = {
+    cwm_minio_api_htpasswd = {
       command   = <<-EOT
         htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}"
       EOT
@@ -185,7 +185,7 @@ resource "kubernetes_secret" "cwm-minio-api-htpasswd" {
   }
   type = "Opaque"
   data = {
-    auth = module.local_files_cwm_minio_api_htpasswd.content["htpasswd"]
+    auth = module.local_files_cwm_minio_api_htpasswd.content["cwm_minio_api_htpasswd"]
   }
 }
 
