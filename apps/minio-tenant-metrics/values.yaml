@@ -1,0 +1,34 @@
+server:
+  # Enable only the release namespace for monitoring. By default all namespaces are monitored.
+  # If releaseNamespace and namespaces are both set a merged list will be monitored.
+  releaseNamespace: true
+
+  ## namespaces to monitor (instead of monitoring all - clusterwide). Needed if you want to run without Cluster-admin privileges.
+  # namespaces:
+  #   - yournamespace
+
+  tolerations:
+    - key: "cwm-iac-worker-role"
+      operator: "Equal"
+      value: "system"
+      effect: "NoExecute"
+
+  persistentVolume:
+    storageClass: longhorn
+
+  retention: "2d"
+
+  prometheus.yml:
+    scrape_configs: []
+
+alertmanager:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
