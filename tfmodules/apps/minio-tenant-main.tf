@@ -116,6 +116,9 @@ locals {
             volumesPerServer = 1
             volumeSize = "999Gi"
             storageClassName = "directpv-min-io"
+            labels = {
+              "cwm-minio-tenant" = "true"
+            }
             tolerations = [
               {
                 key = "cwm-iac-worker-role"
