@@ -1,21 +1,5 @@
-variable "htpasswd_remote_state_key" {
-  type = string
-}
-
 variable "data_path_htpasswd_filename" {
   type = string
-}
-
-variable "local_files_terraform_remote_state" {
-  type = object({
-    backend = string
-    config = map(string)
-    output = string
-  })
-}
-
-variable "bootstrap" {
-  type = bool
 }
 
 variable "secrets" {
@@ -34,20 +18,16 @@ resource "random_password" "password" {
   special = false
 }
 
-module "local_files_htpasswd" {
+module "localdata_htpasswd" {
   depends_on = [random_password.username, random_password.password]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
-  # source = "../../../cwm-iac/tfmodules/local_files"
-  commands = {
-    (var.htpasswd_remote_state_key) : {
-      command   = <<-EOT
-        htpasswd -bn "${random_password.username.result}" "${random_password.password.result}"
-      EOT
-      file_path = var.data_path_htpasswd_filename
-    }
-  }
-  terraform_remote_state = var.local_files_terraform_remote_state
-  bootstrap_all = var.bootstrap
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  source = "../../../cwm-iac/tfmodules/localdata"
+  local_file_path = var.data_path_htpasswd_filename
+  output_content = true
+  generate_script = <<-EOT
+    htpasswd -bn "${random_password.username.result}" "${random_password.password.result}" \
+      > "$FILENAME"
+  EOT
 }
 
 resource "kubernetes_secret" "htpasswd" {
@@ -58,7 +38,7 @@ resource "kubernetes_secret" "htpasswd" {
   }
   type = "Opaque"
   data = {
-    auth = module.local_files_htpasswd.content[var.htpasswd_remote_state_key]
+    auth = module.localdata_htpasswd.content
   }
 }
 
@@ -73,5 +53,5 @@ output "password" {
 }
 
 output "content" {
-  value = module.local_files_htpasswd.content
+  value = module.localdata_htpasswd.content
 }

@@ -1,3 +1,7 @@
+locals {
+  minio_tenant_main_data_path = "${var.data_path}/minio-tenant-main"
+}
+
 resource "kubernetes_namespace" "minio-tenant-main" {
   metadata {
     name = "minio-tenant-main"
@@ -165,20 +169,15 @@ resource "random_password" "cwm-minio-api-password" {
   special = false
 }
 
-module "local_files_cwm_minio_api_htpasswd" {
+module "localdata_cwm_minio_api_htpasswd" {
   depends_on = [random_password.cwm-minio-api-username, random_password.cwm-minio-api-password]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
-  # source = "../../../cwm-iac/tfmodules/local_files"
-  commands = {
-    cwm_minio_api_htpasswd = {
-      command   = <<-EOT
-        htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}"
-      EOT
-      file_path = "${var.data_path}/cwm-minio-api/htpasswd"
-    }
-  }
-  terraform_remote_state = var.local_files_terraform_remote_state
-  bootstrap_all = false  # only for first run you should set it to true
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  source = "../../../cwm-iac/tfmodules/localdata"
+  local_file_path = "${local.minio_tenant_main_data_path}/cwm-minio-api-htpasswd"
+  generate_script = <<-EOT
+    htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}" \
+      > "$FILENAME"
+  EOT
 }
 
 resource "kubernetes_secret" "cwm-minio-api-htpasswd" {
@@ -188,7 +187,7 @@ resource "kubernetes_secret" "cwm-minio-api-htpasswd" {
   }
   type = "Opaque"
   data = {
-    auth = module.local_files_cwm_minio_api_htpasswd.content["cwm_minio_api_htpasswd"]
+    auth = module.localdata_cwm_minio_api_htpasswd.content
   }
 }
 

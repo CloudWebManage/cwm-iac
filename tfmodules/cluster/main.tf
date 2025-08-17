@@ -99,11 +99,3 @@ variable "bootstrap" {
   type = map(string)
   default = {}
 }
-
-variable "local_files_terraform_remote_state" {
-  type = object({
-    backend = string
-    config = map(string)
-    output = string
-  })
-}

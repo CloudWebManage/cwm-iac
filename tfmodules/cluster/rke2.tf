@@ -1,6 +1,6 @@
 resource "null_resource" "rke2_node_settings" {
   for_each = {for name, server in var.servers : name => server if !contains(["bastion", "standalone"], server.role)}
-  depends_on = [null_resource.init_ssh_servers, module.local_files_ssh_known_hosts_servers]
+  depends_on = [null_resource.init_ssh_servers, module.localdata_ssh_known_hosts_servers]
   triggers = {
     command = <<-EOF
       set -euo pipefail
@@ -116,24 +116,14 @@ resource "null_resource" "rke2_install_workers" {
   }
 }
 
-module "local_files_admin_kubeconfig" {
+module "localdata_admin_kubeconfig" {
   count = local.controlplane1_server_name == "" ? 0 : 1
   depends_on = [null_resource.rke2_install_controlplane1]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
-  # source = "../../../cwm-iac/tfmodules/local_files"
-  bootstrap_all = var.bootstrap_all
-  commands = {
-    admin_kubeconfig = {
-      command = <<-EOT
-        tempfile=$(mktemp)
-        trap 'rm -f "$tempfile"' EXIT
-        ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$tempfile"
-        sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' "$tempfile"
-        cat $tempfile
-      EOT
-      file_path = var.admin_kubeconfig_path
-      bootstrap = lookup(var.bootstrap, "admin_kubeconfig", false)
-    }
-  }
-  terraform_remote_state = var.local_files_terraform_remote_state
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  source = "../../../cwm-iac/tfmodules/localdata"
+  local_file_path = var.admin_kubeconfig_path
+  generate_script = <<-EOT
+    ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"
+    sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' "$FILENAME"
+  EOT
 }

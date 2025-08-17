@@ -4,13 +4,24 @@ resource "kubernetes_namespace" "minio-tenant-main-metrics" {
   }
 }
 
+module "local_data_minio_tenant_main_mc_metrics_token" {
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  source = "../../tfmodules/localdata"
+  local_file_path = "${local.minio_tenant_main_data_path}/mc-metrics-token"
+  output_content = true
+  generate_script = <<-EOT
+    ${var.tools.kubectl} exec \
+          -n ${kubernetes_namespace.minio-tenant-main.metadata[0].name} \
+          deploy/cwm-minio-api -- mc admin prometheus generate cwm --api-version v3 \
+            > $FILENAME
+  EOT
+}
+
 locals {
   minio_tenant_main_metrics_values = {
     prometheus = {
-      server = {
-        namespaces = [
-          kubernetes_namespace.minio-tenant-main.metadata[0].name
-        ]
+      serverFiles = {
+        "prometheus.yml" = yamldecode(module.local_data_minio_tenant_main_mc_metrics_token.content)
       }
     }
   }
@@ -42,10 +53,7 @@ resource "kubernetes_manifest" "minio-tenant-main-metrics-app" {
 module "htpasswd_minio_tenant_main_metrics" {
   # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
   source = "../../../cwm-iac/tfmodules/htpasswd"
-  bootstrap = false  # only for first run you should set it to true
-  data_path_htpasswd_filename = "${var.data_path}/minio-tenant-main/metrics-htpasswd"
-  htpasswd_remote_state_key = "minio-tenant-main-metrics-htpasswd"
-  local_files_terraform_remote_state = var.local_files_terraform_remote_state
+  data_path_htpasswd_filename = "${local.minio_tenant_main_data_path}/metrics-htpasswd"
   secrets = [
     {
       name      = "minio-tenant-main-metrics-htpasswd"

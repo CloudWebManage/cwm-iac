@@ -49,24 +49,21 @@ resource "null_resource" "init_ssh_bastion" {
   }
 }
 
-module "local_files_ssh_known_hosts_bastion" {
+module "localdata_ssh_known_hosts_bastion" {
+  for_each = {for name, server in var.servers : name => server if server.role == "bastion"}
   depends_on = [null_resource.init_ssh_bastion]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
-  # source = "../../../cwm-iac/tfmodules/local_files"
-  bootstrap_all = var.bootstrap_all
-  commands = {
-    for name, server in var.servers : "ssh_known_hosts_${name}" => {
-      command = "ssh-keyscan -p ${random_integer.bastion_ssh_port.result} ${local.server_public_ip[name]}"
-      file_path = "${var.data_path}/servers/${name}/ssh_known_hosts"
-      bootstrap = lookup(var.bootstrap, "ssh_known_hosts_${name}", false)
-    } if server.role == "bastion"
-  }
-  terraform_remote_state = var.local_files_terraform_remote_state
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  source = "../../../cwm-iac/tfmodules/localdata"
+  local_file_path = "${var.data_path}/servers/${each.key}/ssh_known_hosts"
+  generate_script = <<-EOT
+    ssh-keyscan -p ${random_integer.bastion_ssh_port.result} ${local.server_public_ip[each.key]} \
+      > "$FILENAME"
+  EOT
 }
 
 resource "null_resource" "init_ssh_servers" {
   for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
-  depends_on = [null_resource.init_ssh_bastion, module.local_files_ssh_known_hosts_bastion]
+  depends_on = [null_resource.init_ssh_bastion, module.localdata_ssh_known_hosts_bastion]
   triggers = {
     v = 2
     command = replace(
@@ -90,22 +87,17 @@ resource "null_resource" "init_ssh_servers" {
   }
 }
 
-module "local_files_ssh_known_hosts_servers" {
+module "localdata_ssh_known_hosts_servers" {
+  for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
   depends_on = [null_resource.init_ssh_bastion]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/local_files?ref=main"
-  # source = "../../../cwm-iac/tfmodules/local_files"
-  bootstrap_all = var.bootstrap_all
-  commands = {
-    for name, server in var.servers : "ssh_known_hosts_${name}" => {
-      command = <<-EOF
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${local.server_public_ip[local.bastion_server_name]} -p ${random_integer.bastion_ssh_port.result} \
-          "ssh-keyscan -p ${random_integer.servers_ssh_port.result} ${local.server_private_ip[name]}"
-      EOF
-      file_path = "${var.data_path}/servers/${name}/ssh_known_hosts"
-      bootstrap = lookup(var.bootstrap, "ssh_known_hosts_${name}", false)
-    } if server.role != "bastion"
-  }
-  terraform_remote_state = var.local_files_terraform_remote_state
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  source = "../../../cwm-iac/tfmodules/localdata"
+  local_file_path = "${var.data_path}/servers/${each.key}/ssh_known_hosts"
+  generate_script = <<-EOT
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${local.server_public_ip[local.bastion_server_name]} -p ${random_integer.bastion_ssh_port.result} \
+          "ssh-keyscan -p ${random_integer.servers_ssh_port.result} ${local.server_private_ip[each.key]}" \
+      > "$FILENAME"
+  EOT
 }
 
 locals {

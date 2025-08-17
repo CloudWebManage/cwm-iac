@@ -1,12 +1,5 @@
 prometheus:
   server:
-    releaseNamespace: false
-
-    ## this is set from tf module to the minio tenant namespace
-    ## namespaces to monitor (instead of monitoring all - clusterwide). Needed if you want to run without Cluster-admin privileges.
-    # namespaces:
-    #   - yournamespace
-
     tolerations:
       - key: "cwm-iac-worker-role"
         operator: "Equal"
