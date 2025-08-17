@@ -119,8 +119,8 @@ resource "null_resource" "rke2_install_workers" {
 module "localdata_admin_kubeconfig" {
   count = local.controlplane1_server_name == "" ? 0 : 1
   depends_on = [null_resource.rke2_install_controlplane1]
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../../cwm-iac/tfmodules/localdata"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  # source = "../../../cwm-iac/tfmodules/localdata"
   local_file_path = var.admin_kubeconfig_path
   generate_script = <<-EOT
     ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"

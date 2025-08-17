@@ -5,8 +5,8 @@ resource "kubernetes_namespace" "minio-tenant-main-metrics" {
 }
 
 module "local_data_minio_tenant_main_mc_metrics_token" {
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../tfmodules/localdata"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  # source = "../../tfmodules/localdata"
   local_file_path = "${local.minio_tenant_main_data_path}/mc-metrics-token"
   output_content = true
   generate_script = <<-EOT
@@ -51,8 +51,8 @@ resource "kubernetes_manifest" "minio-tenant-main-metrics-app" {
 }
 
 module "htpasswd_minio_tenant_main_metrics" {
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
-  source = "../../../cwm-iac/tfmodules/htpasswd"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
+  # source = "../../../cwm-iac/tfmodules/htpasswd"
   data_path_htpasswd_filename = "${local.minio_tenant_main_data_path}/metrics-htpasswd"
   secrets = [
     {

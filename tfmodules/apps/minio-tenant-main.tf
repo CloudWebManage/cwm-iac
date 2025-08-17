@@ -171,8 +171,8 @@ resource "random_password" "cwm-minio-api-password" {
 
 module "localdata_cwm_minio_api_htpasswd" {
   depends_on = [random_password.cwm-minio-api-username, random_password.cwm-minio-api-password]
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../../cwm-iac/tfmodules/localdata"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  # source = "../../../cwm-iac/tfmodules/localdata"
   local_file_path = "${local.minio_tenant_main_data_path}/cwm-minio-api-htpasswd"
   generate_script = <<-EOT
     htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}" \

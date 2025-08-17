@@ -52,8 +52,8 @@ resource "null_resource" "init_ssh_bastion" {
 module "localdata_ssh_known_hosts_bastion" {
   for_each = {for name, server in var.servers : name => server if server.role == "bastion"}
   depends_on = [null_resource.init_ssh_bastion]
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../../cwm-iac/tfmodules/localdata"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  # source = "../../../cwm-iac/tfmodules/localdata"
   local_file_path = "${var.data_path}/servers/${each.key}/ssh_known_hosts"
   generate_script = <<-EOT
     ssh-keyscan -p ${random_integer.bastion_ssh_port.result} ${local.server_public_ip[each.key]} \
@@ -90,8 +90,8 @@ resource "null_resource" "init_ssh_servers" {
 module "localdata_ssh_known_hosts_servers" {
   for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
   depends_on = [null_resource.init_ssh_bastion]
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../../cwm-iac/tfmodules/localdata"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  # source = "../../../cwm-iac/tfmodules/localdata"
   local_file_path = "${var.data_path}/servers/${each.key}/ssh_known_hosts"
   generate_script = <<-EOT
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${local.server_public_ip[local.bastion_server_name]} -p ${random_integer.bastion_ssh_port.result} \

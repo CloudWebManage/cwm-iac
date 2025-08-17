@@ -13,8 +13,8 @@ module "localdata_curl_download_tools" {
       url = "https://github.com/longhorn/cli/releases/download/${local.longhorn_version}/longhornctl-linux-amd64"
     }
   }
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../tfmodules/localdata"
+  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
+  # source = "../../tfmodules/localdata"
   output_content = false
   local_file_path = "${var.tools_data_path}/${each.key}-${each.value.version}"
   generate_script = <<-EOT
