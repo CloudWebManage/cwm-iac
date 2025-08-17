@@ -238,6 +238,7 @@ resource "kubernetes_secret" "cwm_minio_api_tenant_info" {
     tenant_info_json = jsonencode({
       api_url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
       console_url = "https://minio-tenant-main-console.${var.ingress_star_domain}"
+      prometheus_url = "https://minio-tenant-main-prometheus.${var.ingress_star_domain}"
     })
   }
 }
