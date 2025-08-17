@@ -20,8 +20,7 @@ resource "random_password" "password" {
 
 module "localdata_htpasswd" {
   depends_on = [random_password.username, random_password.password]
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  source = "../../../cwm-iac/tfmodules/localdata"
+  source = "../localdata"
   local_file_path = var.data_path_htpasswd_filename
   output_content = true
   generate_script = <<-EOT
