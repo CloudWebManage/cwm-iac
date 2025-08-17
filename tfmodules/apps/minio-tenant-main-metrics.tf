@@ -18,10 +18,36 @@ module "local_data_minio_tenant_main_mc_metrics_token" {
 }
 
 locals {
+  cluster_scrape_config = yamldecode(module.local_data_minio_tenant_main_mc_metrics_token.content)["scrape_configs"][0]
+}
+
+locals {
   minio_tenant_main_metrics_values = {
     prometheus = {
       serverFiles = {
-        "prometheus.yml" = yamldecode(module.local_data_minio_tenant_main_mc_metrics_token.content)
+        "prometheus.yml" = {
+          scrape_configs = [
+            local.cluster_scrape_config,
+            {
+              job_name     = "minio-job-buckets"
+              bearer_token = local.cluster_scrape_config["bearer_token"]
+              scheme       = "https"
+              http_sd_configs = [
+                {
+                  refresh_interval = "30s"
+                  url = "http://cwm-minio-api.${kubernetes_namespace.minio-tenant-main.metadata[0].name}:8000/buckets/list_prometheus_sd?targets=${local.cluster_scrape_config["static_configs"][0]["targets"][0]}"
+                }
+              ],
+              relabel_configs = [
+                {
+                  source_labels = ["bucket"]
+                  target_label = "__metrics_path__"
+                  replacement = "/minio/metrics/v3/bucket/api/$1"
+                }
+              ]
+            }
+          ]
+        }
       }
     }
   }
