@@ -139,25 +139,37 @@ locals {
 }
 
 resource "kubernetes_manifest" "minio-tenant-main-app" {
-  manifest = yamldecode(<<-EOT
-    apiVersion: argoproj.io/v1alpha1
-    kind: Application
-    metadata:
-      name: minio-tenant-main
-      namespace: argocd
-    spec:
-      destination:
-        namespace: minio-tenant-main
-        server: 'https://kubernetes.default.svc'
-      project: default
-      source:
-        repoURL: https://github.com/CloudWebManage/cwm-iac
-        targetRevision: main
-        path: apps/minio-tenant
-        helm:
-          valuesObject: ${jsonencode(local.minio_tenant_main_values)}
-  EOT
-  )
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind = "Application"
+    metadata = {
+      name      = "minio-tenant-main"
+      namespace = "argocd"
+    }
+    spec = {
+      destination = {
+        namespace : "minio-tenant-main"
+        server : "https://kubernetes.default.svc"
+      }
+      project = "default"
+      sources = concat([
+        {
+          repoURL        = "https://github.com/CloudWebManage/cwm-iac"
+          targetRevision = "main"
+          path           = "apps/minio-tenant"
+          helm = merge({
+            valuesObject = local.minio_tenant_main_values
+          }, var.minio_tenant_main_app_helm_overrides)
+        }
+      ], var.minio_tenant_main_app_extra_sources)
+      syncPolicy = {
+        automated = {
+          prune = true
+          selfHeal = true
+        }
+      }
+    }
+  }
 }
 
 resource "random_password" "cwm-minio-api-username" {

@@ -116,3 +116,20 @@ resource "kubernetes_ingress_v1" "argocd-server" {
     }
   }
 }
+
+resource "tls_private_key" "argocd_cwm_worker_cluster_deploy_key" {
+  algorithm = "RSA"
+}
+
+# this is added manually so we don't have to manage GitHub credentials with Terraform
+# resource "github_repository_deploy_key" "argocd_cwm_worker_cluster" {
+#   repository = "cwm-worker-cluster"
+#   title = "ArgoCD Deploy Key"
+#   key = tls_private_key.argocd_cwm_worker_cluster_deploy_key.public_key_openssh
+#   read_only = true
+# }
+
+output "argocd_cwm_worker_cluster_deploy_private_key" {
+  value = tls_private_key.argocd_cwm_worker_cluster_deploy_key.private_key_pem
+  sensitive = true
+}
