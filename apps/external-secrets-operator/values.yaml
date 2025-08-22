@@ -1,0 +1,7 @@
+external-secrets:
+  global:
+    tolerations:
+      - key: "cwm-iac-worker-role"
+        operator: "Equal"
+        value: "system"
+        effect: "NoExecute"
