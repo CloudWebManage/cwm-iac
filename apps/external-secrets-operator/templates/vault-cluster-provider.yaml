@@ -1,0 +1,26 @@
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: vault
+spec:
+  provider:
+    vault:
+      server: {{ .Values.vault_server | quote }}
+      path: "kvv2"
+      version: "v2"
+      caProvider:
+        type: "Secret"
+        namespace: "external-secrets-operator"
+        name: "vault-ca-provider"
+        key: "ca"  # base64 encoded string of certificate
+      auth:
+        appRole:
+          path: "approle"
+          roleRef:
+            name: "vault-app-role"
+            namespace: "external-secrets-operator"
+            key: "id"
+          secretRef:
+            name: "vault-app-role"
+            namespace: "external-secrets-operator"
+            key: "secret"
