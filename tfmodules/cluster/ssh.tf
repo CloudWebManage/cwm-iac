@@ -3,9 +3,17 @@ resource "random_integer" "bastion_ssh_port" {
   max = 65535
 }
 
+output "bastion_ssh_port" {
+  value = random_integer.bastion_ssh_port.result
+}
+
 resource "random_integer" "servers_ssh_port" {
   min = 52000
   max = 65535
+}
+
+output "servers_ssh_port" {
+  value = random_integer.servers_ssh_port.result
 }
 
 locals {
@@ -49,23 +57,10 @@ resource "null_resource" "init_ssh_bastion" {
   }
 }
 
-module "localdata_ssh_known_hosts_bastion" {
-  for_each = {for name, server in var.servers : name => server if server.role == "bastion"}
-  depends_on = [null_resource.init_ssh_bastion]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  # source = "../../../cwm-iac/tfmodules/localdata"
-  local_file_path = "${var.data_path}/servers/${each.key}/ssh_known_hosts"
-  generate_script = <<-EOT
-    ssh-keyscan -p ${random_integer.bastion_ssh_port.result} ${local.server_public_ip[each.key]} \
-      > "$FILENAME"
-  EOT
-}
-
 resource "null_resource" "init_ssh_servers" {
   for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
-  depends_on = [null_resource.init_ssh_bastion, module.localdata_ssh_known_hosts_bastion]
+  depends_on = [null_resource.init_ssh_bastion]
   triggers = {
-    v = 2
     command = replace(
       local.init_ssh_script_template,
       "__LISTEN_ADDR__",
@@ -87,26 +82,31 @@ resource "null_resource" "init_ssh_servers" {
   }
 }
 
-module "localdata_ssh_known_hosts_servers" {
-  for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
-  depends_on = [null_resource.init_ssh_bastion]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  # source = "../../../cwm-iac/tfmodules/localdata"
-  local_file_path = "${var.data_path}/servers/${each.key}/ssh_known_hosts"
-  generate_script = <<-EOT
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${local.server_public_ip[local.bastion_server_name]} -p ${random_integer.bastion_ssh_port.result} \
-          "ssh-keyscan -p ${random_integer.servers_ssh_port.result} ${local.server_private_ip[each.key]}" \
-      > "$FILENAME"
-  EOT
+data "external" "ssh_known_hosts" {
+  depends_on = [null_resource.init_ssh_servers]
+  for_each = var.servers
+  program = [
+    "bash", "-c", <<-EOT
+      set -euo pipefail
+      FILENAME="${var.data_path}/servers/${each.key}/ssh_known_hosts"
+      if ! [ -f "$FILENAME" ]; then
+        mkdir -p "$(dirname "$FILENAME")"
+        SERVER_ROLE="${each.value.role}"
+        if [ "$SERVER_ROLE" = "bastion" ]; then
+          ssh-keyscan -p ${random_integer.bastion_ssh_port.result} ${local.server_public_ip[each.key]} > "$FILENAME"
+        else
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            root@${local.server_public_ip[local.bastion_server_name]} -p ${random_integer.bastion_ssh_port.result} \
+              "ssh-keyscan -p ${random_integer.servers_ssh_port.result} ${local.server_private_ip[each.key]}" > "$FILENAME"
+        fi
+      fi
+      echo '{}'
+    EOT
+  ]
 }
 
 locals {
-  ssh_config_file = "${var.data_path}/servers/ssh_config"
-}
-
-resource "local_file" "servers_ssh_config" {
-  filename = local.ssh_config_file
-  content = join("\n", [
+  ssh_config = join("\n", [
     <<-EOT
         Host ${var.name_prefix}-bastion
           HostName ${local.server_public_ip[local.bastion_server_name]}
@@ -122,10 +122,17 @@ resource "local_file" "servers_ssh_config" {
               User root
               Port ${random_integer.servers_ssh_port.result}
               ProxyJump ${var.name_prefix}-bastion
-              UserKnownHostsFile ${abspath("${var.data_path}/servers/${name}/ssh_known_hosts")}
+              UserKnownHostsFile ${var.data_path}/servers/${name}/ssh_known_hosts
         EOT
       ])
   ])
+  ssh_config_file = "${var.data_path}/servers/ssh_config"
+}
+
+resource "local_file" "ssh_config" {
+  depends_on = [data.external.ssh_known_hosts]
+  filename = "${var.data_path}/servers/ssh_config"
+  content = local.ssh_config
 }
 
 locals {

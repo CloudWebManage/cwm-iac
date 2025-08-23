@@ -30,3 +30,11 @@ variable "minio_tenant_main_app_helm_overrides" {
   type = any
   default = {}
 }
+
+variable "vault_mount" {
+  type = string
+}
+
+variable "vault_path" {
+  type = string
+}

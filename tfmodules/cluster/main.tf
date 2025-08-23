@@ -58,10 +58,8 @@ variable "servers" {
   type = map(object({
     role          = string  # bastion - the bastion node, used for SSH access to the cluster
                             # controlplane1 - the first control plane node, currently we don't support additional control plane nodes
-                            # worker - worker nodes, used for running workloads, must also have worker-role set
+                            # worker - worker nodes, used for running workloads
                             # standalone - a standalone server, not part of the kubernetes cluster
-    worker-role      = optional(string)  # minio - used for running the minio tenants
-                                         # system - used for all other system workloads
     billing_cycle = optional(string)
     cpu_cores     = number
     cpu_type      = string
@@ -88,14 +86,4 @@ variable "admin_kubeconfig_path" {
 
 variable "data_path" {
   type = string
-}
-
-variable "bootstrap_all" {
-  type = bool
-  default = false
-}
-
-variable "bootstrap" {
-  type = map(string)
-  default = {}
 }

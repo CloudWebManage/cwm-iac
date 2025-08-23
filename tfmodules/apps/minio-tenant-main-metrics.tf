@@ -4,21 +4,30 @@ resource "kubernetes_namespace" "minio-tenant-main-metrics" {
   }
 }
 
-module "local_data_minio_tenant_main_mc_metrics_token" {
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  # source = "../../tfmodules/localdata"
-  local_file_path = "${local.minio_tenant_main_data_path}/mc-metrics-token"
-  output_content = true
-  generate_script = <<-EOT
-    ${var.tools.kubectl} exec \
-          -n ${kubernetes_namespace.minio-tenant-main.metadata[0].name} \
-          deploy/cwm-minio-api -- mc admin prometheus generate cwm --api-version v3 \
-            > $FILENAME
-  EOT
+resource "null_resource" "minio_tenant_main_mc_metrics_prometheus_config_vault" {
+  depends_on = [kubernetes_manifest.minio-tenant-main-app]
+  triggers = {
+    command = <<-EOT
+      ${var.tools.kubectl} exec \
+        -n ${kubernetes_namespace.minio-tenant-main.metadata[0].name} \
+        deploy/cwm-minio-api -- mc admin prometheus generate cwm --api-version v3 \
+          | ${var.tools.vault} kv put -mount=${var.vault_mount} ${local.minio_tenant_main_vault_path}/mc_metrics_prometheus_config config=-
+    EOT
+  }
+  provisioner "local-exec" {
+    command = self.triggers.command
+    interpreter = ["bash", "-c"]
+  }
+}
+
+data "vault_kv_secret_v2" "minio_tenant_main_mc_metrics_prometheus_config" {
+  depends_on = [null_resource.minio_tenant_main_mc_metrics_prometheus_config_vault]
+  mount = var.vault_mount
+  name = "${local.minio_tenant_main_vault_path}/mc_metrics_prometheus_config"
 }
 
 locals {
-  cluster_scrape_config = yamldecode(module.local_data_minio_tenant_main_mc_metrics_token.content)["scrape_configs"][0]
+  cluster_scrape_config = yamldecode(data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config.data.config)["scrape_configs"][0]
 }
 
 locals {
@@ -55,31 +64,37 @@ locals {
 
 resource "kubernetes_manifest" "minio-tenant-main-metrics-app" {
   depends_on = [kubernetes_namespace.minio-tenant-main-metrics]
-  manifest = yamldecode(<<-EOT
-    apiVersion: argoproj.io/v1alpha1
-    kind: Application
-    metadata:
-      name: minio-tenant-main-metrics
-      namespace: argocd
-    spec:
-      destination:
-        namespace: minio-tenant-main-metrics
-        server: 'https://kubernetes.default.svc'
-      project: default
-      source:
-        repoURL: https://github.com/CloudWebManage/cwm-iac
-        targetRevision: main
-        path: apps/minio-tenant-metrics
-        helm:
-          valuesObject: ${jsonencode(local.minio_tenant_main_metrics_values)}
-  EOT
-  )
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "minio-tenant-main-metrics"
+      namespace = "argocd"
+    }
+    spec = {
+      destination = {
+        namespace = "minio-tenant-main-metrics"
+        server    = "https://kubernetes.default.svc"
+      }
+      project = "default"
+      source = {
+        repoURL        = "https://github.com/CloudWebManage/cwm-iac"
+        targetRevision = "main"
+        path           = "apps/minio-tenant-metrics"
+        helm = {
+          valuesObject = local.minio_tenant_main_metrics_values
+        }
+      }
+    }
+  }
 }
 
 module "htpasswd_minio_tenant_main_metrics" {
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
-  # source = "../../../cwm-iac/tfmodules/htpasswd"
-  data_path_htpasswd_filename = "${local.minio_tenant_main_data_path}/metrics-htpasswd"
+  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
+  source = "../../../cwm-iac/tfmodules/htpasswd"
+  tools = var.tools
+  vault_mount = var.vault_mount
+  vault_path = "${local.minio_tenant_main_vault_path}/metrics_htpasswd"
   secrets = [
     {
       name      = "minio-tenant-main-metrics-htpasswd"

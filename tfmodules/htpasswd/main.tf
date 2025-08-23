@@ -1,4 +1,8 @@
-variable "data_path_htpasswd_filename" {
+variable "vault_mount" {
+  type = string
+}
+
+variable "vault_path" {
   type = string
 }
 
@@ -7,6 +11,10 @@ variable "secrets" {
     name  = string
     namespace = string
   }))
+}
+
+variable "tools" {
+  type = any
 }
 
 resource "random_password" "username" {
@@ -18,26 +26,47 @@ resource "random_password" "password" {
   special = false
 }
 
-module "localdata_htpasswd" {
-  depends_on = [random_password.username, random_password.password]
-  source = "../localdata"
-  local_file_path = var.data_path_htpasswd_filename
-  output_content = true
-  generate_script = <<-EOT
-    htpasswd -bn "${random_password.username.result}" "${random_password.password.result}" \
-      > "$FILENAME"
-  EOT
+resource "null_resource" "htpasswd_vault" {
+  triggers = {
+    command = <<-EOT
+      htpasswd -bn "${random_password.username.result}" "${random_password.password.result}" \
+        | ${var.tools.vault} kv put -mount=${var.vault_mount} ${var.vault_path} \
+          auth=- \
+          username="${random_password.username.result}" \
+          password="${random_password.password.result}"
+    EOT
+  }
+  provisioner "local-exec" {
+    command = self.triggers.command
+    interpreter = ["bash", "-c"]
+  }
 }
 
-resource "kubernetes_secret" "htpasswd" {
+resource "kubernetes_manifest" "htpasswd_external_secret" {
+  depends_on = [null_resource.htpasswd_vault]
   for_each = {for secret in var.secrets : "${secret.name}-${secret.namespace}" => secret}
-  metadata {
-    name      = each.value.name
-    namespace = each.value.namespace
-  }
-  type = "Opaque"
-  data = {
-    auth = module.localdata_htpasswd.content
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind = "ExternalSecret"
+    metadata = {
+      name      = each.value.name
+      namespace = each.value.namespace
+    }
+    spec = {
+      secretStoreRef = {
+        name = "vault"
+        kind = "ClusterSecretStore"
+      }
+      data = [
+        {
+          secretKey = "auth"
+          remoteRef = {
+            key = var.vault_path
+            property = "auth"
+          }
+        }
+      ]
+    }
   }
 }
 
@@ -49,8 +78,4 @@ output "username" {
 output "password" {
   value = random_password.password.result
   sensitive = true
-}
-
-output "content" {
-  value = module.localdata_htpasswd.content
 }

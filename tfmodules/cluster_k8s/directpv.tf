@@ -50,8 +50,9 @@ resource "null_resource" "directpv_init_drives" {
     counter = lookup(var.force_reinstall_counters, "directpv_init_drives", 0)
     command = <<-EOT
       set -euo pipefail
-      ${local.kubectl_directpv} discover --output-file "${var.data_path}/directpv/drives.yaml"
-      ${local.kubectl_directpv} init "${var.data_path}/directpv/drives.yaml" --dangerous
+      if ${local.kubectl_directpv} discover --output-file "${var.data_path}/directpv/drives.yaml"; then
+          ${local.kubectl_directpv} init "${var.data_path}/directpv/drives.yaml" --dangerous || true
+      fi
     EOT
   }
   provisioner "local-exec" {

@@ -1,5 +1,6 @@
 locals {
   minio_tenant_main_data_path = "${var.data_path}/minio-tenant-main"
+  minio_tenant_main_vault_path = "${var.vault_path}/minio-tenant-main"
 }
 
 resource "kubernetes_namespace" "minio-tenant-main" {
@@ -181,26 +182,47 @@ resource "random_password" "cwm-minio-api-password" {
   special = false
 }
 
-module "localdata_cwm_minio_api_htpasswd" {
-  depends_on = [random_password.cwm-minio-api-username, random_password.cwm-minio-api-password]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  # source = "../../../cwm-iac/tfmodules/localdata"
-  local_file_path = "${local.minio_tenant_main_data_path}/cwm-minio-api-htpasswd"
-  generate_script = <<-EOT
-    htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}" \
-      > "$FILENAME"
-  EOT
+resource "null_resource" "cwm_minio_api_creds" {
+  triggers = {
+    command = <<-EOT
+      htpasswd -bn "${random_password.cwm-minio-api-username.result}" "${random_password.cwm-minio-api-password.result}" \
+        | ${var.tools.vault} kv put -mount=${var.vault_mount} ${var.vault_path}/cwm_minio_api_creds \
+          auth=- \
+          username="${random_password.cwm-minio-api-username.result}" \
+          password="${random_password.cwm-minio-api-password.result}"
+    EOT
+  }
+  provisioner "local-exec" {
+    command = self.triggers.command
+    interpreter = ["bash", "-c"]
+  }
 }
 
-resource "kubernetes_secret" "cwm-minio-api-htpasswd" {
-  metadata {
-    name      = "cwm-minio-api-htpasswd"
-    namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+resource "kubernetes_manifest" "cwm_minio_api_htpasswd_external_secret" {
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind = "ExternalSecret"
+    metadata = {
+      name      = "cwm-minio-api-htpasswd"
+      namespace = kubernetes_namespace.minio-tenant-main.metadata[0].name
+    }
+    spec = {
+      secretStoreRef = {
+        name = "vault"
+        kind = "ClusterSecretStore"
+      }
+      data = [
+        {
+          secretKey = "auth"
+          remoteRef = {
+            key = "${var.vault_path}/cwm_minio_api_creds"
+            property = "auth"
+          }
+        }
+      ]
+    }
   }
-  type = "Opaque"
-  data = {
-    auth = module.localdata_cwm_minio_api_htpasswd.content
-  }
+  depends_on = [null_resource.cwm_minio_api_creds]
 }
 
 resource "kubernetes_ingress_v1" "cwm-minio-api" {

@@ -1,5 +1,5 @@
 locals {
-  longhorn_version = "v1.9.1"
+  longhorn_version = var.longhorn_version
 }
 
 resource "null_resource" "longhorn_init_nodes" {

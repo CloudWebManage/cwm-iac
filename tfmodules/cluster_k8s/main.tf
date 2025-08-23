@@ -25,14 +25,6 @@ variable "data_path" {
   type = string
 }
 
-variable "kube_version" {
-  type = string
-}
-
-variable "tools_data_path" {
-  type = string
-}
-
 variable "ingress_star_domain" {
   type = string
 }
@@ -49,10 +41,6 @@ variable "force_reinstall_counters" {
   type = map(number)
 }
 
-variable "directpv_version" {
-  type = string
-}
-
 variable "workers" {
   type = map(object({
     worker-role          = string  # minio - used for running the minio tenants
@@ -62,4 +50,13 @@ variable "workers" {
 
 variable "servers_ssh_command" {
   type = map(string)
+}
+
+variable "longhorn_version" {
+  type = string
+}
+
+variable "tools" {
+  type = any
+  default = {}
 }

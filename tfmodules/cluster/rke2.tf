@@ -1,6 +1,10 @@
 resource "null_resource" "rke2_node_settings" {
   for_each = {for name, server in var.servers : name => server if !contains(["bastion", "standalone"], server.role)}
-  depends_on = [null_resource.init_ssh_servers, module.localdata_ssh_known_hosts_servers]
+  depends_on = [
+    null_resource.init_ssh_servers,
+    data.external.ssh_known_hosts,
+    local_file.ssh_config,
+  ]
   triggers = {
     command = <<-EOF
       set -euo pipefail
@@ -116,14 +120,19 @@ resource "null_resource" "rke2_install_workers" {
   }
 }
 
-module "localdata_admin_kubeconfig" {
+data "external" "admin_kubeconfig" {
   count = local.controlplane1_server_name == "" ? 0 : 1
   depends_on = [null_resource.rke2_install_controlplane1]
-  source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/localdata?ref=main"
-  # source = "../../../cwm-iac/tfmodules/localdata"
-  local_file_path = var.admin_kubeconfig_path
-  generate_script = <<-EOT
-    ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"
-    sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' "$FILENAME"
-  EOT
+  program = [
+    "bash", "-c", <<-EOT
+      set -euo pipefail
+      FILENAME=${var.admin_kubeconfig_path}
+      if ! [ -f "$FILENAME" ]; then
+        mkdir -p "$(dirname "$FILENAME")"
+        ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"
+        sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' "$FILENAME"
+      fi
+      echo '{}'
+    EOT
+  ]
 }
