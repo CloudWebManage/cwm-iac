@@ -1,0 +1,123 @@
+x-tolerations: &tolerations
+  - key: "cwm-iac-worker-role"
+    operator: "Equal"
+    value: "system"
+    effect: "NoExecute"
+
+kube-prometheus-stack:
+  crds:
+    upgradeJob:
+      tolerations: *tolerations
+  alertmanager:
+#    config:
+#      route:
+#        receiver: slack
+#        routes:
+#          - matchers:
+#              - alertname = "Watchdog"
+#            receiver: 'statuscake'
+#            repeat_interval: 10m
+#      receivers:
+#        - name: slack
+#          slack_configs:
+#          - api_url_file: /etc/alertmanager/secrets/alertmanager-slack-api-url/api-url
+#            channel: "#cluster-rke2-notifications"
+#            send_resolved: true
+#            text: |
+#              {{ len .Alerts }} alerts for namespace "{{ .CommonLabels.namespace }}"
+#              {{ range $i, $alert := .Alerts }}
+#              *Alert #{{$i}}* | {{ .Labels.alertname }} | {{ .Status }} | {{ .StartsAt }}
+#              {{ range $k, $v := .Labels }}  - {{$k}}: {{$v}}
+#              {{ end }}{{ range $k, $v := .Annotations }}  - {{$k}}: {{$v}}
+#              {{ end }}<{{ .GeneratorURL }}|View in Prometheus>
+#              {{ end }}
+#        - name: statuscake
+#          webhook_configs:
+#            - url_file: /etc/alertmanager/secrets/statuscake-webhook-url/url
+#              send_resolved: false
+    alertmanagerSpec:
+      tolerations: *tolerations
+#      secrets:
+#        - alertmanager-slack-api-url
+#        - statuscake-webhook-url
+      resources:
+        requests:
+          cpu: 400m
+          memory: 300Mi
+        limits:
+          memory: 500Mi
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: longhorn
+            resources:
+              requests:
+                storage: 5Gi
+
+  grafana:
+    tolerations: *tolerations
+    resources:
+      requests:
+        cpu: 500m
+        memory: 400Mi
+      limits:
+        memory: 800Mi
+    persistence:
+      enabled: true
+      storageClassName: longhorn
+      size: 5Gi
+    admin:
+      existingSecret: "grafana-admin-password"
+#    additionalDataSources:
+#      - name: "Loki"
+#        type: loki
+#        url: "http://logging-loki-gateway.logging"
+#        jsonData:
+#          maxLines: 1000
+#          timeout: 60
+
+  prometheusOperator:
+    admissionWebhooks:
+      deployment:
+        tolerations: *tolerations
+      patch:
+        tolerations: *tolerations
+    tolerations: *tolerations
+    namespaces:
+      releaseNamespace: true
+    resources:
+      requests:
+        cpu: 200m
+        memory: 200Mi
+      limits:
+        memory: 400Mi
+
+  prometheus:
+    prometheusSpec:
+      tolerations: *tolerations
+      retention: 7d
+      resources:
+        requests:
+          cpu: 400m
+          memory: 600Mi
+        limits:
+          memory: 1200Mi
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: longhorn
+            resources:
+              requests:
+                storage: 100Gi
+
+  kubeEtcd:
+    enabled: false
+
+  kubeScheduler:
+    enabled: false
+
+  kubeControllerManager:
+    enabled: false
+
+  kubeProxy:
+    enabled: false
