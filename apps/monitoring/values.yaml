@@ -121,3 +121,6 @@ kube-prometheus-stack:
 
   kubeProxy:
     enabled: false
+
+  kube-state-metrics:
+    tolerations: *tolerations
