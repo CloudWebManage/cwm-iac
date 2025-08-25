@@ -1,7 +1,0 @@
-- nfs_ssh_key:
-    type: secret
-    name: nfs-ssh-key
-- nfs_initialized:
-    type: configmap
-    name: nfs-initializaed
-    key: initialized
