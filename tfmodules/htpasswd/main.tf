@@ -17,6 +17,11 @@ variable "tools" {
   type = any
 }
 
+variable "vault_kv_put_extra_args" {
+  type = string
+  default = ""
+}
+
 resource "random_password" "username" {
   length = 8
   special = false
@@ -33,7 +38,7 @@ resource "null_resource" "htpasswd_vault" {
         | ${var.tools.vault} kv put -mount=${var.vault_mount} ${var.vault_path} \
           auth=- \
           username="${random_password.username.result}" \
-          password="${random_password.password.result}"
+          password="${random_password.password.result}" ${var.vault_kv_put_extra_args}
     EOT
   }
   provisioner "local-exec" {

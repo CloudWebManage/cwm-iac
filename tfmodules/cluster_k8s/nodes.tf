@@ -12,6 +12,7 @@ resource "kubernetes_node_taint" "controlplane1" {
 
 resource "kubernetes_node_taint" "worker-roles" {
   field_manager = "Terraform_taint_worker_roles"
+  force = true
   for_each = var.workers
   metadata {
     name = each.key

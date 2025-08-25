@@ -11,29 +11,36 @@ data "vault_kv_secret_v2" "vault_external_server" {
 
 resource "kubernetes_manifest" "external-secrets-operator-app" {
   depends_on = [null_resource.argocd_install]
-  manifest = yamldecode(<<-EOT
-    apiVersion: argoproj.io/v1alpha1
-    kind: Application
-    metadata:
-      name: external-secrets-operator
-      namespace: argocd
-    spec:
-      destination:
-        namespace: external-secrets-operator
-        server: 'https://kubernetes.default.svc'
-      project: default
-      source:
-        repoURL: https://github.com/CloudWebManage/cwm-iac
-        targetRevision: main
-        path: apps/external-secrets-operator
-        helm:
-          valuesObject:
-            vault_server: "${data.vault_kv_secret_v2.vault_external_server.data.server}"
-      syncPolicy:
-        syncOptions:
-          - ServerSideApply=true
-  EOT
-  )
+  manifest = {
+    apiVersion : "argoproj.io/v1alpha1"
+    kind : "Application"
+    metadata : {
+      name : "external-secrets-operator"
+      namespace : "argocd"
+    }
+    spec : {
+      destination : {
+        namespace : "external-secrets-operator"
+        server : "https://kubernetes.default.svc"
+      }
+      project : "default"
+      source : {
+        repoURL : "https://github.com/CloudWebManage/cwm-iac"
+        targetRevision : "main"
+        path : "apps/external-secrets-operator"
+        helm : {
+          valuesObject : {
+            vault_server : data.vault_kv_secret_v2.vault_external_server.data.server
+          }
+        }
+      }
+      syncPolicy : {
+        syncOptions : [
+          "ServerSideApply=true"
+        ]
+      }
+    }
+  }
 }
 
 data "vault_kv_secret_v2" "vault_ca_bundle_b64" {
