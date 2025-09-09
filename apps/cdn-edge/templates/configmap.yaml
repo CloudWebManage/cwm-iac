@@ -28,7 +28,8 @@ data:
 
   Corefile: |
     .:53 {
-      auto /data/zones {
+      auto {
+        directory /data/zones
         reload 1s
       }
       cache 30
