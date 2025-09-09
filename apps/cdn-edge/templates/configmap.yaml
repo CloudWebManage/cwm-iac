@@ -28,12 +28,11 @@ data:
 
   Corefile: |
     .:53 {
-      file /data/tenants.db {
+      auto /data/zones {
         reload 1s
       }
       cache 30
       errors
-      log
       health
       forward . /etc/resolv.conf
     }
