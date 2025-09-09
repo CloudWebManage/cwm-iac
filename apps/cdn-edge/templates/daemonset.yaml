@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cdn-edge
+  labels:
+    app: cdn-edge
+spec:
+  selector:
+    matchLabels:
+      app: cdn-edge
+  template:
+    metadata:
+      labels:
+        app: cdn-edge
+    spec:
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: cdn-edge
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: coredns-conf
+          configMap:
+            name: cdn-edge
+            items:
+              - key: Corefile
+                path: Corefile
+        - name: data
+          emptyDir:
+            medium: Memory
+      containers:
+        - name: zonewriter
+          image: {{ .Values.zonewriter.image | quote }}
+          imagePullPolicy: Always
+          command: [cwm-cdn-api, domains, zone-writer, "--daemon", "/data/tenants.db"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ["ls", "/data/tenants.db"]
+        - name: coredns
+          # Pulled Sep 9, 2025
+          image: "coredns/coredns:1.11.1@sha256:986f04c2e15e147d00bdd51e8c51bcef3644b13ff806be7d2ff1b261d6dfbae1"
+          args: ["-conf", "/etc/coredns/Corefile"]
+          volumeMounts:
+            - name: coredns-conf
+              mountPath: /etc/coredns
+              readOnly: true
+            - name: data
+              mountPath: /data
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /health
+        - name: nginx
+          # Pulled Sep 8, 2025
+          image: "nginx:alpine@sha256:42a516af16b852e33b7682d5ef8acbd5d13fe08fecadc7ed98605ba5e3b26ab8"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx
+              readOnly: true

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cdn-edge
+data:
+  nginx.conf: {{ .Files.Get "files/nginx.conf" | quote }}
+  Corefile: {{ .Files.Get "files/Corefile" | quote }}

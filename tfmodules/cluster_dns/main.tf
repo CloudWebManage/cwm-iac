@@ -23,3 +23,7 @@ variable "ingress_servers" {
     public_ip   = string
   }))
 }
+
+variable "cdn" {
+  type = any
+}

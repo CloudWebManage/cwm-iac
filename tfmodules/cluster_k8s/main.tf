@@ -44,7 +44,8 @@ variable "force_reinstall_counters" {
 variable "workers" {
   type = map(object({
     worker-role          = string  # minio - used for running the minio tenants
-                                   # system - used for all other system workloads
+                                   # cdn - used for running the cdn tenants
+                                   # system - used for all other system / management workloads
   }))
 }
 
