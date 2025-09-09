@@ -47,6 +47,12 @@ spec:
           readinessProbe:
             exec:
               command: ["ls", "/data/tenants.db"]
+          env:
+            - name: DB_CONNSTRING
+              valueFrom:
+                secretKeyRef:
+                  name: cdn-db
+                  key: DB_CONNSTRING
         - name: coredns
           # Pulled Sep 9, 2025
           image: "coredns/coredns:1.11.1@sha256:986f04c2e15e147d00bdd51e8c51bcef3644b13ff806be7d2ff1b261d6dfbae1"
