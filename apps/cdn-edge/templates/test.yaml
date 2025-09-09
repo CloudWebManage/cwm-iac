@@ -9,12 +9,6 @@ metadata:
   name: front
   namespace: cdnedgetest
 data:
-  ssl.sh: |
-    #!/bin/bash
-    set -euo pipefail
-    mkdir /certs
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048   -keyout certs/tls.key -out certs/tls.crt -subj "/CN=localhost"
-    chmod 600 /certs/tls.key /certs/tls.crt
   default.conf: |
     server {
       listen       443 ssl;
@@ -54,10 +48,16 @@ spec:
       containers:
         - name: front
           image: nginx:latest
+          command:
+            - bash
+            - "-c"
+            - |
+              set -euo pipefail
+              mkdir /certs
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout certs/tls.key -out certs/tls.crt -subj "/CN=localhost"
+              chmod 600 /certs/tls.key /certs/tls.crt
+              exec nginx -g 'daemon off;'
           volumeMounts:
             - name: config
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
-            - name: config
-              mountPath: /docker-entrypoint.d/ssl.sh
-              subPath: 99-ssl.sh
