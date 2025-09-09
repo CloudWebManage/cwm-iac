@@ -77,8 +77,8 @@ spec:
           # Pulled Sep 8, 2025
           image: "nginx:alpine@sha256:42a516af16b852e33b7682d5ef8acbd5d13fe08fecadc7ed98605ba5e3b26ab8"
           ports:
-            - containerPort: 80
-              hostPort: 80
+            - containerPort: 443
+              hostPort: 443
           volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx
