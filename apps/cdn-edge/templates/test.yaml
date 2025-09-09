@@ -42,6 +42,11 @@ spec:
       labels:
         app: front
     spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
       volumes:
         - name: config
           configMap:
