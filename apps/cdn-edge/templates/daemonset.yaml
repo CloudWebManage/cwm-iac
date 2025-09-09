@@ -40,13 +40,13 @@ spec:
         - name: zonewriter
           image: {{ .Values.cdnApiImage | quote }}
           imagePullPolicy: Always
-          command: [cwm-cdn-api, domains, zone-writer, "--daemon", "/data/zones/tenants.db"]
+          command: [cwm-cdn-api, domains, zone-writer, "--daemon", "/data/zones"]
           volumeMounts:
             - name: data
               mountPath: /data
           readinessProbe:
             exec:
-              command: ["ls", "/data/tenants.db"]
+              command: ["ls", "/data/zones.json"]
           env:
             - name: DB_CONNSTRING
               valueFrom:
