@@ -13,6 +13,13 @@ spec:
       labels:
         app: cdn-edge
     spec:
+      nodeSelector:
+        cwm-iac-worker-role: cdn
+      tolerations:
+        - key: "cwm-iac-worker-role"
+          operator: "Equal"
+          value: "cdn"
+          effect: "NoExecute"
       volumes:
         - name: nginx-conf
           configMap:
