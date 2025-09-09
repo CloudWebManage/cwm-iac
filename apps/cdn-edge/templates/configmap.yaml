@@ -34,6 +34,7 @@ data:
       }
       cache 30
       errors
+      log
       health
       forward . /etc/resolv.conf
     }
