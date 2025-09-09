@@ -5,11 +5,6 @@ metadata:
   labels:
     app: cdn-edge
 spec:
-  updateStrategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: "25%"
-      maxUnavailable: 0
   selector:
     matchLabels:
       app: cdn-edge
