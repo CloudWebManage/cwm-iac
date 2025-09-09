@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdn-api
+spec:
+  selector:
+    matchLabels:
+      app: cdn-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cdn-api
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
+      containers:
+        - name: api
+          image: {{ .Values.cdnApiImage | quote }}
+          imagePullPolicy: Always
+          command:
+            - bash
+            - "-c"
+            - |
+              while true; do sleep 30; done
+          env:
+            - name: GUNICORN_WORKERS
+              value: "10"
+            - name: DB_CONNSTRING
+              valueFrom:
+                secretKeyRef:
+                  name: cdn-db
+                  key: DB_CONNSTRING
