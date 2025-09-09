@@ -1,9 +1,0 @@
-.:53 {
-  file /data/tenants.db {
-    reload 1s
-  }
-  cache 30
-  errors
-  health
-  forward . /etc/resolv.conf
-}
