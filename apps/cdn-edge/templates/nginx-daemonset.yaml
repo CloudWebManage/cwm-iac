@@ -41,7 +41,7 @@ spec:
                   fieldPath: status.hostIP
           command:
             - sh
-            - -s
+            - -c
             - |
               set -euo pipefail
               sed -i 's/__RESOLVER_IP__/${RESOLVER_IP}:5353/' /etc/nginx/nginx.conf
