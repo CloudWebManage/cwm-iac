@@ -34,7 +34,6 @@ data:
       }
       cache 30
       errors
-      log
       health :8181
       forward . 169.254.20.10
     }
