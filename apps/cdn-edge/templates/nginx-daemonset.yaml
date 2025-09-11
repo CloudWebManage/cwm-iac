@@ -44,8 +44,8 @@ spec:
             - -c
             - |
               set -euo pipefail
-              sed -i 's/__RESOLVER_IP__/${RESOLVER_IP}:5353/' /etc/nginx/nginx.conf
+              sed 's/__RESOLVER_IP__/${RESOLVER_IP}:5353/' /etc/nginx/tmpconf/nginx.conf > /etc/nginx/nginx.conf
               exec nginx -g 'daemon off;'
           volumeMounts:
             - name: nginx-conf
-              mountPath: /etc/nginx
+              mountPath: /etc/nginx/tmpconf
