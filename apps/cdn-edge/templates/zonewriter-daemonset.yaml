@@ -28,7 +28,9 @@ spec:
         - name: zonewriter
           image: {{ .Values.cdnApiImage | quote }}
           imagePullPolicy: Always
-          command: [sleep, "999999"]  # [cwm-cdn-api, domains, zone-writer, "--daemon", "/data/zones"]
+          command: [cwm-cdn-api, domains, zone-writer, "--daemon", "/data/zones"]
+          securityContext:
+            runAsUser: 100
           volumeMounts:
             - name: data
               mountPath: /data
