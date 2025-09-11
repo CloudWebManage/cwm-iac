@@ -11,6 +11,8 @@ resource "kubernetes_manifest" "rke2-coredns-helm-chart-config" {
     }
     spec = {
       valuesContent = <<-EOT
+        nodelocal:
+          enabled: true
         tolerations:
           - key: "cwm-iac-worker-role"
             operator: "Equal"

@@ -47,5 +47,5 @@ spec:
               readOnly: true
           readinessProbe:
             httpGet:
-              port: 8080
+              port: 8181
               path: /health
