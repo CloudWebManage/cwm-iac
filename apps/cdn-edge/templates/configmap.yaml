@@ -27,7 +27,7 @@ data:
     }
 
   Corefile: |
-    .:53 {
+    .:5353 {
       auto {
         directory /data/zones (.*)\.db$ {1}
         reload 1s
