@@ -30,7 +30,8 @@ spec:
           command:
             - chown
             - -R
-            - 100 /data
+            - "100"
+            - /data
           volumeMounts:
             - mountPath: /data
               name: data
