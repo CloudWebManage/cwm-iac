@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cdn-edge-zonewriter
+  labels:
+    app: cdn-edge-zonewriter
+spec:
+  selector:
+    matchLabels:
+      app: cdn-edge-zonewriter
+  template:
+    metadata:
+      labels:
+        app: cdn-edge-zonewriter
+    spec:
+      nodeSelector:
+        cwm-iac-worker-role: cdn
+      tolerations:
+        - key: "cwm-iac-worker-role"
+          operator: "Equal"
+          value: "cdn"
+          effect: "NoExecute"
+      volumes:
+        - name: data
+          hostPath:
+            path: /var/lib/cwm/cdn-edge-data
+      containers:
+        - name: zonewriter
+          image: {{ .Values.cdnApiImage | quote }}
+          imagePullPolicy: Always
+          command: [cwm-cdn-api, domains, zone-writer, "--daemon", "/data/zones"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ["ls", "/data/zones.json"]
+          env:
+            - name: DB_CONNSTRING
+              valueFrom:
+                secretKeyRef:
+                  name: cdn-db
+                  key: DB_CONNSTRING

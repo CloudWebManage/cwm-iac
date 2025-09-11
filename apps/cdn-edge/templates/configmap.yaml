@@ -15,7 +15,7 @@ data:
     }
 
     stream {
-      resolver 127.0.0.1 valid=30s ipv6=off;
+      resolver __RESOLVER_IP__ valid=30s ipv6=off;
       resolver_timeout 2s;
       server {
         listen 443;

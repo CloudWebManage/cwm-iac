@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cdn-edge-nginx
+  labels:
+    app: cdn-edge-nginx
+spec:
+  selector:
+    matchLabels:
+      app: cdn-edge-nginx
+  template:
+    metadata:
+      labels:
+        app: cdn-edge-nginx
+    spec:
+      nodeSelector:
+        cwm-iac-worker-role: cdn
+      tolerations:
+        - key: "cwm-iac-worker-role"
+          operator: "Equal"
+          value: "cdn"
+          effect: "NoExecute"
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: cdn-edge
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+      hostNetwork: true
+      containers:
+        - name: nginx
+          # Pulled Sep 8, 2025
+          image: "nginx:alpine@sha256:42a516af16b852e33b7682d5ef8acbd5d13fe08fecadc7ed98605ba5e3b26ab8"
+          env:
+            - name: RESOLVER_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          command:
+            - sh
+            - -s
+            - |
+              set -euo pipefail
+              sed -i 's/__RESOLVER_IP__/${RESOLVER_IP}/' /etc/nginx/nginx.conf
+              exec nginx -g 'daemon off;'
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx
+              readOnly: true

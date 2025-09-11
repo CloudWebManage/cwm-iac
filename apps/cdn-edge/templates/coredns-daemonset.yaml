@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cdn-edge-coredns
+  labels:
+    app: cdn-edge-coredns
+spec:
+  selector:
+    matchLabels:
+      app: cdn-edge-coredns
+  template:
+    metadata:
+      labels:
+        app: cdn-edge-coredns
+    spec:
+      nodeSelector:
+        cwm-iac-worker-role: cdn
+      tolerations:
+        - key: "cwm-iac-worker-role"
+          operator: "Equal"
+          value: "cdn"
+          effect: "NoExecute"
+      volumes:
+        - name: coredns-conf
+          configMap:
+            name: cdn-edge
+            items:
+              - key: Corefile
+                path: Corefile
+        - name: data
+          hostPath:
+            path: /var/lib/cwm/cdn-edge-data
+      hostNetwork: true
+      containers:
+        - name: coredns
+          # Pulled Sep 9, 2025
+          image: "coredns/coredns:1.11.1@sha256:986f04c2e15e147d00bdd51e8c51bcef3644b13ff806be7d2ff1b261d6dfbae1"
+          args: ["-conf", "/etc/coredns/Corefile"]
+          volumeMounts:
+            - name: coredns-conf
+              mountPath: /etc/coredns
+              readOnly: true
+            - name: data
+              mountPath: /data
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /health
