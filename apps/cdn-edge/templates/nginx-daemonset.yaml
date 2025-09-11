@@ -49,4 +49,3 @@ spec:
           volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx
-              readOnly: true
