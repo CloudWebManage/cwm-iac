@@ -5,6 +5,8 @@ metadata:
   labels:
     app: cdn-edge-coredns
 spec:
+  updateStrategy:
+    type: OnDelete
   selector:
     matchLabels:
       app: cdn-edge-coredns
