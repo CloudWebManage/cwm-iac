@@ -5,6 +5,8 @@ metadata:
   labels:
     app: cdn-edge-nginx
 spec:
+  updateStrategy:
+    type: OnDelete
   selector:
     matchLabels:
       app: cdn-edge-nginx
@@ -42,7 +44,7 @@ spec:
             - -s
             - |
               set -euo pipefail
-              sed -i 's/__RESOLVER_IP__/${RESOLVER_IP}/' /etc/nginx/nginx.conf
+              sed -i 's/__RESOLVER_IP__/${RESOLVER_IP}:5353/' /etc/nginx/nginx.conf
               exec nginx -g 'daemon off;'
           volumeMounts:
             - name: nginx-conf
