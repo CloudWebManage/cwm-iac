@@ -29,8 +29,3 @@ spec:
           env:
             - name: GUNICORN_WORKERS
               value: "10"
-            - name: DB_CONNSTRING
-              valueFrom:
-                secretKeyRef:
-                  name: cdn-db
-                  key: DB_CONNSTRING
