@@ -22,11 +22,6 @@ spec:
         - name: api
           image: {{ .Values.cdnApiImage | quote }}
           imagePullPolicy: Always
-          command:
-            - bash
-            - "-c"
-            - |
-              while true; do sleep 30; done
           env:
             - name: GUNICORN_WORKERS
               value: "10"
