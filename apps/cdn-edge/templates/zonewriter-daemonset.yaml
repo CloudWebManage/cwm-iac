@@ -13,6 +13,7 @@ spec:
       labels:
         app: cdn-edge-zonewriter
     spec:
+      serviceAccountName: cdn-edge-zonewriter
       nodeSelector:
         cwm-iac-worker-role: cdn
       tolerations:
@@ -47,8 +48,5 @@ spec:
             exec:
               command: ["ls", "/data/zones.json"]
           env:
-            - name: DB_CONNSTRING
-              valueFrom:
-                secretKeyRef:
-                  name: cdn-db
-                  key: DB_CONNSTRING
+            - name: NAMESPACE
+              value: "cdn-api"
