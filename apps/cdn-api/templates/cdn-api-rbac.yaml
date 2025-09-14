@@ -28,7 +28,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: cdn-api
-    namespace: default
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
   name: cdn-api
@@ -41,7 +41,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: cdn-api
-    namespace: default
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: cdn-api

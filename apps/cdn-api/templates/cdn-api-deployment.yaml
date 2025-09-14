@@ -25,3 +25,5 @@ spec:
           env:
             - name: GUNICORN_WORKERS
               value: "10"
+            - name: NAMESPACE
+              value: {{ .Release.Namespace | quote }}
