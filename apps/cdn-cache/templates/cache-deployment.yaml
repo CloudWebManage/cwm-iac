@@ -1,16 +1,17 @@
+{{- range $i := untilStep 1 (add .Values.numCacheServers 1) 1 }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cache
+  name: cache{{ $i }}
 spec:
   selector:
     matchLabels:
-      app: cache
-  replicas: {{ .Values.numCacheServers }}
+      app: cache{{ $i }}
+  replicas: {{ $.Values.numCacheServers }}
   template:
     metadata:
       labels:
-        app: cache
+        app: cache{{ $i }}
     spec:
       tolerations:
         - key: cwm-iac-worker-role
@@ -19,8 +20,10 @@ spec:
           effect: NoExecute
       containers:
         - name: cache
-          image: {{ .Values.cdnCacheImage | quote }}
+          image: {{ $.Values.cdnCacheImage | quote }}
           imagePullPolicy: Always
           env:
             - name: TYPE
               value: "cache"
+---
+{{- end }}
