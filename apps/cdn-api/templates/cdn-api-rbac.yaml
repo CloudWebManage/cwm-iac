@@ -6,6 +6,9 @@ rules:
   - verbs: [get, list, watch, create, update, patch, delete]
     apiGroups: ["cdn.cloudwm-cdn.com"]
     resources: ["cdntenants"]
+  - verbs: [get, list, watch]
+    resources: [namespaces]
+    apiGroups: [""]
 ---
 apiVersion: v1
 kind: ServiceAccount
