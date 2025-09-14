@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cache{{ $i }}
+  name: cache{{ add1 $i }}
 spec:
   selector:
     matchLabels:
-      app: cache{{ $i }}
+      app: cache{{ add1 $i }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: cache{{ $i }}
+        app: cache{{ add1 $i }}
     spec:
       tolerations:
         - key: cwm-iac-worker-role
