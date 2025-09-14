@@ -1,0 +1,2 @@
+cdnCacheImage: "ghcr.io/cloudwebmanage/cwm-cdn-api-cache-nginx:latest"
+numCacheServers: 3

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: router
+spec:
+  selector:
+    matchLabels:
+      app: router
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: router
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: cdn
+          effect: NoExecute
+      containers:
+        - name: router
+          image: {{ .Values.cdnCacheImage | quote }}
+          imagePullPolicy: Always
+          env:
+            - name: TYPE
+              value: "router"
+            - name: NUM_CACHE_SERVERS
+              value: {{ .Values.numCacheServers | quote }}

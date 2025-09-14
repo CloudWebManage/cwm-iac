@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+spec:
+  selector:
+    matchLabels:
+      app: cache
+  replicas: {{ .Values.numCacheServers }}
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: cdn
+          effect: NoExecute
+      containers:
+        - name: cache
+          image: {{ .Values.cdnCacheImage | quote }}
+          imagePullPolicy: Always
+          env:
+            - name: TYPE
+              value: "cache"
