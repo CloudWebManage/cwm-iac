@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cdn-api
+rules:
+  - verbs: [get, list, watch, create, update, patch, delete]
+    apiGroups: ["cdntenant.cdn.cloudwm-cdn.com"]
+    resources: ["cdntenants"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cdn-api
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cdn-api
+subjects:
+  - kind: ServiceAccount
+    name: cdn-api
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: cdn-api
+  apiGroup: rbac.authorization.k8s.io

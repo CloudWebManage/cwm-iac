@@ -12,6 +12,7 @@ spec:
       labels:
         app: cdn-api
     spec:
+      serviceAccountName: cdn-api
       tolerations:
         - key: cwm-iac-worker-role
           operator: Equal
