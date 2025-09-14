@@ -1,4 +1,4 @@
-{{- range $i, $_ := until .Values.numCacheServers }}
+{{- range $i, $_ := until (int .Values.numCacheServers) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
