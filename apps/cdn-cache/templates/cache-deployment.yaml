@@ -24,13 +24,13 @@ spec:
           operator: Equal
           value: cdn
           effect: NoExecute
-      initContainers:
-        - name: init-cache
-          image: busybox:latest
-          command: ['sh', '-c', 'mkdir -p /var/cache/nginx']
-          volumeMounts:
-            - name: cache
-              mountPath: /var/cache
+{{/*      initContainers:*/}}
+{{/*        - name: init-cache*/}}
+{{/*          image: busybox:latest*/}}
+{{/*          command: ['sh', '-c', 'mkdir -p /var/cache/nginx']*/}}
+{{/*          volumeMounts:*/}}
+{{/*            - name: cache*/}}
+{{/*              mountPath: /var/cache*/}}
       containers:
         - name: cache
           image: {{ $.Values.cdnCacheImage | quote }}
@@ -38,13 +38,13 @@ spec:
           imagePullPolicy: Always
           volumeMounts:
             - name: cache
-              mountPath: /var/cache
+              mountPath: /var/cache/nginx
           env:
             - name: TYPE
               value: "cache"
             - name: NGINX_HTTP_CONFIGS
               value: |
-                proxy_cache_path /var/cache levels=1:2 keys_zone=cwm:500m inactive=5d;
+                proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=cwm:500m inactive=5d;
             - name: NGINX_LOCATION_CONFIGS
               value: |
                 error_log stderr debug;
