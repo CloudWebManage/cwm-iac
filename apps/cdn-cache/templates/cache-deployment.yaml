@@ -36,6 +36,6 @@ spec:
               value: "cache"
             - name: NGINX_HTTP_CONFIGS
               value: |
-                proxy_cache_path /var/cache levels=1:2:3 keys_zone=cwm:1g inactive=5d use_temp_path=off;
+                proxy_cache_path /var/cache levels=1:2 keys_zone=cwm:1g inactive=5d use_temp_path=off;
 ---
 {{- end }}
