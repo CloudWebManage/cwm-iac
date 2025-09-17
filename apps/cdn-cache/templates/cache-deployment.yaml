@@ -24,6 +24,14 @@ spec:
           operator: Equal
           value: cdn
           effect: NoExecute
+      initContainers:
+        - name: init-cache
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'mkdir -p /var/cache && chown -R 101:101 /var/cache']
+          volumeMounts:
+            - name: cache
+              mountPath: /var/cache
       containers:
         - name: cache
           image: {{ $.Values.cdnCacheImage | quote }}
