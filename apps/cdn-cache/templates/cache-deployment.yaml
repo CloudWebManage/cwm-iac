@@ -43,9 +43,11 @@ spec:
               value: "cache"
             - name: NGINX_HTTP_CONFIGS
               value: |
-                proxy_cache_path /var/cache levels=1:2 keys_zone=cwm:500m inactive=5d use_temp_path=off;
-                proxy_cache_convert_head on;
-                proxy_cache_key "$request_method$http_x_cwmcdn_tenant_name$request_uri";
+                proxy_cache_path /var/cache levels=1:2 keys_zone=cwm:500m inactive=5d;
+            - name: NGINX_LOCATION_CONFIGS
+              value: |
+                error_log /dev/stderr debug;
                 proxy_cache cwm;
+                proxy_cache_key "$http_x_cwmcdn_tenant_name$request_uri";
 ---
 {{- end }}
