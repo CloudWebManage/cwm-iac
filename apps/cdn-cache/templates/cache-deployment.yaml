@@ -50,5 +50,6 @@ spec:
                 error_log stderr debug;
                 proxy_cache cwm;
                 proxy_cache_key "$http_x_cwmcdn_tenant_name$request_uri";
+                proxy_cache_valid any 1h;
 ---
 {{- end }}
