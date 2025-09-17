@@ -24,13 +24,6 @@ spec:
           operator: Equal
           value: cdn
           effect: NoExecute
-{{/*      initContainers:*/}}
-{{/*        - name: init-cache*/}}
-{{/*          image: busybox:latest*/}}
-{{/*          command: ['sh', '-c', 'mkdir -p /var/cache/nginx']*/}}
-{{/*          volumeMounts:*/}}
-{{/*            - name: cache*/}}
-{{/*              mountPath: /var/cache*/}}
       containers:
         - name: cache
           image: {{ $.Values.cdnCacheImage | quote }}
