@@ -34,6 +34,7 @@ spec:
       containers:
         - name: cache
           image: {{ $.Values.cdnCacheImage | quote }}
+          args: ["nginx-debug", "-g", "daemon off;"]
           imagePullPolicy: Always
           volumeMounts:
             - name: cache
@@ -46,7 +47,7 @@ spec:
                 proxy_cache_path /var/cache levels=1:2 keys_zone=cwm:500m inactive=5d;
             - name: NGINX_LOCATION_CONFIGS
               value: |
-                error_log /dev/stderr debug;
+                error_log stderr debug;
                 proxy_cache cwm;
                 proxy_cache_key "$http_x_cwmcdn_tenant_name$request_uri";
 ---
