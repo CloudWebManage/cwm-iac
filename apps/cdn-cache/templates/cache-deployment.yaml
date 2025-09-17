@@ -27,7 +27,7 @@ spec:
       initContainers:
         - name: init-cache
           image: busybox:latest
-          command: ['sh', '-c', 'mkdir -p /var/cache && touch /var/cache/.placeholder']
+          command: ['sh', '-c', 'mkdir -p /var/cache/nginx']
           volumeMounts:
             - name: cache
               mountPath: /var/cache
