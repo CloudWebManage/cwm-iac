@@ -1,18 +1,24 @@
-{{- range $i, $_ := until (int .Values.numCacheServers) }}
+{{- range $name, $server := .Values.cacheServers }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cache{{ add1 $i }}
+  name: {{ $name | quote }}
 spec:
   selector:
     matchLabels:
-      app: cache{{ add1 $i }}
+      app: {{ $name | quote }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: cache{{ add1 $i }}
+        app: {{ $name | quote }}
     spec:
+      volumes:
+        - name: cache
+          hostPath:
+            path: "/var/lib/cwm/cdn-cache/{{ $name }}"
+      nodeSelector:
+        kubernetes.io/hostname: {{ $server.nodeName | quote }}
       tolerations:
         - key: cwm-iac-worker-role
           operator: Equal
@@ -22,8 +28,14 @@ spec:
         - name: cache
           image: {{ $.Values.cdnCacheImage | quote }}
           imagePullPolicy: Always
+          volumeMounts:
+            - name: cache
+              mountPath: /var/cache
           env:
             - name: TYPE
               value: "cache"
+            - name: NGINX_HTTP_CONFIGS
+              value: |
+                proxy_cache_path /var/cache levels=1:2:3 keys_zone=cwm:1g inactive=5d use_temp_path=off;
 ---
 {{- end }}

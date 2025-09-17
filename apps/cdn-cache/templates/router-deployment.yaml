@@ -24,5 +24,8 @@ spec:
           env:
             - name: TYPE
               value: "router"
-            - name: NUM_CACHE_SERVERS
-              value: {{ .Values.numCacheServers | quote }}
+            - name: NGINX_UPSTREAM_CACHE_SERVERS
+              value: |
+                {{- range $name, $server := .Values.cacheServers }}
+                server {{ $name }}:80;
+                {{- end }}

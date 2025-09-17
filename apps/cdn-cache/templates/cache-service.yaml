@@ -1,11 +1,11 @@
-{{- range $i, $_ := until (int .Values.numCacheServers) }}
+{{- range $name, $server := .Values.cacheServers }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: cache{{ add1 $i }}
+  name: {{ $name | quote }}
 spec:
   selector:
-    app: cache{{ add1 $i }}
+    app: {{ $name | quote }}
   ports:
     - port: 80
 ---
