@@ -13,9 +13,12 @@ longhorn:
     provisionerReplicaCount: 1
     resizerReplicaCount: 1
     snapshotterReplicaCount: 1
-  defaultSettings:
-    taintToleration: cwm-iac-worker-role=system:NoExecute
-    defaultReplicaCount: 1
-    systemManagedComponentsNodeSelector: "cwm-iac-worker-role=system"
   persistence:
     defaultClassReplicaCount: 1
+  preUpgradeChecker:
+    jobEnabled: false
+
+overrideSettings:
+  taint-toleration: "cwm-iac-worker-role=system:NoExecute"
+  defaultReplicaCount: "1"
+  systemManagedComponentsNodeSelector: "cwm-iac-worker-role=system"
