@@ -1,0 +1,9 @@
+{{- range $k, $v := .Values.overrideSettings }}
+apiVersion: longhorn.io/v1beta2
+kind: Setting
+metadata:
+  name: {{ $k | quote }}
+  namespace: longhorn-system
+value: {{ $v | quote }}
+---
+{{- end }}
