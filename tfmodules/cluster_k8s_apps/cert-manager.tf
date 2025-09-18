@@ -27,35 +27,17 @@ locals {
     kind: Kustomization
 
     resources:
-    - install-${var.certmanager_version}.yaml
+    - install-${var.versions["certmanager"]}.yaml
+    - cluster-issuer.yaml
 
     patches:
     ${local.certmanager_patch_deploymens}
   EOT
 }
 
-resource "null_resource" "certmanager_install" {
-  triggers = {
-    counter = lookup(var.force_reinstall_counters, "cert-manager", 0)
-    command = <<-EOT
-      set -euo pipefail
-      mkdir -p "${var.data_path}/cert-manager"
-      if ! [ -f "${var.data_path}/cert-manager/install-${var.certmanager_version}.yaml" ]; then
-        curl -L -o "${var.data_path}/cert-manager/install-${var.certmanager_version}.yaml" \
-          https://github.com/jetstack/cert-manager/releases/download/v${var.certmanager_version}/cert-manager.yaml
-      fi
-      echo '${local.certmanager_kustomization_yaml}' > "${var.data_path}/cert-manager/kustomization.yaml"
-      ${local.kubectl} apply -k "${var.data_path}/cert-manager"
-    EOT
-  }
-  provisioner "local-exec" {
-    command = self.triggers.command
-    interpreter = ["bash", "-c"]
-  }
-}
-
-resource "kubernetes_manifest" "certmanager_cluster_issuer" {
-  manifest = {
+resource "local_file" "certmanager_cluster_issuer" {
+  filename = "${var.data_path}/cert-manager/cluster-issuer.yaml"
+  content = yamlencode({
     apiVersion = "cert-manager.io/v1"
     kind       = "ClusterIssuer"
     metadata = {
@@ -91,5 +73,30 @@ resource "kubernetes_manifest" "certmanager_cluster_issuer" {
         ]
       }
     }
+  })
+}
+
+resource "null_resource" "certmanager_install" {
+  triggers = {
+    counter = lookup(var.force_reinstall_counters, "cert-manager", 0)
+    cluster_issuer = local_file.certmanager_cluster_issuer.content
+    command = <<-EOT
+      set -euo pipefail
+      mkdir -p "${var.data_path}/cert-manager"
+      if ! [ -f "${var.data_path}/cert-manager/install-${var.versions["certmanager"]}.yaml" ]; then
+        curl -L -o "${var.data_path}/cert-manager/install-${var.versions["certmanager"]}.yaml" \
+          https://github.com/jetstack/cert-manager/releases/download/v${var.versions["certmanager"]}/cert-manager.yaml
+      fi
+      echo '${local.certmanager_kustomization_yaml}' > "${var.data_path}/cert-manager/kustomization.yaml"
+      if ! KUBECONFIG=${var.admin_kubeconfig_path} ${var.tools.kubectl} apply -k "${var.data_path}/cert-manager"; then
+        echo waiting for cert-manager CRD to be installed...
+        sleep 10
+        KUBECONFIG=${var.admin_kubeconfig_path} ${var.tools.kubectl} apply -k "${var.data_path}/cert-manager"
+      fi
+    EOT
+  }
+  provisioner "local-exec" {
+    command = self.triggers.command
+    interpreter = ["bash", "-c"]
   }
 }

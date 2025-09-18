@@ -69,6 +69,7 @@ variable "servers" {
     monthly_traffic_package = optional(string)
     ram_mb        = number
     kamatera_server_name = optional(string)  # Optional override for the Kamatera server name
+    ingress       = optional(bool)  # Whether this server should be added to the ingress DNS records
   }))
 }
 
@@ -87,3 +88,4 @@ variable "admin_kubeconfig_path" {
 variable "data_path" {
   type = string
 }
+

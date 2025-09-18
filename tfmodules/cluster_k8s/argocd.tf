@@ -37,7 +37,7 @@ locals {
     kind: Kustomization
 
     resources:
-    - install-${var.argocd_version}.yaml
+    - install-${var.versions["argocd"]}.yaml
 
     patches:
     - target:
@@ -61,9 +61,9 @@ resource "null_resource" "argocd_install" {
     command = <<-EOT
       set -euo pipefail
       mkdir -p "${var.data_path}/argocd"
-      if ! [ -f "${var.data_path}/argocd/install-${var.argocd_version}.yaml" ]; then
-        curl -L -o "${var.data_path}/argocd/install-${var.argocd_version}.yaml" \
-          https://raw.githubusercontent.com/argoproj/argo-cd/v${var.argocd_version}/manifests/install.yaml
+      if ! [ -f "${var.data_path}/argocd/install-${var.versions["argocd"]}.yaml" ]; then
+        curl -L -o "${var.data_path}/argocd/install-${var.versions["argocd"]}.yaml" \
+          https://raw.githubusercontent.com/argoproj/argo-cd/v${var.versions["argocd"]}/manifests/install.yaml
       fi
       echo '${local.argocd_kustomization_yaml}' > "${var.data_path}/argocd/kustomization.yaml"
       ${local.kubectl} apply -n argocd -k "${var.data_path}/argocd"
@@ -117,19 +117,34 @@ resource "kubernetes_ingress_v1" "argocd-server" {
   }
 }
 
-resource "tls_private_key" "argocd_cwm_worker_cluster_deploy_key" {
+resource "tls_private_key" "argocd_github_repo_deploy_keys" {
+  for_each = var.argocd_github_repo_deploy_keys
   algorithm = "RSA"
 }
 
-# this is added manually so we don't have to manage GitHub credentials with Terraform
-# resource "github_repository_deploy_key" "argocd_cwm_worker_cluster" {
-#   repository = "cwm-worker-cluster"
-#   title = "ArgoCD Deploy Key"
-#   key = tls_private_key.argocd_cwm_worker_cluster_deploy_key.public_key_openssh
-#   read_only = true
-# }
+resource "kubernetes_secret" "argocd_github_repo_deploy_keys" {
+  depends_on = [kubernetes_namespace.argocd]
+  for_each = var.argocd_github_repo_deploy_keys
+  metadata {
+    name      = "argocd-repo-${each.key}"
+    namespace = "argocd"
+    labels = {
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
+  data = {
+    "type" = "git"
+    "url" = "git@github.com:${each.value.repo_slug}.git"
+    "sshPrivateKey" = tls_private_key.argocd_github_repo_deploy_keys[each.key].private_key_pem
+  }
+  type = "Opaque"
+}
 
-output "argocd_cwm_worker_cluster_deploy_private_key" {
-  value = tls_private_key.argocd_cwm_worker_cluster_deploy_key.private_key_pem
-  sensitive = true
+output "argocd_github_repo_deploy_keys" {
+  value = {
+    for k, v in var.argocd_github_repo_deploy_keys : k => {
+      repo_slug = v.repo_slug
+      public_key = tls_private_key.argocd_github_repo_deploy_keys[k].public_key_openssh
+    }
+  }
 }

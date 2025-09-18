@@ -32,11 +32,12 @@ resource "null_resource" "directpv_install" {
     command = <<-EOT
       set -euo pipefail
       mkdir -p "${var.data_path}/directpv"
-      ${local.kubectl_directpv} install \
+      export KUBECONFIG=${var.kubeconfig_path}
+      ${var.tools.kubectl_directpv} install \
         --tolerations cwm-iac-worker-role=minio:NoExecute \
         -o yaml > "${var.data_path}/directpv/install.yaml"
       echo '${local.directpv_kustomization_yaml}' > "${var.data_path}/directpv/kustomization.yaml"
-      ${local.kubectl} apply -k "${var.data_path}/directpv"
+      ${var.tools.kubectl} apply -k "${var.data_path}/directpv"
     EOT
   }
   provisioner "local-exec" {
@@ -50,8 +51,9 @@ resource "null_resource" "directpv_init_drives" {
     counter = lookup(var.force_reinstall_counters, "directpv_init_drives", 0)
     command = <<-EOT
       set -euo pipefail
-      if ${local.kubectl_directpv} discover --output-file "${var.data_path}/directpv/drives.yaml"; then
-          ${local.kubectl_directpv} init "${var.data_path}/directpv/drives.yaml" --dangerous || true
+      export KUBECONFIG=${var.kubeconfig_path}
+      if ${var.tools.kubectl_directpv} discover --output-file "${var.data_path}/directpv/drives.yaml"; then
+          ${var.tools.kubectl_directpv} init "${var.data_path}/directpv/drives.yaml" --dangerous || true
       fi
     EOT
   }

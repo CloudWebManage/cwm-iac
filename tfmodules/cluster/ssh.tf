@@ -70,7 +70,12 @@ resource "null_resource" "init_ssh_servers" {
   provisioner "local-exec" {
     command = <<-EOF
       set -euo pipefail
-      SSHCMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${local.server_private_ip[each.key]}"
+      TMPFILE=$(mktemp)
+      trap 'rm -f "$TMPFILE"' EXIT
+      echo 'Host *' > "$TMPFILE"
+      echo '  StrictHostKeyChecking no' >> "$TMPFILE"
+      echo '  UserKnownHostsFile /dev/null' >> "$TMPFILE"
+      SSHCMD="ssh -F $TMPFILE root@${local.server_private_ip[each.key]}"
       SSHCMD+=" -J root@${local.server_public_ip[local.bastion_server_name]}:${random_integer.bastion_ssh_port.result}"
       if $SSHCMD -p ${random_integer.servers_ssh_port.result} true; then
         $SSHCMD -p ${random_integer.servers_ssh_port.result} "${self.triggers.command}"

@@ -98,7 +98,7 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
           tolerations:
             - key: "cwm-iac-worker-role"
               operator: "Equal"
-              value: "minio"
+              value: "${var.ingress_nginx_controller_worker_role}"
               effect: "NoExecute"
           config:
             # this is required for cert-manager, see https://cert-manager.io/docs/releases/release-notes/release-notes-1.18/

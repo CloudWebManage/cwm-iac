@@ -10,7 +10,6 @@ data "vault_kv_secret_v2" "vault_external_server" {
 }
 
 resource "kubernetes_manifest" "external-secrets-operator-app" {
-  depends_on = [null_resource.argocd_install]
   manifest = {
     apiVersion : "argoproj.io/v1alpha1"
     kind : "Application"
@@ -59,7 +58,7 @@ resource "kubernetes_secret" "external-secrets-operator-vault-ca-provider" {
 }
 
 resource "vault_policy" "external-secrets-operator" {
-  name   = "external-secrets-operator"
+  name   = "${var.name_prefix}-external-secrets-operator"
   policy = <<-EOT
     path "auth/approle/login" {
       capabilities = ["create", "read"]
@@ -71,7 +70,7 @@ resource "vault_policy" "external-secrets-operator" {
 }
 
 resource "vault_approle_auth_backend_role" "external-secrets-operator" {
-  role_name = "external-secrets-operator"
+  role_name = "${var.name_prefix}-external-secrets-operator"
   token_policies = [
     vault_policy.external-secrets-operator.name,
   ]
