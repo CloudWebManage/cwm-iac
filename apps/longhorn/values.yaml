@@ -20,5 +20,5 @@ longhorn:
 
 overrideSettings:
   taint-toleration: "cwm-iac-worker-role=system:NoExecute"
-  defaultReplicaCount: "1"
-  systemManagedComponentsNodeSelector: "cwm-iac-worker-role:system"
+  default-replica-count: "1"
+  system-managed-components-node-selector: "cwm-iac-worker-role:system"
