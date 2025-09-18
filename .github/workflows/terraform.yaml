@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - tfmodules/**
+      - .github/workflows/terraform.*
 jobs:
   terraform:
     runs-on: ubuntu-latest
