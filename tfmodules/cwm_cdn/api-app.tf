@@ -8,6 +8,7 @@ module "api_app" {
 }
 
 resource "kubernetes_manifest" "cwm_cdn_tenants_config_external_secret" {
+  count = var.is_primary ? 1 : 0
   depends_on = [kubernetes_namespace.namespaces]
   manifest = {
     apiVersion = "external-secrets.io/v1"
