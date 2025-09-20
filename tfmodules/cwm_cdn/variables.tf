@@ -53,6 +53,11 @@ variable "is_primary" {
   default = false
 }
 
+variable "allowed_primary_cluster_name" {
+  type = string
+  default = ""
+}
+
 variable "secondaries" {
   type = map(object({
     cluster_name = string

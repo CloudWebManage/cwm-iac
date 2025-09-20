@@ -1,10 +1,33 @@
+data "vault_kv_secret_v2" "allowed_primary_key" {
+  count = var.is_primary ? 0 : 1
+  mount = var.vault_mount
+  name  = "cwm-worker-cluster/${var.allowed_primary_cluster_name}/cwm_cdn/cwm_cdn_api_primary_key"
+}
+
 module "api_app" {
   source = "../argocd-app"
   name = "cdn-api"
   create_namespace = false
   values = {
     isPrimary = var.is_primary
+    allowedPrimaryKey = var.is_primary ? "" : data.vault_kv_secret_v2.allowed_primary_key[0].data["key"]
   }
+}
+
+resource "random_password" "primary_key" {
+  count = var.is_primary ? 1 : 0
+  length = 32
+  special = false
+}
+
+resource "vault_kv_secret_v2" "primary_key" {
+  count = var.is_primary ? 1 : 0
+  depends_on = [random_password.primary_key]
+  mount = var.vault_mount
+  name  = "${var.vault_path}/cwm_cdn_api_primary_key"
+  data_json = jsonencode({
+    key = random_password.primary_key[0].result
+  })
 }
 
 resource "kubernetes_manifest" "cwm_cdn_tenants_config_external_secret" {
@@ -30,6 +53,7 @@ resource "kubernetes_manifest" "cwm_cdn_tenants_config_external_secret" {
             }
           }
           data = {
+            "primaryKey" = random_password.primary_key[0].result
             "secondaries.json" = jsonencode({
               for name, config in var.secondaries : name => {
                 url = "https://cwm-cdn-api.${config.cluster_name}.${var.zone_domain}"

@@ -29,3 +29,5 @@ spec:
               value: {{ .Release.Namespace | quote }}
             - name: IS_PRIMARY
               value: "{{ if .Values.isPrimary }}true{{ else }}false{{ end }}"
+            - name: ALLOWED_PRIMARY_KEY
+              value: {{ .Values.allowedPrimaryKey | quote }}

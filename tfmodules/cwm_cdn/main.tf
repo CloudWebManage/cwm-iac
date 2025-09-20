@@ -6,5 +6,8 @@ terraform {
         aws.route53
       ]
     }
+    vault = {
+      source = "hashicorp/vault"
+    }
   }
 }
