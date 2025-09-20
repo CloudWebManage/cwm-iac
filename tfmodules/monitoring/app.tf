@@ -1,5 +1,5 @@
 module "app" {
-  source = "../../tfmodules/argocd-app"
+  source = "../argocd-app"
   name = "monitoring"
   create_namespace = false
   values = {

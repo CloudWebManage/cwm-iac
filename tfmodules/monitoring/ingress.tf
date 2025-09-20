@@ -1,6 +1,5 @@
 module "monitoring_htpasswd" {
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
-  source = "../../../cwm-iac/tfmodules/htpasswd"
+  source = "../htpasswd"
   tools = var.tools
   vault_mount = var.vault_mount
   vault_path = "${var.vault_path}/monitoring/htpasswd"
