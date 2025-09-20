@@ -22,8 +22,7 @@ resource "null_resource" "longhorn_init_nodes" {
 
 module "longhorn-app" {
   depends_on = [null_resource.longhorn_init_nodes]
-  source = "app.terraform.io/cwm-iac/argocd-app/generic"
-  version = "v0.0.0+b6f64d0ad39a458c0d236e5bdbfc7fc4c55535b0"
+  source = "../argocd-app"
   name = "longhorn"
   namespace = "longhorn-system"
 }
