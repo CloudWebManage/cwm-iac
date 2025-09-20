@@ -27,3 +27,5 @@ spec:
               value: "10"
             - name: NAMESPACE
               value: {{ .Release.Namespace | quote }}
+            - name: IS_PRIMARY
+              value: "{{ if .Values.isPrimary }}true{{ else }}false{{ end }}"

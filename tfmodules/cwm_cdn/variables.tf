@@ -47,3 +47,15 @@ variable "geolocation_set_identifier" {
   type = string
   default = ""
 }
+
+variable "is_primary" {
+  type = bool
+  default = false
+}
+
+variable "secondaries" {
+  type = map(object({
+    cluster_name = string
+  }))
+  default = {}
+}
