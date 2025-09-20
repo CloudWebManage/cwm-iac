@@ -1,4 +1,5 @@
 resource "kubernetes_ingress_v1" "cwm-minio-api" {
+  count = var.initialize ? 0 : 1
   depends_on = [kubernetes_namespace.tenant]
   metadata {
     name = "cwm-minio-api"

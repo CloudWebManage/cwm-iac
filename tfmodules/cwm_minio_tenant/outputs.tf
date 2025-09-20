@@ -1,7 +1,7 @@
 output "minio_tenant" {
   value = {
-    api_url = "https://minio-tenant-main-api.${var.ingress_star_domain}"
-    console_url = "https://minio-tenant-main-console.${var.ingress_star_domain}"
+    api_url = "https://minio-tenant-${var.name}-api.${var.ingress_star_domain}"
+    console_url = "https://minio-tenant-${var.name}-console.${var.ingress_star_domain}"
     admin_username = random_password.admin-user.result
     admin_password = random_password.admin-password.result
   }
@@ -19,9 +19,9 @@ output "cwm_minio_api" {
 
 output "minio_tenant_metrics_creds" {
   value = {
-    username = module.htpasswd_minio_tenant_main_metrics.username
-    password = module.htpasswd_minio_tenant_main_metrics.password
-    prometheus_url = "https://minio-tenant-main-prometheus.${var.ingress_star_domain}"
+    username = var.metrics ? module.htpasswd_minio_tenant_main_metrics[0].username : ""
+    password = var.metrics ? module.htpasswd_minio_tenant_main_metrics[0].password : ""
+    prometheus_url = "https://minio-tenant-${var.name}-prometheus.${var.ingress_star_domain}"
   }
   sensitive = true
 }

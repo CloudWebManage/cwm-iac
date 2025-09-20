@@ -1,4 +1,5 @@
 resource "aws_route53_record" "edge" {
+  provider = aws.route53
   name    = "edge.${var.name_prefix}.${var.zone_domain}"
   type    = "A"
   zone_id = var.zone_id
@@ -7,5 +8,5 @@ resource "aws_route53_record" "edge" {
 }
 
 output "edge_dns" {
-  value = aws_route53_record.edge[0].name
+  value = aws_route53_record.edge.name
 }

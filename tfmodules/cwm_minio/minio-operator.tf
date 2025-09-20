@@ -1,6 +1,6 @@
 module "minio_operator" {
   depends_on = [module.cloudnative_pg, null_resource.directpv_init_drives]
-  source = "../../tfmodules/argocd-app"
+  source = "../argocd-app"
   name = "minio-operator"
   values = {
     # https://github.com/minio/operator/blob/master/helm/operator/values.yaml

@@ -1,5 +1,5 @@
 module "minio_tenant_main" {
-  source = "../../tfmodules/argocd-app"
+  source = "../argocd-app"
   name = "minio-tenant-${var.name}"
   create_namespace = false
   path = "apps/minio-tenant"
@@ -10,6 +10,7 @@ module "minio_tenant_main" {
       path           = "apps/minio-tenant"
       helm = merge({
         valuesObject = {
+          initialize = var.initialize
           tenant = {
             ingress = {
               api = {

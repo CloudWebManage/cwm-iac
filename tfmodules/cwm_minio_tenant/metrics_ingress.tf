@@ -1,7 +1,8 @@
 resource "kubernetes_ingress_v1" "minio-tenant-metrics-prometheus" {
+  count = var.metrics ? 1 : 0
   metadata {
     name = "prometheus"
-    namespace = kubernetes_namespace.minio-tenant-metrics.metadata[0].name
+    namespace = kubernetes_namespace.minio-tenant-metrics[0].metadata[0].name
     annotations = {
       "cert-manager.io/cluster-issuer": "letsencrypt"
       "nginx.ingress.kubernetes.io/auth-type": "basic"

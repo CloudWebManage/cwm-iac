@@ -4,11 +4,6 @@ resource "kubernetes_namespace" "external-secrets-operator" {
   }
 }
 
-data "vault_kv_secret_v2" "vault_external_server" {
-  mount = "kvv2"
-  name  = "cwm-worker-cluster/cwmc-management/vault_external_server"
-}
-
 resource "kubernetes_manifest" "external-secrets-operator-app" {
   manifest = {
     apiVersion : "argoproj.io/v1alpha1"
@@ -29,7 +24,7 @@ resource "kubernetes_manifest" "external-secrets-operator-app" {
         path : "apps/external-secrets-operator"
         helm : {
           valuesObject : {
-            vault_server : data.vault_kv_secret_v2.vault_external_server.data.server
+            vault_server : var.vault_external_server
           }
         }
       }
@@ -42,18 +37,13 @@ resource "kubernetes_manifest" "external-secrets-operator-app" {
   }
 }
 
-data "vault_kv_secret_v2" "vault_ca_bundle_b64" {
-  mount = "kvv2"
-  name  = "cwm-worker-cluster/cwmc-management/vault_ca_bundle_b64"
-}
-
 resource "kubernetes_secret" "external-secrets-operator-vault-ca-provider" {
   metadata {
     name      = "vault-ca-provider"
     namespace = kubernetes_namespace.external-secrets-operator.metadata[0].name
   }
   data = {
-    "ca" = base64decode(data.vault_kv_secret_v2.vault_ca_bundle_b64.data["ca"])
+    "ca" = base64decode(var.vault_ca_bundle_b64)
   }
 }
 

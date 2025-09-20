@@ -1,4 +1,5 @@
 resource "null_resource" "minio_tenant_mc_metrics_prometheus_config_vault" {
+  count = var.metrics ? 1 : 0
   depends_on = [module.minio_tenant_main]
   triggers = {
     command = <<-EOT
@@ -15,19 +16,22 @@ resource "null_resource" "minio_tenant_mc_metrics_prometheus_config_vault" {
 }
 
 data "vault_kv_secret_v2" "minio_tenant_main_mc_metrics_prometheus_config" {
+  count = var.metrics ? 1 : 0
   depends_on = [null_resource.minio_tenant_mc_metrics_prometheus_config_vault]
   mount = var.vault_mount
   name = "${var.vault_path}/mc_metrics_prometheus_config"
 }
 
 locals {
-  cluster_scrape_config = yamldecode(data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config.data.config)["scrape_configs"][0]
+  cluster_scrape_config = yamldecode(var.metrics ? data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config[0].data.config : "")["scrape_configs"][0]
 }
 
 module "metrics_app" {
+  count = var.metrics ? 1 : 0
   depends_on = [kubernetes_namespace.minio-tenant-metrics]
-  source = "../../tfmodules/argocd-app"
+  source = "../argocd-app"
   name = "minio-tenant-${var.name}-metrics"
+  create_namespace = false
   path = "apps/minio-tenant-metrics"
   values = {
     prometheus = {

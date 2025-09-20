@@ -31,18 +31,15 @@ variable "data_path" {
   type = string
 }
 
-variable "ingress_star_domain" {
-  type = string
-}
-
 variable "force_reinstall_counters" {
   type = map(number)
 }
 
 variable "workers" {
   type = map(object({
-    worker-role          = string  # system - used for system / management workloads
-                                   # any other value is considered an application workload node, it's used to label/taint the nodes
+    worker-role = string  # system - used for system / management workloads
+                          # any other value is considered an application workload node, it's used to label/taint the nodes
+    public-ip = string
   }))
 }
 
@@ -73,4 +70,8 @@ variable "ingress_dns_zone_id" {
 variable "ingress_dns_zone_domain" {
   type = string
   default = ""
+}
+
+variable "cluster_name" {
+  type = string
 }

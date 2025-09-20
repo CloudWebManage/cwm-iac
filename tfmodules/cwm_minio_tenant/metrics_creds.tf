@@ -1,5 +1,5 @@
 module "htpasswd_minio_tenant_main_metrics" {
-  # source = "git::https://github.com/CloudWebManage/cwm-iac.git//tfmodules/htpasswd?ref=main"
+  count = var.metrics ? 1 : 0
   source = "../htpasswd"
   tools = var.tools
   vault_mount = var.vault_mount
@@ -7,7 +7,7 @@ module "htpasswd_minio_tenant_main_metrics" {
   secrets = [
     {
       name      = "minio-tenant-main-metrics-htpasswd"
-      namespace = kubernetes_namespace.minio-tenant-metrics.metadata[0].name
+      namespace = kubernetes_namespace.minio-tenant-metrics[0].metadata[0].name
     }
   ]
 }

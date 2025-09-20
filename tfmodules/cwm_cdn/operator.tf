@@ -17,10 +17,10 @@ resource "null_resource" "cdn_operator_install" {
     command = <<-EOT
       set -euo pipefail
       DIST_INSTALL="${var.data_path}/operator/dist-install-${var.versions["cwm-cdn-operator-dist-install"]}.yaml"
-      if ! [ -f "${DIST_INSTALL}" ]; then
+      if ! [ -f "$DIST_INSTALL" ]; then
         mkdir -p "${var.data_path}/operator"
-        curl -L -o "${DIST_INSTALL}" \
-          https://github.com/CloudWebManage/cwm-cdn-operator/blob/${var.versions["cwm-cdn-operator-dist-install"]}/dist/install.yaml
+        curl -L -o "$DIST_INSTALL" \
+          https://raw.githubusercontent.com/CloudWebManage/cwm-cdn-operator/${var.versions["cwm-cdn-operator-dist-install"]}/dist/install.yaml
       fi
       echo '${local.cdn_operator_kustomization_yaml}' > "${var.data_path}/operator/kustomization.yaml"
       KUBECONFIG=${var.kubeconfig_path} ${var.tools.kubectl} apply -k "${var.data_path}/operator"

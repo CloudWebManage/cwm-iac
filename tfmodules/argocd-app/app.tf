@@ -6,7 +6,7 @@ locals {
     }
     project = var.project
   }
-  sources_spec = var.sources == null ? {
+  source_spec = var.sources == null ? {
     source = {
       repoURL        = "https://github.com/CloudWebManage/cwm-iac"
       targetRevision = var.targetRevision
@@ -15,9 +15,10 @@ locals {
         valuesObject = var.values
       }
     }
-  } : {
+  } : {}
+  sources_spec = var.sources != null ? {
     sources = var.sources
-  }
+  } : {}
   sync_policy_spec = merge(
     var.autosync == true ? {
       syncPolicy = {
@@ -41,6 +42,6 @@ resource "kubernetes_manifest" "app" {
       name      = var.name
       namespace = "argocd"
     }
-    spec = merge(local.base_spec, local.sources_spec, local.sync_policy_spec)
+    spec = merge(local.base_spec, local.source_spec, local.sources_spec, local.sync_policy_spec)
   }
 }

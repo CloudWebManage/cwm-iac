@@ -77,7 +77,7 @@ resource "null_resource" "argocd_install" {
 
 output "argocd_admin" {
   value = {
-    url = "https://argocd.${var.ingress_star_domain}"
+    url = "https://argocd.${local.ingress_star_domain}"
     username = "admin"
     password = "${local.kubectl} -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode"
   }
@@ -94,11 +94,11 @@ resource "kubernetes_ingress_v1" "argocd-server" {
   spec {
     ingress_class_name = "nginx"
     tls {
-      hosts = ["argocd.${var.ingress_star_domain}"]
+      hosts = ["argocd.${local.ingress_star_domain}"]
       secret_name = "argocd-tls"
     }
     rule {
-      host = "argocd.${var.ingress_star_domain}"
+      host = "argocd.${local.ingress_star_domain}"
       http {
         path {
           path = "/"

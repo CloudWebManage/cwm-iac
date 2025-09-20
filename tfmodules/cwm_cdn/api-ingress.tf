@@ -63,11 +63,11 @@ resource "kubernetes_ingress_v1" "cwm-cdn-api" {
   spec {
     ingress_class_name = "nginx"
     tls {
-      hosts = ["cwm-cdn-api.${var.name_prefix}.${var.ingress_dns_zone_domain}"]
+      hosts = ["cwm-cdn-api.${var.name_prefix}.${var.zone_domain}"]
       secret_name = "cwm-cdn-api-tls"
     }
     rule {
-      host = "cwm-cdn-api.${var.name_prefix}.${var.ingress_dns_zone_domain}"
+      host = "cwm-cdn-api.${var.name_prefix}.${var.zone_domain}"
       http {
         path {
           path = "/"

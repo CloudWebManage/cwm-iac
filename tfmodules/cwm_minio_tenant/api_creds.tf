@@ -40,7 +40,7 @@ resource "kubernetes_manifest" "cwm_minio_api_htpasswd_external_secret" {
         {
           secretKey = "auth"
           remoteRef = {
-            key = "${var.vault_path}/cwm_minio_api_creds"
+            key = "${var.vault_path}/api_creds"
             property = "auth"
           }
         }

@@ -44,3 +44,11 @@ variable "vault_mount" {
 variable "vault_path" {
   type = string
 }
+
+variable "initialize" {
+  type = bool
+}
+
+variable "metrics" {
+  type = bool
+}

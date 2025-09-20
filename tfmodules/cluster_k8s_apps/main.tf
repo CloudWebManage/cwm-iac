@@ -47,3 +47,13 @@ variable "admin_kubeconfig_path" {
 variable "tools" {
   type = any
 }
+
+variable "vault_external_server" {
+  type = string
+  sensitive = true
+}
+
+variable "vault_ca_bundle_b64" {
+  type = string
+  sensitive = true
+}

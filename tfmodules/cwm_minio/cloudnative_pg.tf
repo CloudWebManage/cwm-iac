@@ -1,4 +1,9 @@
 module "cloudnative_pg" {
-  source = "../../tfmodules/argocd-app"
+  source = "../argocd-app"
   name = "cloudnative-pg"
+  sync_policy = {
+    syncOptions : [
+      "ServerSideApply=true"
+    ]
+  }
 }

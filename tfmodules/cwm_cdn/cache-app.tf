@@ -1,5 +1,5 @@
-module "edge-app" {
+module "cache-app" {
   source = "../argocd-app"
-  name = "cdn-edge"
+  name = "cdn-cache"
   create_namespace = false
 }
