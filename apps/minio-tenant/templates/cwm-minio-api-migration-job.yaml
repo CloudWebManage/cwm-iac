@@ -1,3 +1,4 @@
+{{ if not .Values.initialize }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -27,3 +28,4 @@ spec:
               secretKeyRef:
                 name: cwm-minio-api-db
                 key: DB_CONNSTRING
+{{ end }}

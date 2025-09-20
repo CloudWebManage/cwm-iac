@@ -1,3 +1,4 @@
+{{ if not .Values.initialize }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,3 +51,4 @@ spec:
                 secretKeyRef:
                   name: cwm-minio-api-tenant-creds
                   key: secretkey
+{{ end }}
