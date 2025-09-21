@@ -31,7 +31,7 @@ longhorn:
       "nginx.ingress.kubernetes.io/auth-realm": "Protected Area"
 
 overrideSettings:
-  taint-toleration: "cwm-iac-worker-role=system:NoExecute"
+  taint-toleration: "cwm-iac-worker-role=system:NoExecute;cwm-iac-worker-role=logging:NoExecute"
   default-replica-count: "1"
   system-managed-components-node-selector: "cwm-iac-worker-role:system"
 
