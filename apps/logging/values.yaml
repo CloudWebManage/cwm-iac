@@ -44,37 +44,37 @@ loki:
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
-        value: logging
+        value: system
         effect: NoExecute
   read:
     replicas: 1
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
-        value: logging
+        value: system
         effect: NoExecute
   write:
     replicas: 1
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
-        value: logging
+        value: system
         effect: NoExecute
   chunksCache:
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
-        value: logging
+        value: system
         effect: NoExecute
   gateway:
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
-        value: logging
+        value: system
         effect: NoExecute
   resultsCache:
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
-        value: logging
+        value: system
         effect: NoExecute
