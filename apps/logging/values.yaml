@@ -80,3 +80,10 @@ loki:
         operator: Equal
         value: system
         effect: NoExecute
+
+alloy:
+  controller:
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoExecute"
