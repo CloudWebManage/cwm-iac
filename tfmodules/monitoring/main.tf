@@ -11,19 +11,3 @@ terraform {
     }
   }
 }
-
-variable "vault_mount" {
-  type = string
-}
-
-variable "vault_path" {
-  type = string
-}
-
-variable "ingress_star_domain" {
-  type = string
-}
-
-variable "tools" {
-  type = any
-}

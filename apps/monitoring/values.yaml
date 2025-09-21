@@ -9,37 +9,8 @@ kube-prometheus-stack:
     upgradeJob:
       tolerations: *tolerations
   alertmanager:
-#    config:
-#      route:
-#        receiver: slack
-#        routes:
-#          - matchers:
-#              - alertname = "Watchdog"
-#            receiver: 'statuscake'
-#            repeat_interval: 10m
-#      receivers:
-#        - name: slack
-#          slack_configs:
-#          - api_url_file: /etc/alertmanager/secrets/alertmanager-slack-api-url/api-url
-#            channel: "#cluster-rke2-notifications"
-#            send_resolved: true
-#            text: |
-#              {{ len .Alerts }} alerts for namespace "{{ .CommonLabels.namespace }}"
-#              {{ range $i, $alert := .Alerts }}
-#              *Alert #{{$i}}* | {{ .Labels.alertname }} | {{ .Status }} | {{ .StartsAt }}
-#              {{ range $k, $v := .Labels }}  - {{$k}}: {{$v}}
-#              {{ end }}{{ range $k, $v := .Annotations }}  - {{$k}}: {{$v}}
-#              {{ end }}<{{ .GeneratorURL }}|View in Prometheus>
-#              {{ end }}
-#        - name: statuscake
-#          webhook_configs:
-#            - url_file: /etc/alertmanager/secrets/statuscake-webhook-url/url
-#              send_resolved: false
     alertmanagerSpec:
       tolerations: *tolerations
-#      secrets:
-#        - alertmanager-slack-api-url
-#        - statuscake-webhook-url
       resources:
         requests:
           cpu: 400m
