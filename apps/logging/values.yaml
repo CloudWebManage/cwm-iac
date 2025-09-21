@@ -87,3 +87,6 @@ alloy:
       - key: "CriticalAddonsOnly"
         operator: "Exists"
         effect: "NoExecute"
+      - key: cwm-iac-worker-role
+        operator: Exists
+        effect: NoExecute
