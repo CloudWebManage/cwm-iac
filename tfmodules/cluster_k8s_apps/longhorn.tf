@@ -27,6 +27,11 @@ module "longhorn-app" {
   namespace = "longhorn-system"
   values = {
     "htpasswdVaultPath": "${var.vault_path}/longhorn/htpasswd"
+    longhorn = {
+      ingress = {
+        host = "longhorn.${var.ingress_star_domain}"
+      }
+    }
   }
 }
 

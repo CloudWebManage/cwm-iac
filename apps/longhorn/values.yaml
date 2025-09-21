@@ -19,6 +19,7 @@ longhorn:
     jobEnabled: false
   ingress:
     enabled: true
+    host: ""
     annotations: 
       "cert-manager.io/cluster-issuer": "letsencrypt"
       "nginx.ingress.kubernetes.io/auth-type": "basic"
