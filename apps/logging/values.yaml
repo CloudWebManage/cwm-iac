@@ -11,8 +11,6 @@ tenant:
       enabled: false
 
 loki:
-  global:
-    dnsService: "kube-dns-upstream"
   loki:
     schemaConfig:
       configs:
@@ -69,7 +67,8 @@ loki:
         value: system
         effect: NoExecute
   gateway:
-    dnsConfig:
+    nginxConfig:
+      resolver: "169.254.20.10"
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
