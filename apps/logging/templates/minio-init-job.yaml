@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-init
+spec:
+    template:
+      spec:
+        volumes:
+          - name: tenant-env-configuration
+            secret:
+              secretName: tenant-env-configuration
+        containers:
+          - name: minio-init
+            image: quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
+            volumeMounts:
+              - name: tenant-env-configuration
+                mountPath: /etc/tenant-env-configuration
+            command:
+              - /bin/bash
+              - -c
+              - |
+                set -euo pipefail
+                source /etc/tenant-env-configuration/config.env
+                mc alias set l http://minio.logging.svc.cluster.local "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
+                mc mb --ignore-existing l/loki-chunks l/loki-ruler l/loki-admin
