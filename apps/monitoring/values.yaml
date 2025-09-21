@@ -68,13 +68,13 @@ kube-prometheus-stack:
       size: 5Gi
     admin:
       existingSecret: "grafana-admin-password"
-#    additionalDataSources:
-#      - name: "Loki"
-#        type: loki
-#        url: "http://logging-loki-gateway.logging"
-#        jsonData:
-#          maxLines: 1000
-#          timeout: 60
+    additionalDataSources:
+      - name: "Loki"
+        type: loki
+        url: "http://logging-loki-gateway.logging"
+        jsonData:
+          maxLines: 1000
+          timeout: 60
 
   prometheusOperator:
     admissionWebhooks:
