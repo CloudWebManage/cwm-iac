@@ -6,10 +6,6 @@ terraform {
   }
 }
 
-variable "force_reinstall_counters" {
-  type = map(number)
-}
-
 variable "data_path" {
   type = string
 }
@@ -20,4 +16,9 @@ variable "tools" {
 
 variable "kubeconfig_path" {
   type = string
+}
+
+variable "with_cloudnative_pg" {
+  type    = bool
+  default = true
 }
