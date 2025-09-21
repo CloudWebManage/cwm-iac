@@ -5,6 +5,7 @@ metadata:
 spec:
     template:
       spec:
+        restartPolicy: OnFailure
         volumes:
           - name: tenant-env-configuration
             secret:
