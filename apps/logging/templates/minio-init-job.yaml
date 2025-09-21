@@ -6,6 +6,11 @@ spec:
     template:
       spec:
         restartPolicy: OnFailure
+        tolerations:
+          - key: cwm-iac-worker-role
+            operator: Equal
+            value: system
+            effect: NoExecute
         volumes:
           - name: tenant-env-configuration
             secret:
