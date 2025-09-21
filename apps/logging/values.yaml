@@ -60,3 +60,21 @@ loki:
         operator: Equal
         value: logging
         effect: NoExecute
+  chunksCache:
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: logging
+        effect: NoExecute
+  gateway:
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: logging
+        effect: NoExecute
+  resultsCache:
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: logging
+        effect: NoExecute
