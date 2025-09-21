@@ -91,3 +91,105 @@ alloy:
       - key: cwm-iac-worker-role
         operator: Exists
         effect: NoExecute
+    volumes:
+      extra:
+        - name: varlibrancher
+          hostPath:
+            path: /var/lib/rancher
+  alloy:
+    mounts:
+      varlog: true
+      extra:
+        - name: varlibrancher
+          mountPath: /var/lib/rancher
+          readOnly: true
+    configMap:
+      content: |
+        loki.write "default" {
+          endpoint {
+            url = "http://logging-loki-gateway/loki/api/v1/push"
+          }
+        }
+        
+        logging {
+          level = "debug"
+        }
+        
+        // pods //
+        
+        discovery.kubernetes "pod" {
+          role = "pod"
+        }
+        discovery.relabel "pod" {
+          targets = discovery.kubernetes.pod.targets
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            target_label  = "namespace"
+          }
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            target_label  = "pod_name"
+          }
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_name"]
+            target_label  = "container_name"
+          }
+          rule {
+            source_labels = ["__meta_kubernetes_pod_node_name"]
+            target_label  = "node_name"
+          }
+          rule {
+            source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_name"]
+            separator = "_"
+            target_label  = "service_name"
+          }
+          rule {
+            source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_name", "__meta_kubernetes_pod_uid"]
+            target_label  = "__log_pods_subpath"
+            separator     = "_"
+          }
+          rule {
+            source_labels = ["__log_pods_subpath", "__meta_kubernetes_pod_container_name"]
+            target_label  = "__path__"
+            separator     = "/"
+            replacement   = "/var/log/pods/$1/*.log"
+          }
+        }
+        local.file_match "pod" {
+          path_targets = discovery.relabel.pod.output
+        }
+        loki.source.file "pod" {
+          targets    = local.file_match.pod.targets
+          forward_to = [loki.write.default.receiver]
+        }
+        
+        // kubelet //
+        
+        loki.source.file "kubelet" {
+          targets    = [
+            {
+              __path__ = "/var/lib/rancher/rke2/agent/logs/kubelet.log",
+              "node_name" = sys.env("HOSTNAME"),
+              "service_name" = "kubelet",
+            },
+          ]
+          forward_to = [loki.write.default.receiver]
+        }
+
+        // systemd //
+        
+        loki.relabel "journal" {
+          forward_to = []
+        
+          rule {
+            source_labels = ["__journal__systemd_unit"]
+            target_label  = "unit"
+          }
+        }
+        
+        loki.source.journal "journal"  {
+          path          = "/var/log/journal"
+          forward_to    = [loki.write.default.receiver]
+          relabel_rules = loki.relabel.journal.rules
+          labels        = {service_name = "systemd"}
+        }
