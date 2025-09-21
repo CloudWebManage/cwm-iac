@@ -2,5 +2,8 @@ dependencies:
 - name: tenant
   repository: https://operator.min.io
   version: 7.1.1
-digest: sha256:81df9cf3b41feecbd07ad2da6a68459a9f1065e3627af906c21bb1192f6d01fd
-generated: "2025-09-21T16:28:56.860120265+03:00"
+- name: loki
+  repository: https://grafana.github.io/helm-charts
+  version: 6.40.0
+digest: sha256:d75940f80e11759e0603c0a9c4b3717e46785f1adc750b20b180a66cd8da019c
+generated: "2025-09-21T16:35:24.531784688+03:00"
