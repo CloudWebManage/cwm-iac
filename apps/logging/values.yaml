@@ -41,7 +41,22 @@ loki:
   deploymentMode: SimpleScalable
   backend:
     replicas: 2
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: logging
+        effect: NoExecute
   read:
     replicas: 2
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: logging
+        effect: NoExecute
   write:
     replicas: 3
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: logging
+        effect: NoExecute
