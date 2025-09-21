@@ -40,21 +40,21 @@ loki:
       retention_period: 120h
   deploymentMode: SimpleScalable
   backend:
-    replicas: 2
+    replicas: 1
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
         value: logging
         effect: NoExecute
   read:
-    replicas: 2
+    replicas: 1
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
         value: logging
         effect: NoExecute
   write:
-    replicas: 3
+    replicas: 1
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
