@@ -1,0 +1,42 @@
+tenant:
+  tenant:
+    name: ""
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2025-04-08T15-41-24Z
+      pullPolicy: IfNotPresent
+    configSecret:
+      name: ""
+    metrics:
+      enabled: false
+
+loki:
+  loki:
+    schemaConfig:
+      configs:
+        - from: "2024-04-01"
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    storage_config:
+      aws:
+        s3forcepathstyle: true
+        s3: ""  # http<s>://<username>:<secret>@<fqdn>:<port>
+    querier:
+      max_concurrent: 4
+    pattern_ingester:
+      enabled: true
+    limits_config:
+      allow_structured_metadata: true
+      volume_enabled: true
+      retention_period: 120h
+  deploymentMode: SimpleScalable
+  backend:
+    replicas: 2
+  read:
+    replicas: 2
+  write:
+    replicas: 3
