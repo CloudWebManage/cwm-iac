@@ -25,4 +25,16 @@ module "longhorn-app" {
   source = "../argocd-app"
   name = "longhorn"
   namespace = "longhorn-system"
+  values = {
+    "htpasswdVaultPath": "${var.vault_path}/longhorn/htpasswd"
+  }
+}
+
+module "longhorn_htpasswd" {
+  source = "../htpasswd"
+  tools = var.tools
+  vault_mount = var.vault_mount
+  vault_path = "${var.vault_path}/longhorn/htpasswd"
+  vault_kv_put_extra_args = "longhorn_url=\"https://longhorn.${var.ingress_star_domain}\""
+  secrets = []
 }
