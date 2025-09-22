@@ -1,4 +1,3 @@
-cdnCacheImage: "ghcr.io/cloudwebmanage/cwm-cdn-api-cache-nginx:latest"
 cacheServers:
   "cache1":
     nodeName: "cdn1"
@@ -6,3 +5,7 @@ cacheServers:
     nodeName: "cdn1"
   "cache3":
     nodeName: "cdn1"
+
+cwmCdnApi:
+  cacheNginx:
+    image: "ghcr.io/cloudwebmanage/cwm-cdn-api-cache-nginx:latest"

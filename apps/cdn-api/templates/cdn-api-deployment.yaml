@@ -20,7 +20,7 @@ spec:
           effect: NoExecute
       containers:
         - name: api
-          image: {{ .Values.cdnApiImage | quote }}
+          image: {{ .Values.cwmCdnApi.api.image | quote }}
           imagePullPolicy: Always
           env:
             - name: GUNICORN_WORKERS

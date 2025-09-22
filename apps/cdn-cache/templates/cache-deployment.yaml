@@ -26,7 +26,7 @@ spec:
           effect: NoExecute
       containers:
         - name: cache
-          image: {{ $.Values.cdnCacheImage | quote }}
+          image: {{ $.Values.cwmCdnApi.cacheNginx.image | quote }}
           args: ["nginx-debug", "-g", "daemon off;"]
           imagePullPolicy: Always
           volumeMounts:

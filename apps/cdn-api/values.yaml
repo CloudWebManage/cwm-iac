@@ -1,4 +1,6 @@
-cdnApiImage: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"
-
 isPrimary: false
 allowedPrimaryKey: ""
+
+cwmCdnApi:
+  api:
+    image: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"

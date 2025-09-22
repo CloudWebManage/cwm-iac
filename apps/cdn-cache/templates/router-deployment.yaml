@@ -19,7 +19,7 @@ spec:
           effect: NoExecute
       containers:
         - name: router
-          image: {{ .Values.cdnCacheImage | quote }}
+          image: {{ .Values.cwmCdnApi.cacheNginx.image | quote }}
           imagePullPolicy: Always
           env:
             - name: TYPE
