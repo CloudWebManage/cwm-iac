@@ -58,3 +58,13 @@ variable "sync_policy" {
   default = null
   description = "if this is set you define the syncPolicy"
 }
+
+variable "configSource" {
+  type = any
+  default = null
+}
+
+variable "configValueFiles" {
+  type = list(string)
+  default = null
+}

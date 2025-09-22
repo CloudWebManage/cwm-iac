@@ -8,10 +8,24 @@ module "api_app" {
   source = "../argocd-app"
   name = "cdn-api"
   create_namespace = false
-  values = {
-    isPrimary = var.is_primary
-    allowedPrimaryKey = var.is_primary ? "" : data.vault_kv_secret_v2.allowed_primary_key[0].data["key"]
-  }
+  values = merge(
+    {
+      isPrimary = var.is_primary
+      allowedPrimaryKey = var.is_primary ? "" : data.vault_kv_secret_v2.allowed_primary_key[0].data["key"]
+    },
+    var.versions["cwm-cdn-api"] == "latest" ? {} : {
+      cwmCdnApi = {
+        api = {
+          image = "ghcr.io/cloudwebmanage/cwm-cdn-api:${var.versions["cwm-cdn-api"]}"
+        }
+      }
+    }
+  )
+  configSource = var.argocdConfigSource
+  configValueFiles = var.versions["cwm-cdn-api"] == "latest" ? [
+    "config/auto-updated/cwm-cdn-api/api.yaml"
+  ] : []
+  autosync = true
 }
 
 resource "random_password" "primary_key" {

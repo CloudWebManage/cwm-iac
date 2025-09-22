@@ -64,3 +64,8 @@ variable "secondaries" {
   }))
   default = {}
 }
+
+variable "argocdConfigSource" {
+  type = any
+  default = {}
+}

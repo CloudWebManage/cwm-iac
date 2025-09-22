@@ -6,7 +6,7 @@ locals {
     }
     project = var.project
   }
-  source_spec = var.sources == null ? {
+  source_spec = (var.sources == null && var.configValueFiles == null) ? {
     source = {
       repoURL        = "https://github.com/CloudWebManage/cwm-iac"
       targetRevision = var.targetRevision
@@ -15,6 +15,22 @@ locals {
         valuesObject = var.values
       }
     }
+  } : {}
+  config_sources_spec = (var.configValueFiles != null && var.configSource != null) ? {
+    sources = [
+      {
+        repoURL        = "https://github.com/CloudWebManage/cwm-iac"
+        targetRevision = var.targetRevision
+        path           = coalesce(var.path, "apps/${var.name}")
+        helm = {
+          valuesObject = var.values
+          valueFiles   = [
+            for vf in var.configValueFiles : "$configValues/${vf}"
+          ]
+        }
+      },
+      merge(var.configSource, {ref = "configValues"})
+    ]
   } : {}
   sources_spec = var.sources != null ? {
     sources = var.sources
@@ -42,6 +58,6 @@ resource "kubernetes_manifest" "app" {
       name      = var.name
       namespace = "argocd"
     }
-    spec = merge(local.base_spec, local.source_spec, local.sources_spec, local.sync_policy_spec)
+    spec = merge(local.base_spec, local.source_spec, local.config_sources_spec, local.sources_spec, local.sync_policy_spec)
   }
 }

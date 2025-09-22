@@ -139,12 +139,3 @@ resource "kubernetes_secret" "argocd_github_repo_deploy_keys" {
   }
   type = "Opaque"
 }
-
-output "argocd_github_repo_deploy_keys" {
-  value = {
-    for k, v in var.argocd_github_repo_deploy_keys : k => {
-      repo_slug = v.repo_slug
-      public_key = tls_private_key.argocd_github_repo_deploy_keys[k].public_key_openssh
-    }
-  }
-}

@@ -9,6 +9,18 @@ locals {
     images:
     - name: ghcr.io/cloudwebmanage/cwm-cdn-operator/operator
       newTag: ${var.versions["cwm-cdn-operator"]}
+
+    patches:
+      - target:
+          kind: Deployment
+          name: cwm-cdn-operator-controller-manager
+          namespace: cwm-cdn-operator-system
+        patch: |-
+          - op: replace
+            path: /spec/template/spec/containers/0/env
+            value:
+              - name: CWM_CDN_TENANT_DEFAULT_IMAGE
+                value: "ghcr.io/cloudwebmanage/cwm-cdn-api-tenant-nginx:${var.versions["cwm-cdn-api-tenant-nginx"]}"
   EOT
 }
 
