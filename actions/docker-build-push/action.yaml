@@ -62,7 +62,7 @@ runs:
         import os
         with open(os.getenv("GITHUB_ENV"), "a") as f:
             f.write("DEPLOY_CONTENT=" + os.getenv('DEPLOY_CONTENT_TEMPLATE').replace('__IMAGE__', os.getenv('IMAGE')) + "\n")
-    - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_prefix != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_template != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       uses: CloudWebManage/cwm-iac/actions/deploy@main
       with:
         deploy_key_b64: ${{ inputs.deploy_key_b64 }}
