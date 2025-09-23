@@ -53,7 +53,7 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
     - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_prefix != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-      uses: ./actions/deploy
+      uses: CloudWebManage/cwm-iac/actions/deploy@main
       with:
         deploy_key_b64: ${{ inputs.deploy_key_b64 }}
         file_path: ${{ inputs.deploy_file_path }}
