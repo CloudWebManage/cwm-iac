@@ -60,7 +60,7 @@ runs:
       run: |
         import os
         with open(os.getenv("GITHUB_ENV"), "a") as f:
-            f.write("DEPLOY_CONTENT=" + os.getenv('DEPLOY_CONTENT_TEMPLATE').replace('__IMAGE__', os.getenv('IMAGE')) + "\n")
+            f.write("DEPLOY_CONTENT<<EOF\n" + os.getenv('DEPLOY_CONTENT_TEMPLATE').replace('__IMAGE__', os.getenv('IMAGE')).strip() + "\nEOF\n")
     - if: ${{ env.DEPLOY_CONTENT != '' }}
       uses: CloudWebManage/cwm-iac/actions/deploy@main
       with:
