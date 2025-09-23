@@ -33,7 +33,6 @@ runs:
       env:
         CONTENT: ${{ inputs.content }}
         COMMIT_MESSAGE: ${{ inputs.commit_message }}
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
         echo "${{ inputs.deploy_key_b64 }}" | base64 -d > /tmp/deploy_key
         chmod 600 /tmp/deploy_key
