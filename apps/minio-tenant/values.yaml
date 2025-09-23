@@ -1,5 +1,6 @@
 cwmMinioApi:
-  image: "ghcr.io/cloudwebmanage/cwm-minio-api:latest"
+  api:
+    image: "ghcr.io/cloudwebmanage/cwm-minio-api:latest"
   resources: {}
 
 initialize: false

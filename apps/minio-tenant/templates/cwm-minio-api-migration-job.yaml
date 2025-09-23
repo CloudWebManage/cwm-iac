@@ -17,7 +17,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: migration
-        image: {{ .Values.cwmMinioApi.image | quote }}
+        image: {{ .Values.cwmMinioApi.api.image | quote }}
         imagePullPolicy: Always
         command:
           - bin/migrate.sh

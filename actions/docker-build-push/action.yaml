@@ -52,17 +52,16 @@ runs:
         build-args: ${{ inputs.build_args }}
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
-    - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_prefix != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-      id: prepare_deploy_content
-      shell: python
+    - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_template != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       env:
         DEPLOY_CONTENT_TEMPLATE: ${{ inputs.deploy_content_template }}
         IMAGE: ${{ format('ghcr.io/cloudwebmanage/{0}:{1}', inputs.image_suffix, github.sha) }}
+      shell: python
       run: |
         import os
         with open(os.getenv("GITHUB_ENV"), "a") as f:
             f.write("DEPLOY_CONTENT=" + os.getenv('DEPLOY_CONTENT_TEMPLATE').replace('__IMAGE__', os.getenv('IMAGE')) + "\n")
-    - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_template != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    - if: ${{ env.DEPLOY_CONTENT != '' }}
       uses: CloudWebManage/cwm-iac/actions/deploy@main
       with:
         deploy_key_b64: ${{ inputs.deploy_key_b64 }}

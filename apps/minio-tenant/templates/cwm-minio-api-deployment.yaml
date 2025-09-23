@@ -20,7 +20,7 @@ spec:
           effect: NoExecute
       containers:
         - name: api
-          image: {{ .Values.cwmMinioApi.image | quote }}
+          image: {{ .Values.cwmMinioApi.api.image | quote }}
           imagePullPolicy: Always
           resources: {{ .Values.cwmMinioApi.resources | toYaml | nindent 12 }}
           env:
