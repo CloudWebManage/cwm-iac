@@ -2,13 +2,11 @@ name: "Deploy"
 description: "Update values in relevant repo to trigger deployment by ArgoCD (or other CD tools)"
 inputs:
   deploy_repo_org:
-    required: false
-    description: 'Github org of the repo to deploy to'
     default: 'CloudWebManage'
+    description: 'Github org of the repo to deploy to'
   deploy_repo_name:
-    required: false
-    description: 'Name of the repo to deploy to'
     default: 'cwm-worker-cluster'
+    description: 'Name of the repo to deploy to'
   deploy_key_b64:
     required: true
     description: 'Base64 encoded deploy key with write access to the target repo'
@@ -19,13 +17,11 @@ inputs:
     required: true
     description: 'Path to the file to write the content to'
   git_user_name:
-    required: false
-    description: 'Git user name for the commit'
     default: 'GitHub Actions'
+    description: 'Git user name for the commit'
   git_user_email:
-    required: false
-    description: 'Git user email for the commit'
     default: 'actions@localhost'
+    description: 'Git user email for the commit'
   commit_message:
     required: true
     description: 'Commit message'
@@ -37,6 +33,7 @@ runs:
       env:
         CONTENT: ${{ inputs.content }}
         COMMIT_MESSAGE: ${{ inputs.commit_message }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
         echo "${{ inputs.deploy_key_b64 }}" | base64 -d > /tmp/deploy_key
         chmod 600 /tmp/deploy_key
