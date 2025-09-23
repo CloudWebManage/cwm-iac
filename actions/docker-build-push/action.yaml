@@ -57,5 +57,5 @@ runs:
       with:
         deploy_key_b64: ${{ inputs.deploy_key_b64 }}
         file_path: ${{ inputs.deploy_file_path }}
-        content: ${{ format('{0} "{1}"', inputs.deploy_content_prefix, IMAGE) }}
+        content: ${{ format('{0} "ghcr.io/cloudwebmanage/{1}:{2}"', inputs.deploy_content_prefix, inputs.image_suffix, github.sha) }}
         commit_message: ${{ inputs.deploy_commit_message }}
