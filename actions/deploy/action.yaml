@@ -6,8 +6,9 @@ inputs:
     description: 'Github org of the repo to deploy to'
     default: 'CloudWebManage'
   deploy_repo_name:
-    required: true
+    required: false
     description: 'Name of the repo to deploy to'
+    default: 'cwm-worker-cluster'
   deploy_key_b64:
     required: true
     description: 'Base64 encoded deploy key with write access to the target repo'
