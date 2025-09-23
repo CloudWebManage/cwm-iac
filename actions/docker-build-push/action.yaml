@@ -24,8 +24,8 @@ inputs:
     description: 'Path to the file to write the content to in the deploy repo'
     required: false
     default: ''
-  deploy_content_prefix:
-    description: 'Content to write to the values file in the deploy repo, the full built image will be appended to this'
+  deploy_content_template:
+    description: 'Content to write to the values file in the deploy repo, use __IMAGE__ as placeholder for the image name'
     required: false
     default: ''
   deploy_commit_message:
@@ -53,9 +53,19 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
     - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_prefix != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      id: prepare_deploy_content
+      shell: python
+      env:
+        DEPLOY_CONTENT_TEMPLATE: ${{ inputs.deploy_content_template }}
+        IMAGE: ${{ format('ghcr.io/cloudwebmanage/{0}:{1}', inputs.image_suffix, github.sha) }}
+      run: |
+        import os
+        with open(os.getenv("GITHUB_ENV"), "a") as f:
+            f.write("DEPLOY_CONTENT=" + os.getenv('DEPLOY_CONTENT_TEMPLATE').replace('__IMAGE__', os.getenv('IMAGE')) + "\n")
+    - if: ${{ inputs.deploy_key_b64 != '' && inputs.deploy_file_path != '' && inputs.deploy_content_prefix != '' && inputs.deploy_commit_message != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       uses: CloudWebManage/cwm-iac/actions/deploy@main
       with:
         deploy_key_b64: ${{ inputs.deploy_key_b64 }}
         file_path: ${{ inputs.deploy_file_path }}
-        content: ${{ format('{0} "ghcr.io/cloudwebmanage/{1}:{2}"', inputs.deploy_content_prefix, inputs.image_suffix, github.sha) }}
+        content: ${{ env.DEPLOY_CONTENT }}
         commit_message: ${{ inputs.deploy_commit_message }}
