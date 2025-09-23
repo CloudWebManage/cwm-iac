@@ -3,79 +3,84 @@ module "minio_tenant_main" {
   name = "minio-tenant-${var.name}"
   create_namespace = false
   path = "apps/minio-tenant"
-  sources = concat([
+  values = merge(
     {
-      repoURL        = "https://github.com/CloudWebManage/cwm-iac"
-      targetRevision = "main"
-      path           = "apps/minio-tenant"
-      helm = merge({
-        valuesObject = {
-          initialize = var.initialize
-          tenant = {
-            ingress = {
-              api = {
-                enabled = true
-                annotations = {
-                  "cert-manager.io/cluster-issuer" = "letsencrypt"
-                }
-                host = "minio-tenant-${var.name}-api.${var.ingress_star_domain}"
-                tls = [
-                  {
-                    hosts = ["minio-tenant-${var.name}-api.${var.ingress_star_domain}"]
-                    secretName = "minio-tenant-${var.name}-api-tls"
-                  }
-                ]
-              }
-              console = {
-                enabled = true
-                annotations = {
-                  "cert-manager.io/cluster-issuer" = "letsencrypt"
-                }
-                host = "minio-tenant-${var.name}-console.${var.ingress_star_domain}"
-                tls = [
-                  {
-                    hosts = ["minio-tenant-${var.name}-console.${var.ingress_star_domain}"]
-                    secretName = "minio-tenant-${var.name}-console-tls"
-                  }
-                ]
-              }
+      initialize = var.initialize
+      tenant = {
+        ingress = {
+          api = {
+            enabled = true
+            annotations = {
+              "cert-manager.io/cluster-issuer" = "letsencrypt"
             }
-            tenant = {
-              name = var.name
-              image = {
-                tag = var.minio_image_tag
+            host = "minio-tenant-${var.name}-api.${var.ingress_star_domain}"
+            tls = [
+              {
+                hosts = ["minio-tenant-${var.name}-api.${var.ingress_star_domain}"]
+                secretName = "minio-tenant-${var.name}-api-tls"
               }
-              configSecret = {
-                name = kubernetes_secret.env-config.metadata[0].name
-                existingSecret = true
-              }
-              certificate = {
-                requestAutoCert = false
-              }
-              pools = [
-                for name, pool in var.pools : merge({
-                  name = name
-                  servers = 1
-                  volumesPerServer = 1
-                  volumeSize = "999Gi"
-                  storageClassName = "directpv-min-io"
-                  labels = {
-                    "cwm-minio-tenant" = "true"
-                  }
-                  tolerations = [
-                    {
-                      key = "cwm-iac-worker-role"
-                      operator = "Equal"
-                      value = "minio"
-                      effect = "NoExecute"
-                    }
-                  ]
-                }, pool)
-              ]
+            ]
+          }
+          console = {
+            enabled = true
+            annotations = {
+              "cert-manager.io/cluster-issuer" = "letsencrypt"
             }
+            host = "minio-tenant-${var.name}-console.${var.ingress_star_domain}"
+            tls = [
+              {
+                hosts = ["minio-tenant-${var.name}-console.${var.ingress_star_domain}"]
+                secretName = "minio-tenant-${var.name}-console-tls"
+              }
+            ]
           }
         }
-      }, var.app_helm_overrides)
+        tenant = {
+          name = var.name
+          image = {
+            tag = var.minio_image_tag
+          }
+          configSecret = {
+            name           = kubernetes_secret.env-config.metadata[0].name
+            existingSecret = true
+          }
+          certificate = {
+            requestAutoCert = false
+          }
+          pools = [
+            for name, pool in var.pools : merge({
+              name             = name
+              servers          = 1
+              volumesPerServer = 1
+              volumeSize       = "999Gi"
+              storageClassName = "directpv-min-io"
+              labels = {
+                "cwm-minio-tenant" = "true"
+              }
+              tolerations = [
+                {
+                  key      = "cwm-iac-worker-role"
+                  operator = "Equal"
+                  value    = "minio"
+                  effect   = "NoExecute"
+                }
+              ]
+            }, pool)
+          ]
+        }
+      }
+    },
+    var.versions["cwm-minio-api"] == "latest" ? {} : {
+      cwmMinioApi = {
+        api = {
+          image = "ghcr.io/cloudwebmanage/cwm-minio-api:${var.versions["cwm-minio-api"]}"
+        }
+      }
     }
-  ], var.app_extra_sources)
+  )
+  configSource = var.argocdConfigSource
+  configValueFiles = var.versions["cwm-minio-api"] == "latest" ? [
+    "config/auto-updated/cwm-minio-api/api.yaml"
+  ] : []
+  autosync = true
 }

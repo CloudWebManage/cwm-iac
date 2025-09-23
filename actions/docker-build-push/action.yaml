@@ -47,8 +47,8 @@ runs:
         tags: |
           ghcr.io/cloudwebmanage/${{ inputs.image_suffix }}:${{ github.sha }}
           ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && format('ghcr.io/cloudwebmanage/{0}:latest', inputs.image_suffix) || '' }}
-        cache-from: type=registry,ref=ghcr.io/cloudwebmanage/${{ inputs.image_suffix }}:buildcache-latest
-        cache-to: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && format('type=registry,ref=ghcr.io/cloudwebmanage/{0}:buildcache-latest,mode=max', inputs.image_suffix) || '' }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
         build-args: ${{ inputs.build_args }}
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
