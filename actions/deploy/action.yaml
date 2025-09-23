@@ -34,14 +34,26 @@ runs:
         CONTENT: ${{ inputs.content }}
         COMMIT_MESSAGE: ${{ inputs.commit_message }}
       run: |
-        echo "${{ inputs.deploy_key_b64 }}" | base64 -d > /tmp/deploy_key
-        chmod 600 /tmp/deploy_key
-        export GIT_SSH_COMMAND="ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-        git config --global user.name "${{ inputs.git_user_name }}"
-        git config --global user.email "${{ inputs.git_user_email }}"
-        git clone "git@github.com:${{ inputs.deploy_repo_org }}/${{ inputs.deploy_repo_name }}.git"
-        cd "${{ inputs.deploy_repo_name }}"
-        echo "${CONTENT}" > "${{ inputs.file_path }}"
-        git add "${{ inputs.file_path }}"
-        git commit -m "${COMMIT_MESSAGE}"
-        git push origin main
+        for i in {1..5}; do
+          if (
+            echo "${{ inputs.deploy_key_b64 }}" | base64 -d > /tmp/deploy_key
+            chmod 600 /tmp/deploy_key
+            export GIT_SSH_COMMAND="ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+            git config --global user.name "${{ inputs.git_user_name }}"
+            git config --global user.email "${{ inputs.git_user_email }}"
+            git clone "git@github.com:${{ inputs.deploy_repo_org }}/${{ inputs.deploy_repo_name }}.git"
+            cd "${{ inputs.deploy_repo_name }}"
+            echo "${CONTENT}" > "${{ inputs.file_path }}"
+            git add "${{ inputs.file_path }}"
+            git commit -m "${COMMIT_MESSAGE}"
+            git push origin main
+          ); then
+            exit 0
+          else
+            SLEEP_SECONDS=$((RANDOM % 10 + 1))
+            echo "Failed to deploy, retrying in $SLEEP_SECONDS seconds... (attempt $i of 5)"
+            sleep $SLEEP_SECONDS
+          fi
+        done
+        echo "Failed to deploy after 5 attempts"
+        exit 1
