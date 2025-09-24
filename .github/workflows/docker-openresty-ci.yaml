@@ -1,0 +1,24 @@
+name: Docker OpenResty CI
+on:
+  push:
+    paths:
+      - .github/workflows/docker-openresty-ci.yaml
+      - docker/openresty/**
+env:
+  PYTHON_VERSION: "3.12"
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: run tests
+        run: |
+          pip install -r docker/openresty/requirements.txt
+          pytest docker/openresty
+      - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
+        with:
+          image_suffix: cwm-iac-openresty
+          deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}

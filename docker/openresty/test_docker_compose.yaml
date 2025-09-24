@@ -1,0 +1,8 @@
+name: cwm-iac-test-docker-openresty
+services:
+  openresty:
+    restart: on-failure
+    build: .
+    ports:
+      - "48080:80"
+      - "49999:9999"
