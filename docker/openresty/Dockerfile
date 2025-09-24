@@ -8,5 +8,6 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 COPY entrypoint.sh /entrypoint.sh
 COPY metrics.conf /etc/nginx/metrics.conf
 COPY metrics_server.conf /etc/nginx/metrics_server.conf
+COPY entrypoint.py /entrypoint.py
 
 ENTRYPOINT ["/entrypoint.sh"]
