@@ -16,7 +16,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: run tests
         run: |
-          pip install -r docker/openresty/requirements.txt
+          pip install -r docker/openresty/test_requirements.txt
           pytest docker/openresty
       - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
         with:
