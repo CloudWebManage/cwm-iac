@@ -6,5 +6,7 @@ RUN opm get knyar/nginx-lua-prometheus=0.20240525 && rm -rf /root/.opm
 COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
 COPY default.conf /etc/nginx/conf.d/default.conf
 COPY entrypoint.sh /entrypoint.sh
+COPY metrics.conf /etc/nginx/metrics.conf
+COPY metrics_server.conf /etc/nginx/metrics_server.conf
 
 ENTRYPOINT ["/entrypoint.sh"]

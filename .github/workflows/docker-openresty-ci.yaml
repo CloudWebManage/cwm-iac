@@ -20,6 +20,12 @@ jobs:
             pip install -r docker/openresty/test_requirements.txt
             pytest -svv docker/openresty
           image_suffix: cwm-iac-openresty
-          deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
           context: docker/openresty
           dockerfile: docker/openresty/Dockerfile
+          deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
+          deploy_file_path: config/auto-updated/cwm-iac/openresty.yaml
+          deploy_content_template: |
+            cwmIac:
+              openresty:
+                image: "__IMAGE__"
+          deploy_commit_message: "Update cwm-iac/openresty"

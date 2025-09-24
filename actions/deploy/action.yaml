@@ -43,6 +43,7 @@ runs:
             git config --global user.email "${{ inputs.git_user_email }}"
             git clone "git@github.com:${{ inputs.deploy_repo_org }}/${{ inputs.deploy_repo_name }}.git"
             cd "${{ inputs.deploy_repo_name }}"
+            mkdir -p "$(dirname "${{ inputs.file_path }}")"
             echo "${CONTENT}" > "${{ inputs.file_path }}"
             git add "${{ inputs.file_path }}"
             git commit -m "${COMMIT_MESSAGE}"
