@@ -1,1 +1,5 @@
 cdnApiImage: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"
+
+cwmIac:
+  openresty:
+    image: "ghcr.io/cloudwebmanage/cwm-iac-openresty:latest"

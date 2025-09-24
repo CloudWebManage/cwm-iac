@@ -28,7 +28,6 @@ spec:
         - name: cache
           image: {{ $.Values.cwmCdnApi.cacheNginx.image | quote }}
           args: ["nginx-debug", "-g", "daemon off;"]
-          imagePullPolicy: Always
           volumeMounts:
             - name: cache
               mountPath: /var/cache/nginx
@@ -37,6 +36,7 @@ spec:
               value: "cache"
             - name: NGINX_HTTP_CONFIGS
               value: |
+                include /etc/nginx/metrics.conf;
                 proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=cwm:500m inactive=5d;
             - name: NGINX_LOCATION_CONFIGS
               value: |

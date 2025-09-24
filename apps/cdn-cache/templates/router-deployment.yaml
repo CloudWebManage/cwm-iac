@@ -20,10 +20,12 @@ spec:
       containers:
         - name: router
           image: {{ .Values.cwmCdnApi.cacheNginx.image | quote }}
-          imagePullPolicy: Always
           env:
             - name: TYPE
               value: "router"
+            - name: NGINX_HTTP_CONFIGS
+              value: |
+                include /etc/nginx/metrics.conf;
             - name: NGINX_UPSTREAM_CACHE_SERVERS
               value: |
                 {{- range $name, $server := .Values.cacheServers }}

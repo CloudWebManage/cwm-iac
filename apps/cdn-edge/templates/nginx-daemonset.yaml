@@ -32,8 +32,7 @@ spec:
       hostNetwork: true
       containers:
         - name: nginx
-          # Pulled Sep 8, 2025
-          image: "nginx:alpine@sha256:42a516af16b852e33b7682d5ef8acbd5d13fe08fecadc7ed98605ba5e3b26ab8"
+          image: {{ .Values.cwmIac.openresty.image | quote }}
           env:
             - name: RESOLVER_IP
               valueFrom:
