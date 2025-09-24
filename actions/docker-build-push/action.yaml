@@ -48,7 +48,6 @@ runs:
     - if: ${{ inputs.test_script != '' }}
       uses: docker/build-push-action@v6
       with:
-        tags: ghcr.io/cloudwebmanage/${{ inputs.image_suffix }}:latest
         push: false
         cache-from: type=gha
         build-args: ${{ inputs.build_args }}

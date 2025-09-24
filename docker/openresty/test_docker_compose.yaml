@@ -2,7 +2,6 @@ name: cwm-iac-test-docker-openresty
 services:
   openresty:
     restart: on-failure
-    image: cloudwebmanage/cwm-iac-openresty
     build: .
     ports:
       - "48080:80"
