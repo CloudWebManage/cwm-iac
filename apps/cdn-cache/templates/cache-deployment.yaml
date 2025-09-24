@@ -27,7 +27,6 @@ spec:
       containers:
         - name: cache
           image: {{ $.Values.cwmCdnApi.cacheNginx.image | quote }}
-          args: ["nginx-debug", "-g", "daemon off;"]
           volumeMounts:
             - name: cache
               mountPath: /var/cache/nginx
