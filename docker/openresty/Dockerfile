@@ -8,6 +8,6 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 COPY entrypoint.sh /entrypoint.sh
 COPY metrics.conf /etc/nginx/metrics.conf
 COPY metrics_server.conf /etc/nginx/metrics_server.conf
-COPY entrypoint.py /entrypoint.py
+COPY entrypoint.py /docker-entrypoint.d/000-openresty-entrypoint.py
 
 ENTRYPOINT ["/entrypoint.sh"]
