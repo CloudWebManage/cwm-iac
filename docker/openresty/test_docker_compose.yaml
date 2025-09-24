@@ -2,7 +2,10 @@ name: cwm-iac-test-docker-openresty
 services:
   openresty:
     restart: on-failure
-    build: .
+    build:
+      context: .
+      cache_from:
+        - type=gha
     ports:
       - "48080:80"
       - "49999:9999"
