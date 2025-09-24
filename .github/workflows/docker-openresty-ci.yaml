@@ -22,3 +22,4 @@ jobs:
         with:
           image_suffix: cwm-iac-openresty
           deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
+          context: docker/openresty
