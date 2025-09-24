@@ -35,7 +35,8 @@ def test():
     try:
         subprocess.check_call([
             "docker", "compose", "-f", "test_docker_compose.yaml",
-            "up", "--wait", "--yes", "--build", "--force-recreate", "--remove-orphans",
+            "up", "--wait", "--yes", "--force-recreate", "--remove-orphans",
+            *([] if os.getenv("CI") else ["--build"])
         ], cwd=os.path.join(os.path.dirname(__file__)))
         time.sleep(5)
         assert get_metrics() == {
