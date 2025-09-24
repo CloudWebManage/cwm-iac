@@ -54,6 +54,7 @@ runs:
         build-args: ${{ inputs.build_args }}
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
+        load: true
     - if: ${{ inputs.test_script != '' }}
       shell: bash
       run: ${{ inputs.test_script }}
