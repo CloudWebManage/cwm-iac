@@ -14,12 +14,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: run tests
-        run: |
-          pip install -r docker/openresty/test_requirements.txt
-          pytest -svv docker/openresty
       - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
         with:
+          test_script: |
+            pip install -r docker/openresty/test_requirements.txt
+            pytest -svv docker/openresty
           image_suffix: cwm-iac-openresty
           deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
           context: docker/openresty
