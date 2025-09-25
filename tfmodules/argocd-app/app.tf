@@ -22,12 +22,10 @@ locals {
         repoURL        = "https://github.com/CloudWebManage/cwm-iac"
         targetRevision = var.targetRevision
         path           = coalesce(var.path, "apps/${var.name}")
-        helm = {
-          valuesObject = var.values
-          valueFiles   = [
-            for vf in var.configValueFiles : "$configValues/${vf}"
-          ]
-        }
+        helm = merge(
+          var.values == null ? {} : { valuesObject = var.values },
+          {valueFiles = [for vf in var.configValueFiles : "$configValues/${vf}"]}
+        )
       },
       merge(var.configSource, {ref = "configValues"})
     ]

@@ -12,6 +12,6 @@ module "edge-app" {
   configSource = var.argocdConfigSource
   configValueFiles = var.versions["cwm-cdn-edge-openresty"] == "latest" ? [
     "config/auto-updated/cwm-iac/openresty.yaml"
-  ] : []
+  ] : null
   autosync = true
 }
