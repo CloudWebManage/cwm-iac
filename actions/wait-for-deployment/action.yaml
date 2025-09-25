@@ -11,9 +11,6 @@ runs:
       with:
         repository: CloudWebManage/cwm-iac
         ref: main
-    - uses: actions/setup-python@v6
-      with:
-        python-version: "3.12"
     - shell: bash
       env:
         INPUT_JSON: ${{ inputs.json }}
