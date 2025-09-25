@@ -1,0 +1,62 @@
+name: "ArgoCD Sync"
+description: "Sync ArgoCD Apps"
+inputs:
+  clusters_match:
+    required: false
+    default: "all"
+    description: 'Match condition to get cluster names'
+  argocd_sync_args:
+    required: false
+    default: "--project=default"
+    description: 'Additional args to pass to argocd app sync command'
+  deploy_key_b64:
+    required: true
+    description: 'Base64 encoded deploy key with read access to cwm-worker-cluster'
+  VAULT_URL:
+    required: true
+    description: VAULT_URL
+  VAULT_CA_B64:
+    required: true
+    description: VAULT_CA_B64
+  VAULT_ROLE_ID:
+    required: true
+    description: VAULT_ROLE_ID
+  VAULT_SECRET_ID:
+    required: true
+    description: VAULT_SECRET_ID
+runs:
+  using: composite
+  steps:
+    - name: download argocd cli
+      shell: bash
+      env:
+        ARGOCD_VERSION: "3.0.12"
+      run: |
+        curl -s -L -o argocd "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64"
+        mv argocd /usr/local/bin/argocd
+        chmod +x /usr/local/bin/argocd
+    - name: clone cwm-worker-cluster
+      shell: bash
+      run: |
+        echo "${{ inputs.deploy_key_b64 }}" | base64 -d > /tmp/deploy_key
+        chmod 600 /tmp/deploy_key
+        export GIT_SSH_COMMAND="ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        git config --global user.name "github actions"
+        git config --global user.email "actions@localhost"
+        git clone "git@github.com:CloudWebManage/cwm-worker-cluster.git"
+    - name: sync
+      uses: CloudWebManage/cwm-iac/actions/vault@main
+      with:
+        VAULT_CA_B64: ${{ inputs.VAULT_CA_B64 }}
+        VAULT_URL: ${{ inputs.VAULT_URL }}
+        VAULT_ROLE_ID: ${{ inputs.VAULT_ROLE_ID }}
+        VAULT_SECRET_ID: ${{ inputs.VAULT_SECRET_ID }}
+        script: |
+          set -euo pipefail
+          for cluster_name in $(python3 cwm-worker-cluster/bin/get_cluster_names.py '${{ inputs.clusters_match }}'); do
+            echo "Processing cluster: $cluster_name"
+            ARGOCD_SERVER="argocd.$(python3 cwm-worker-cluster/bin/get_cluster_domain.py "$cluster_name")"
+            export ARGOCD_AUTH_TOKEN="$(vault_kv_get "cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/argocd_syncer_token" | jq -r .token)"
+            argocd --server "${ARGOCD_SERVER}" --grpc-web app sync --async ${{ inputs.argocd_sync_args }}
+            echo OK
+          done
