@@ -57,6 +57,6 @@ runs:
             echo "Processing cluster: $cluster_name"
             ARGOCD_SERVER="argocd.$(python3 cwm-worker-cluster/bin/get_cluster_domain.py "$cluster_name")"
             export ARGOCD_AUTH_TOKEN="$($vault_kv_get "cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/argocd_syncer_token" | jq -r .token)"
-            argocd --server "${ARGOCD_SERVER}" --grpc-web app sync --async --retry-limit 10 ${{ inputs.argocd_sync_args }}
+            argocd --server "${ARGOCD_SERVER}" --grpc-web app get --refresh ${{ inputs.argocd_sync_args }}
             echo OK
           done
