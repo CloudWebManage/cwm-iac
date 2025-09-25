@@ -1,0 +1,17 @@
+name: ArgoCD Sync
+on:
+  push:
+    paths:
+      - apps/**
+      - .github/workflows/argocd-sync.yaml
+jobs:
+  argocd-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: CloudWebManage/cwm-iac/actions/argocd-sync@main
+        with:
+          deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
+          VAULT_CA_B64: ${{ secrets.VAULT_CA_B64 }}
+          VAULT_URL: ${{ secrets.VAULT_URL }}
+          VAULT_ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
+          VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
