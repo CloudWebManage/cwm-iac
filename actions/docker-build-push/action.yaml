@@ -36,6 +36,10 @@ inputs:
     description: 'Optional test script to run after building the image but before pushing / deploying'
     required: false
     default: ''
+  wait_for_deployment_json:
+    description: 'Optional JSON, if set passed to deploy action'
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
@@ -48,6 +52,7 @@ runs:
     - if: ${{ inputs.test_script != '' }}
       uses: docker/build-push-action@v6
       with:
+        tags: ghcr.io/cloudwebmanage/${{ inputs.image_suffix }}:latest
         push: false
         cache-from: type=gha
         build-args: ${{ inputs.build_args }}
@@ -84,3 +89,4 @@ runs:
         file_path: ${{ inputs.deploy_file_path }}
         content: ${{ env.DEPLOY_CONTENT }}
         commit_message: ${{ inputs.deploy_commit_message }}
+        wait_for_deployment_json: ${{ inputs.wait_for_deployment_json }}

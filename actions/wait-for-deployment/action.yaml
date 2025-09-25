@@ -1,0 +1,23 @@
+name: "Wait for deployment"
+description: "Wait for deployment to be ready"
+inputs:
+  json:
+    description: 'Configuration JSON, see action.py for details'
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v5
+      with:
+        repository: CloudWebManage/cwm-iac
+        ref: main
+    - uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+    - shell: bash
+      env:
+        INPUT_JSON: ${{ inputs.json }}
+      run: |
+        cd actions/wait-for-deployment
+        python3 -m pip install -r requirements.txt
+        python3 action.py

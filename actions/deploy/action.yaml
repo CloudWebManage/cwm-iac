@@ -25,6 +25,9 @@ inputs:
   commit_message:
     required: true
     description: 'Commit message'
+  wait_for_deployment_json:
+    default: ''
+    description: 'Optional JSON, if set passed to wait-for-deployment action'
 runs:
   using: composite
   steps:
@@ -58,3 +61,7 @@ runs:
         done
         echo "Failed to deploy after 5 attempts"
         exit 1
+    - if: ${{ inputs.wait_for_deployment_json != '' }}
+      uses: CloudWebManage/cwm-iac/actions/wait-for-deployment@main
+      with:
+        json: ${{ inputs.wait_for_deployment_json }}
