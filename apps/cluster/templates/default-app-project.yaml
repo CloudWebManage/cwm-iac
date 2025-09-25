@@ -15,5 +15,5 @@ spec:
   roles:
     - name: syncer
       policies:
-        - p, proj:default:syncer, applications, get, *, allow
-        - p, proj:default:syncer, applications, sync, *, allow
+        - p, proj:default:syncer, applications, get, default/*, allow
+        - p, proj:default:syncer, applications, sync, default/*, allow
