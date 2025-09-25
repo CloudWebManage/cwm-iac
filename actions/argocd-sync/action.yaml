@@ -5,10 +5,6 @@ inputs:
     required: false
     default: "all"
     description: 'Match condition to get cluster names'
-  argocd_sync_args:
-    required: false
-    default: "--project=default"
-    description: 'Additional args to pass to argocd app sync command'
   deploy_key_b64:
     required: true
     description: 'Base64 encoded deploy key with read access to cwm-worker-cluster'
@@ -57,6 +53,9 @@ runs:
             echo "Processing cluster: $cluster_name"
             ARGOCD_SERVER="argocd.$(python3 cwm-worker-cluster/bin/get_cluster_domain.py "$cluster_name")"
             export ARGOCD_AUTH_TOKEN="$($vault_kv_get "cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/argocd_syncer_token" | jq -r .token)"
-            argocd --server "${ARGOCD_SERVER}" --grpc-web app get --refresh ${{ inputs.argocd_sync_args }}
+            for app_name in $(argocd --server "${ARGOCD_SERVER}" --grpc-web app list -o name); do
+              echo "Syncing app: $app_name"
+              argocd --server "${ARGOCD_SERVER}" --grpc-web app get "$app_name" --refresh
+            done
             echo OK
           done
