@@ -56,7 +56,7 @@ runs:
           for cluster_name in $(python3 cwm-worker-cluster/bin/get_cluster_names.py '${{ inputs.clusters_match }}'); do
             echo "Processing cluster: $cluster_name"
             ARGOCD_SERVER="argocd.$(python3 cwm-worker-cluster/bin/get_cluster_domain.py "$cluster_name")"
-            export ARGOCD_AUTH_TOKEN="$(vault_kv_get "cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/argocd_syncer_token" | jq -r .token)"
+            export ARGOCD_AUTH_TOKEN="$($vault_kv_get "cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/argocd_syncer_token" | jq -r .token)"
             argocd --server "${ARGOCD_SERVER}" --grpc-web app sync --async ${{ inputs.argocd_sync_args }}
             echo OK
           done

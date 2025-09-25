@@ -43,5 +43,5 @@ runs:
         echo "${VAULT_CA_B64}" | base64 -d > "$ca"
         export VAULT_CACERT="$ca"
         export VAULT_TOKEN="$(vault write auth/approle/login role_id="$VAULT_ROLE_ID" secret_id="$VAULT_SECRET_ID" | jq -r .auth.client_token)"
-        alias vault_kv_get='vault kv get -mount=kvv2 -field=data'
+        export vault_kv_get='vault kv get -mount=kvv2 -field=data'
         eval "${SCRIPT}"
