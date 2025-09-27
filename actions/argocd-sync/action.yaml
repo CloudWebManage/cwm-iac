@@ -35,14 +35,11 @@ runs:
           set -euo pipefail
           
           for cluster_name in $(get_cluster_names '${{ inputs.clusters_match }}'); do
-            (
-              echo "Syncing cluster: $cluster_name"
-              kubeconfig=$(get_cluster_kubeconfig "$cluster_name")
-              for app_name in $(kubectl --kubeconfig=$kubeconfig -n argocd get application -oname); do
-                echo "Syncing app $cluster_name / $app_name"
-                kubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
-              done
-            ) & sleep 1
-            wait
+            echo "Syncing cluster: $cluster_name"
+            kubeconfig=$(get_cluster_kubeconfig "$cluster_name")
+            for app_name in $(kubectl --kubeconfig=$kubeconfig -n argocd get application -oname); do
+              echo "Syncing app $cluster_name / $app_name"
+              kubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
+            done
             echo OK
           done

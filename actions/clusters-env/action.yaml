@@ -66,7 +66,7 @@ runs:
         
         function get_cluster_kubeconfig() {
           local cluster_name="$1"
-          local k8s_token="$(vault write -force k8s-${cluster_name}/creds/github-actions | jq .data.service_account_token)"
+          local k8s_token="$(vault write -force k8s-${cluster_name}/creds/github-actions | jq -r .data.service_account_token)"
           local kubeconfig=$(mktemp)
           vault_kv_get cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/kubeconfig-template | jq -r .kubeconfig > "$kubeconfig"
           sed -i "s|__K8S_TOKEN__|${k8s_token}|g" "$kubeconfig"
