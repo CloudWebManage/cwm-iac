@@ -32,6 +32,8 @@ runs:
         VAULT_ROLE_ID: ${{ inputs.VAULT_ROLE_ID }}
         VAULT_SECRET_ID: ${{ inputs.VAULT_SECRET_ID }}
         script: |
+          set -euo pipefail
+          
           for cluster_name in $(get_cluster_names '${{ inputs.clusters_match }}'); do
             (
               echo "Syncing cluster: $cluster_name"
