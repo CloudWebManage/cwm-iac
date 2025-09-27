@@ -6,5 +6,8 @@ terraform {
     null = {
       source  = "hashicorp/null"
     }
+    vault = {
+      source  = "hashicorp/vault"
+    }
   }
 }

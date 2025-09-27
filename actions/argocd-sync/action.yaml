@@ -23,14 +23,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: download argocd cli
-      shell: bash
-      env:
-        ARGOCD_VERSION: "3.0.12"
-      run: |
-        curl -s -L -o argocd "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64"
-        mv argocd /usr/local/bin/argocd
-        chmod +x /usr/local/bin/argocd
     - name: clone cwm-worker-cluster
       shell: bash
       run: |
@@ -40,6 +32,14 @@ runs:
         git config --global user.name "github actions"
         git config --global user.email "actions@localhost"
         git clone "git@github.com:CloudWebManage/cwm-worker-cluster.git"
+    - name: download kubectl
+      shell: bash
+      env:
+        KUBECTL_VERSION: "v1.33.1"
+      run: |
+        curl -s -L -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+        mv kubectl /usr/local/bin/kubectl
+        chmod +x /usr/local/bin/kubectl
     - name: sync
       uses: CloudWebManage/cwm-iac/actions/vault@main
       with:
@@ -50,12 +50,19 @@ runs:
         script: |
           set -euo pipefail
           for cluster_name in $(python3 cwm-worker-cluster/bin/get_cluster_names.py '${{ inputs.clusters_match }}'); do
-            echo "Processing cluster: $cluster_name"
-            ARGOCD_SERVER="argocd.$(python3 cwm-worker-cluster/bin/get_cluster_domain.py "$cluster_name")"
-            export ARGOCD_AUTH_TOKEN="$($vault_kv_get "cwm-worker-cluster/${cluster_name}/cluster_k8s_apps/argocd_syncer_token" | jq -r .token)"
-            for app_name in $(argocd --server "${ARGOCD_SERVER}" --grpc-web app list -o name); do
-              echo "Syncing app: $app_name"
-              argocd --server "${ARGOCD_SERVER}" --grpc-web app get "$app_name" --refresh
-            done
+            (
+              echo "Processing cluster: $cluster_name"
+              K8S_TOKEN="$(vault write -force k8s-${cluster_name}/creds/github-actions | jq .data.service_account_token)"
+              local tmpfile=$(mktemp)
+              trap 'rm -f "$tmpfile"' EXIT
+              export KUBECONFIG="$tmpfile"
+              vault_kv_get cwm-worker-cluster/${cluster_name}/kubeconfig_template | jq -r .template > "$KUBECONFIG"
+              sed -i "s|__K8S_TOKEN__|${K8S_TOKEN}|g" "$KUBECONFIG"
+              for app_name in $(kubectl -n argocd get application -oname); do
+                echo "Syncing $cluster_name / $app_name"
+                kubectl -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
+              done
+            ) & sleep 1
+            wait
             echo OK
           done

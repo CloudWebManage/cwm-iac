@@ -22,6 +22,9 @@ resource "kubernetes_node_taint" "worker-roles" {
     value = each.value.worker-role
     effect = "NoExecute"
   }
+  lifecycle {
+    ignore_changes = ["taint"]  # this is needed so that it won't remove automatically added taints
+  }
 }
 
 resource "kubernetes_labels" "node_worker_role" {
