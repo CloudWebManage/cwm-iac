@@ -34,6 +34,7 @@ runs:
     - name: download tools
       shell: bash
       run: |
+        cd cwm-worker-cluster
         DOWNLOAD_TOOLS_GLOBAL=yes DOWNLOAD_TOOLS_ONLY="vault,kubectl" sudo -E python3 bin/terraform/download_tools.py cwmc-eu-objstoretest
     - name: run script
       shell: bash
