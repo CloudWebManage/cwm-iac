@@ -23,44 +23,22 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: clone cwm-worker-cluster
-      shell: bash
-      run: |
-        echo "${{ inputs.deploy_key_b64 }}" | base64 -d > /tmp/deploy_key
-        chmod 600 /tmp/deploy_key
-        export GIT_SSH_COMMAND="ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-        git config --global user.name "github actions"
-        git config --global user.email "actions@localhost"
-        git clone "git@github.com:CloudWebManage/cwm-worker-cluster.git"
-    - name: download kubectl
-      shell: bash
-      env:
-        KUBECTL_VERSION: "v1.33.1"
-      run: |
-        curl -s -L -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-        mv kubectl /usr/local/bin/kubectl
-        chmod +x /usr/local/bin/kubectl
     - name: sync
-      uses: CloudWebManage/cwm-iac/actions/vault@main
+      uses: CloudWebManage/cwm-iac/actions/clusters-env@main
       with:
+        deploy_key_b64: ${{ inputs.deploy_key_b64 }}
         VAULT_CA_B64: ${{ inputs.VAULT_CA_B64 }}
         VAULT_URL: ${{ inputs.VAULT_URL }}
         VAULT_ROLE_ID: ${{ inputs.VAULT_ROLE_ID }}
         VAULT_SECRET_ID: ${{ inputs.VAULT_SECRET_ID }}
         script: |
-          set -euo pipefail
-          for cluster_name in $(python3 cwm-worker-cluster/bin/get_cluster_names.py '${{ inputs.clusters_match }}'); do
+          for cluster_name in $(get_cluster_names '${{ inputs.clusters_match }}'); do
             (
-              echo "Processing cluster: $cluster_name"
-              K8S_TOKEN="$(vault write -force k8s-${cluster_name}/creds/github-actions | jq .data.service_account_token)"
-              local tmpfile=$(mktemp)
-              trap 'rm -f "$tmpfile"' EXIT
-              export KUBECONFIG="$tmpfile"
-              vault_kv_get cwm-worker-cluster/${cluster_name}/kubeconfig_template | jq -r .template > "$KUBECONFIG"
-              sed -i "s|__K8S_TOKEN__|${K8S_TOKEN}|g" "$KUBECONFIG"
-              for app_name in $(kubectl -n argocd get application -oname); do
-                echo "Syncing $cluster_name / $app_name"
-                kubectl -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
+              echo "Syncing cluster: $cluster_name"
+              kubeconfig=$(get_cluster_kubeconfig "$cluster_name")
+              for app_name in $(kubectl --kubeconfig=$kubeconfig -n argocd get application -oname); do
+                echo "Syncing app $cluster_name / $app_name"
+                kubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
               done
             ) & sleep 1
             wait
