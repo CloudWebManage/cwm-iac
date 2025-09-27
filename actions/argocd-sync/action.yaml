@@ -52,5 +52,7 @@ runs:
           export -f sync_app
           export -f sync_cluster
           export -f get_cluster_kubeconfig
+          export -f vault_kv_get
+          export -f get_cluster_names
           
           get_cluster_names '${{ inputs.clusters_match }}' | parallel --will-cite --halt soon,fail=1 -j3 sync_cluster {}
