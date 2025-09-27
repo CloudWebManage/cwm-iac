@@ -2,16 +2,6 @@ variable "name" {
   type = string
 }
 
-variable "app_extra_sources" {
-  type = any
-  default = []
-}
-
-variable "app_helm_overrides" {
-  type = any
-  default = {}
-}
-
 variable "ingress_star_domain" {
   type = string
 }
@@ -52,4 +42,14 @@ variable "versions" {
 variable "argocdConfigSource" {
   type = any
   default = {}
+}
+
+variable "erasure_code_standard" {
+  type = string
+  default = "EC:2"
+}
+
+variable "erasure_code_reduced" {
+  type = string
+  default = "EC:2"
 }

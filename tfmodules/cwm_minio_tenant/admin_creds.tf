@@ -6,21 +6,6 @@ resource "random_password" "admin-password" {
   length = 16
 }
 
-resource "kubernetes_secret" "env-config" {
-  depends_on = [kubernetes_namespace.tenant]
-  metadata {
-    name      = "tenant-env-configuration"
-    namespace = "minio-tenant-${var.name}"
-  }
-  type = "Opaque"
-  data = {
-    "config.env": <<-EOT
-      export MINIO_ROOT_USER=${ random_password.admin-user.result }
-      export MINIO_ROOT_PASSWORD=${ random_password.admin-password.result }
-    EOT
-  }
-}
-
 resource "kubernetes_secret" "cwm-minio-api-tenant-creds" {
   metadata {
     name      = "cwm-minio-api-tenant-creds"
