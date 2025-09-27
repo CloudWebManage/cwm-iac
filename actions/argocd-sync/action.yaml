@@ -39,7 +39,7 @@ runs:
             local app_name="$2"
             local kubeconfig="$3"
             echo "${cluster_name}/${app_name}"
-            kubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
+            xkubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
           }
           
           function sync_cluster() {
