@@ -1,3 +1,9 @@
+resource "kubernetes_namespace" "certmanager" {
+  metadata {
+    name = "cert-manager"
+  }
+}
+
 locals {
   certmanager_patch_deploymens = join("\n", [for o in [
     {name: "cert-manager"},
@@ -35,6 +41,19 @@ locals {
   EOT
 }
 
+resource "kubernetes_secret" "cert-manager-route53-credentials" {
+  depends_on = [kubernetes_namespace.certmanager]
+  metadata {
+    name = "cert-manager-route53-credentials"
+    namespace = "cert-manager"
+  }
+  data = {
+    accessKeyId   = var.aws_route53_access_key
+    secretAccessKey = var.aws_route53_secret_key
+  }
+  type = "Opaque"
+}
+
 resource "local_file" "certmanager_cluster_issuer" {
   filename = "${var.data_path}/cert-manager/cluster-issuer.yaml"
   content = yamlencode({
@@ -51,6 +70,21 @@ resource "local_file" "certmanager_cluster_issuer" {
           name = "letsencrypt-issuer-private-key"
         }
         solvers = [
+          {
+            dns01 = {
+              route53 = {
+                region = var.aws_route53_region
+                accessKeyIDSecretRef = {
+                  name = "cert-manager-route53-credentials"
+                  key = "accessKeyId"
+                }
+                secretAccessKeySecretRef = {
+                  name = "cert-manager-route53-credentials"
+                  key = "secretAccessKey"
+                }
+              }
+            }
+          },
           {
             http01 = {
               ingress = {
@@ -77,6 +111,7 @@ resource "local_file" "certmanager_cluster_issuer" {
 }
 
 resource "null_resource" "certmanager_install" {
+  depends_on = [kubernetes_namespace.certmanager, local_file.certmanager_cluster_issuer, kubernetes_secret.cert-manager-route53-credentials]
   triggers = {
     counter = lookup(var.force_reinstall_counters, "cert-manager", 0)
     cluster_issuer = local_file.certmanager_cluster_issuer.content

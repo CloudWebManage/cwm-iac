@@ -58,3 +58,17 @@ variable "vault_path" {
 variable "ingress_star_domain" {
   type = string
 }
+
+variable "aws_route53_region" {
+  type = string
+}
+
+variable "aws_route53_access_key" {
+  type = string
+  sensitive = true
+}
+
+variable "aws_route53_secret_key" {
+  type = string
+  sensitive = true
+}
