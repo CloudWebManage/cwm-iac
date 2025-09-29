@@ -81,6 +81,6 @@ module "minio_tenant_main" {
   configSource = var.argocdConfigSource
   configValueFiles = var.versions["cwm-minio-api"] == "latest" ? [
     "config/auto-updated/cwm-minio-api/api.yaml"
-  ] : []
+  ] : null
   autosync = true
 }

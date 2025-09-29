@@ -15,6 +15,12 @@ terraform {
     external = {
       source  = "hashicorp/external"
     }
+    aws = {
+      source = "hashicorp/aws"
+      configuration_aliases = [
+        aws.route53
+      ]
+    }
   }
 }
 

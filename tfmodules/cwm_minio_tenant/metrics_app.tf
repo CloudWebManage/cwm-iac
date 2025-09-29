@@ -23,7 +23,7 @@ data "vault_kv_secret_v2" "minio_tenant_main_mc_metrics_prometheus_config" {
 }
 
 locals {
-  cluster_scrape_config = yamldecode(var.metrics ? data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config[0].data.config : "")["scrape_configs"][0]
+  cluster_scrape_config = var.metrics ? yamldecode(data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config[0].data.config)["scrape_configs"][0] : null
 }
 
 module "metrics_app" {
@@ -31,6 +31,7 @@ module "metrics_app" {
   depends_on = [kubernetes_namespace.minio-tenant-metrics]
   source = "../argocd-app"
   name = "minio-tenant-${var.name}-metrics"
+  autosync = true
   create_namespace = false
   path = "apps/minio-tenant-metrics"
   values = {

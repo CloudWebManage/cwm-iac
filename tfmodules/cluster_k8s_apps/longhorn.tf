@@ -25,6 +25,7 @@ module "longhorn-app" {
   source = "../argocd-app"
   name = "longhorn"
   namespace = "longhorn-system"
+  autosync = true
   values = {
     "htpasswdVaultPath": "${var.vault_path}/longhorn/htpasswd"
     longhorn = {

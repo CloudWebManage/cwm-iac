@@ -10,6 +10,19 @@ resource "kubernetes_node_taint" "controlplane1" {
   }
 }
 
+resource "kubernetes_node_taint" "controlplane_secondaries" {
+  field_manager = "Terraform_taint_controlplane_secondaries"
+  for_each = toset(var.controlplane_secondary_names)
+  metadata {
+    name = each.value
+  }
+  taint {
+    key    = "CriticalAddonsOnly"
+    value  = "true"
+    effect = "NoExecute"
+  }
+}
+
 resource "kubernetes_node_taint" "worker-roles" {
   field_manager = "Terraform_taint_worker_roles"
   force = true

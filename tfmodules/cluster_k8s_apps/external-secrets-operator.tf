@@ -29,6 +29,10 @@ resource "kubernetes_manifest" "external-secrets-operator-app" {
         }
       }
       syncPolicy : {
+        automated = {
+          prune    = true
+          selfHeal = true
+        }
         syncOptions : [
           "ServerSideApply=true"
         ]

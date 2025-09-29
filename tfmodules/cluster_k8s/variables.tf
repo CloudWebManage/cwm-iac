@@ -2,6 +2,10 @@ variable "controlplane1_node_name" {
   type = string
 }
 
+variable "controlplane_secondary_names" {
+  type = list(string)
+}
+
 variable "kubeconfig_path" {
   type = string
 }

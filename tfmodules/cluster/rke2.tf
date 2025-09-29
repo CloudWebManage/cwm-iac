@@ -57,6 +57,7 @@ locals {
       - 0.0.0.0
       - ${local.controlplane1_private_ip}
       - ${local.controlplane1_public_ip}
+      - controlplane.${var.name_prefix}.${var.ingress_dns_zone_domain}
     etcd-snapshot-retention: 14  # snapshot every 12 hours, total of 1 week
   EOF
   rke2_install_controlplane1_command = <<-EOT
@@ -86,9 +87,50 @@ resource "null_resource" "rke2_install_controlplane1" {
   }
 }
 
+resource "null_resource" "rke2_install_secondary_controlplanes" {
+  for_each = {for name, server in var.servers : name => server if server.role == "controlplane"}
+  depends_on = [null_resource.rke2_install_controlplane1]
+  triggers = {
+    config = <<-EOF
+      token-file: /etc/rancher/rke2/node-token
+      server: https://${local.controlplane1_private_ip}:9345
+      node-name: ${each.key}
+      node-ip: ${local.server_private_ip[each.key]}
+      node-external-ip: ${local.server_public_ip[each.key]}
+      advertise-address: ${local.server_private_ip[each.key]}
+      tls-san:
+        - 0.0.0.0
+        - ${local.server_private_ip[each.key]}
+        - ${local.server_public_ip[each.key]}
+        - controlplane.${var.name_prefix}.${var.ingress_dns_zone_domain}
+      etcd-snapshot-retention: 14  # snapshot every 12 hours, total of 1 week
+    EOF
+    command = <<-EOF
+      curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION=${var.rke2_version} INSTALL_RKE2_TYPE=server sh - &&\
+      if systemctl is-active --quiet rke2-server.service; then
+        systemctl restart rke2-server.service
+      else
+        systemctl enable rke2-server.service &&\
+        systemctl start rke2-server.service
+      fi
+    EOF
+  }
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -euo pipefail
+      ${local.servers_ssh_command[each.key]} "mkdir -p /etc/rancher/rke2"
+      echo "${self.triggers.config}" | ${local.servers_ssh_command[each.key]} "cat > /etc/rancher/rke2/config.yaml"
+      ${local.servers_ssh_command[local.controlplane1_server_name]} "cat /var/lib/rancher/rke2/server/node-token" \
+          | ${local.servers_ssh_command[each.key]} "cat > /etc/rancher/rke2/node-token"
+      ${local.servers_ssh_command[each.key]} "${self.triggers.command}"
+    EOT
+    interpreter = ["bash", "-c"]
+  }
+}
+
 resource "null_resource" "rke2_install_workers" {
   for_each = {for name, server in var.servers : name => server if server.role == "worker"}
-  depends_on = [null_resource.rke2_install_controlplane1]
+  depends_on = [null_resource.rke2_install_secondary_controlplanes]
   triggers = {
     config = <<-EOF
       node-name: ${each.key}
@@ -122,7 +164,7 @@ resource "null_resource" "rke2_install_workers" {
 
 data "external" "admin_kubeconfig" {
   count = local.controlplane1_server_name == "" ? 0 : 1
-  depends_on = [null_resource.rke2_install_controlplane1]
+  depends_on = [null_resource.rke2_install_secondary_controlplanes]
   program = [
     "bash", "-c", <<-EOT
       set -euo pipefail
@@ -130,7 +172,7 @@ data "external" "admin_kubeconfig" {
       if ! [ -f "$FILENAME" ]; then
         mkdir -p "$(dirname "$FILENAME")"
         ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"
-        sed -i 's|https://127.0.0.1:6443|https://${local.controlplane1_public_ip}:6443|' "$FILENAME"
+        sed -i 's|https://127.0.0.1:6443|https://controlplane.${var.name_prefix}.${var.ingress_dns_zone_domain}:6443|' "$FILENAME"
       fi
       echo '{}'
     EOT

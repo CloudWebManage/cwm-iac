@@ -15,6 +15,7 @@ runs:
       env:
         INPUT_JSON: ${{ inputs.json }}
       run: |
-        cd actions/wait-for-deployment
+        pushd actions/wait-for-deployment
         python3 -m pip install -r requirements.txt
         python3 action.py
+        popd

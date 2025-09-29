@@ -2,6 +2,7 @@ module "minio_operator" {
   depends_on = [module.cloudnative_pg, null_resource.directpv_init_drives]
   source = "../argocd-app"
   name = "minio-operator"
+  autosync = true
   values = {
     # https://github.com/minio/operator/blob/master/helm/operator/values.yaml
     operator: {

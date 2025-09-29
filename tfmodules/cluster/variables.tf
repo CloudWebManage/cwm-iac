@@ -37,7 +37,8 @@ variable "ssh_pubkey" {
 variable "servers" {
   type = map(object({
     role          = string  # bastion - the bastion node, used for SSH access to the cluster
-                            # controlplane1 - the first control plane node, currently we don't support additional control plane nodes
+                            # controlplane1 - the first control plane node
+                            # controlplane - secondary control plane nodes
                             # worker - worker nodes, used for running workloads
                             # standalone - a standalone server, not part of the kubernetes cluster
     billing_cycle = optional(string)
@@ -66,5 +67,13 @@ variable "admin_kubeconfig_path" {
 }
 
 variable "data_path" {
+  type = string
+}
+
+variable "ingress_dns_zone_domain" {
+  type = string
+}
+
+variable "ingress_dns_zone_id" {
   type = string
 }

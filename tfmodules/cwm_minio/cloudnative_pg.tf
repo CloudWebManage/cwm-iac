@@ -3,6 +3,10 @@ module "cloudnative_pg" {
   source = "../argocd-app"
   name = "cloudnative-pg"
   sync_policy = {
+    automated = {
+      prune = true
+      selfHeal = true
+    }
     syncOptions : [
       "ServerSideApply=true"
     ]
