@@ -70,7 +70,7 @@ module "minio_tenant_main" {
         }
       }
     },
-    var.versions["cwm-minio-api"] == "latest" ? {} : {
+    startswith(var.versions["cwm-minio-api"], "config/") ? {} : {
       cwmMinioApi = {
         api = {
           image = "ghcr.io/cloudwebmanage/cwm-minio-api:${var.versions["cwm-minio-api"]}"
@@ -79,8 +79,8 @@ module "minio_tenant_main" {
     }
   )
   configSource = var.argocdConfigSource
-  configValueFiles = var.versions["cwm-minio-api"] == "latest" ? [
-    "config/auto-updated/cwm-minio-api/api.yaml"
+  configValueFiles = startswith(var.versions["cwm-minio-api"], "config/") ? [
+    "${var.versions["cwm-minio-api"]}/cwm-minio-api/api.yaml"
   ] : null
   autosync = true
 }
