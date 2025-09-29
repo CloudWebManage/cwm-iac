@@ -9,6 +9,7 @@ resource "kubernetes_secret" "cwm_minio_api_tenant_info" {
       api_url = "https://minio-tenant-${var.name}-api.${var.ingress_star_domain}"
       console_url = "https://minio-tenant-${var.name}-console.${var.ingress_star_domain}"
       prometheus_url = "https://minio-tenant-${var.name}-prometheus.${var.ingress_star_domain}"
+      bucket_api_url = "https://<BUCKET_NAME>.${var.minio_domain}"
     })
   }
 }

@@ -11,6 +11,7 @@ resource "kubernetes_secret" "env-config" {
       export MINIO_ROOT_PASSWORD=${ random_password.admin-password.result }
       export MINIO_STORAGE_CLASS_STANDARD="${var.erasure_code_standard}"
       export MINIO_STORAGE_CLASS_RRS="${var.erasure_code_reduced}"
+      export MINIO_DOMAIN="${var.minio_domain}"
     EOT
   }
 }

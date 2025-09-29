@@ -46,10 +46,16 @@ variable "argocdConfigSource" {
 
 variable "erasure_code_standard" {
   type = string
-  default = "EC:2"
 }
 
 variable "erasure_code_reduced" {
   type = string
-  default = "EC:2"
+}
+
+variable "minio_domain" {
+  type = string
+}
+
+variable "zone_id" {
+  type = string
 }
