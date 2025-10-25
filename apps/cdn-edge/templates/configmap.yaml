@@ -14,6 +14,8 @@ data:
         worker_connections  10240;
     }
 
+    include /etc/nginx/metrics.conf;
+
     stream {
       resolver __RESOLVER_IP__ valid=30s ipv6=off;
       resolver_timeout 2s;
