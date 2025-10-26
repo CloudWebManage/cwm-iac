@@ -17,12 +17,12 @@ data:
 
       init_worker_by_lua_block {
           prometheus = require("prometheus").init("prometheus_metrics")
-          metric_connections = prometheus:counter("nginx_stream_connections_total", "Number of Stream connections", {"server_addr"})
+          metric_connections = prometheus:counter("nginx_stream_connections_total", "Number of Stream connections", {"server_name"})
       }
 
       preread_by_lua_block {
-          local s = ngx.var.server_addr or "unknown"
-          metric_connections:inc(1, {s})
+          local sni = ngx.var.ssl_preread_server_name or "unknown"
+          metric_connections:inc(1, {sni})
       }
 
       resolver __RESOLVER_IP__ valid=30s ipv6=off;
