@@ -12,46 +12,8 @@ data:
         worker_connections  10240;
     }
 
-    lua_shared_dict prometheus_metrics 16m;
-
-    http {
-      include       mime.types;
-      default_type  application/octet-stream;
-      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                        '$status $body_bytes_sent "$http_referer" '
-                        '"$http_user_agent" "$http_x_forwarded_for"';
-      access_log logs/access.log combined;
-      client_body_temp_path /var/run/openresty/nginx-client-body;
-      proxy_temp_path       /var/run/openresty/nginx-proxy;
-      fastcgi_temp_path     /var/run/openresty/nginx-fastcgi;
-      uwsgi_temp_path       /var/run/openresty/nginx-uwsgi;
-      scgi_temp_path        /var/run/openresty/nginx-scgi;
-      sendfile        on;
-      keepalive_timeout  65;
-      server_tokens off;
-      server {
-          listen 9999;
-          server_name  _;
-          location /metrics {
-              content_by_lua_block {
-                  local prometheus = require("prometheus").init("prometheus_metrics")
-                  prometheus:collect()
-              }
-          }
-      }
-    }
-
     stream {
-      resolver __RESOLVER_IP__ valid=30s ipv6=off;
-      resolver_timeout 2s;
-
-      server {
-        listen 443;
-        ssl_preread on;
-        proxy_connect_timeout 10s;
-        proxy_timeout 300s;
-        proxy_pass $ssl_preread_server_name:443;
-      }
+      lua_shared_dict prometheus_metrics 16m;
 
       init_worker_by_lua_block {
           prometheus = require("prometheus").init("prometheus_metrics")
@@ -66,11 +28,33 @@ data:
               { 128, 512, 1024, 4096, 16384, 65536, 262144, 1048576, 4194304, 16777216 }
           )
       }
+
       log_by_lua_block {
           metric_requests:inc(1, {ngx.var.server_name, ngx.var.status})
           metric_latency:observe(tonumber(ngx.var.request_time), {ngx.var.server_name})
           metric_response_size:observe(tonumber(ngx.var.bytes_sent), {ngx.var.server_name})
           metric_request_size:observe(tonumber(ngx.var.request_length), {ngx.var.server_name})
+      }
+
+      resolver __RESOLVER_IP__ valid=30s ipv6=off;
+      resolver_timeout 2s;
+
+      server {
+        listen 443;
+        ssl_preread on;
+        proxy_connect_timeout 10s;
+        proxy_timeout 300s;
+        proxy_pass $ssl_preread_server_name:443;
+      }
+
+    server {
+      listen 9999;
+        content_by_lua_block {
+          ngx.say("HTTP/1.1 200 OK")
+          ngx.say("Content-Type: text/plain")
+          ngx.say("")
+          ngx.say(table.concat(prometheus:metric_data(), ""))
+        }
       }
     }
 
