@@ -47,13 +47,14 @@ data:
         proxy_pass $ssl_preread_server_name:443;
       }
 
-    server {
-      listen 9999;
+      server {
+        listen 9999;
         content_by_lua_block {
-          ngx.say("HTTP/1.1 200 OK")
-          ngx.say("Content-Type: text/plain")
-          ngx.say("")
-          ngx.say(table.concat(prometheus:metric_data(), ""))
+          local metrics = table.concat(prometheus:metric_data(), "")
+          ngx.print("HTTP/1.1 200 OK\r\n")
+          ngx.print("Content-Type: text/plain\r\n")
+          ngx.print("Content-Length: " .. #metrics .. "\r\n\r\n")
+          ngx.print(metrics)
         }
       }
     }
