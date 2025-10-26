@@ -27,20 +27,13 @@ data:
       sendfile        on;
       keepalive_timeout  65;
       server_tokens off;
-      server {
-          listen 9999;
-          server_name  _;
-          location /metrics {
-              content_by_lua_block {
-                  prometheus:collect()
-              }
-          }
-      }
+
     }
 
     stream {
       resolver __RESOLVER_IP__ valid=30s ipv6=off;
       resolver_timeout 2s;
+
       server {
         listen 443;
         ssl_preread on;
@@ -68,6 +61,15 @@ data:
           metric_latency:observe(tonumber(ngx.var.request_time), {ngx.var.server_name})
           metric_response_size:observe(tonumber(ngx.var.bytes_sent), {ngx.var.server_name})
           metric_request_size:observe(tonumber(ngx.var.request_length), {ngx.var.server_name})
+      }
+
+      server {
+          listen 9999;
+          location /metrics {
+              content_by_lua_block {
+                  prometheus:collect()
+              }
+          }
       }
     }
 
