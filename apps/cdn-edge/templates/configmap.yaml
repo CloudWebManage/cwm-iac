@@ -65,10 +65,8 @@ data:
 
       server {
           listen 9999;
-          location /metrics {
-              content_by_lua_block {
-                  prometheus:collect()
-              }
+          content_by_lua_block {
+              prometheus:collect()
           }
       }
     }
