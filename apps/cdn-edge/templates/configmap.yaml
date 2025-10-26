@@ -21,7 +21,8 @@ data:
       }
 
       preread_by_lua_block {
-          metric_connections:inc(1, {ngx.var.ssl_preread_server_name})
+          local sni = ngx.var.ssl_preread_server_name or ""
+          metric_connections:inc(1, {sni})
       }
 
       resolver __RESOLVER_IP__ valid=30s ipv6=off;
