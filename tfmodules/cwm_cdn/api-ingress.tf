@@ -85,3 +85,40 @@ resource "kubernetes_ingress_v1" "cwm-cdn-api" {
     }
   }
 }
+
+resource "kubernetes_ingress_v1" "cwm-cdn-api-prometheus" {
+  metadata {
+    name = "cwm-cdn-api-prometheus"
+    namespace = "cdn-api"
+    annotations = {
+      "cert-manager.io/cluster-issuer": "letsencrypt"
+      "nginx.ingress.kubernetes.io/auth-type": "basic"
+      "nginx.ingress.kubernetes.io/auth-secret": "cwm-cdn-api-htpasswd"
+      "nginx.ingress.kubernetes.io/auth-realm": "Protected Area"
+    }
+  }
+  spec {
+    ingress_class_name = "nginx"
+    tls {
+      hosts = ["cwm-cdn-api-prometheus.${var.name_prefix}.${var.zone_domain}"]
+      secret_name = "cwm-cdn-api-prometheus-tls"
+    }
+    rule {
+      host = "cwm-cdn-api-prometheus.${var.name_prefix}.${var.zone_domain}"
+      http {
+        path {
+          path = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "cdn-api-prometheus-server"
+              port {
+                number = 80
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
