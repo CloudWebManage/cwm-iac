@@ -4,3 +4,32 @@ allowedPrimaryKey: ""
 cwmCdnApi:
   api:
     image: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"
+
+prometheus:
+  server:
+    tolerations:
+      - key: "cwm-iac-worker-role"
+        operator: "Equal"
+        value: "system"
+        effect: "NoExecute"
+
+    persistentVolume:
+      storageClass: longhorn
+
+    retention: "2d"
+
+  serverFiles:
+    prometheus.yml:
+      scrape_configs: []
+
+  alertmanager:
+    enabled: false
+
+  kube-state-metrics:
+    enabled: false
+
+  prometheus-node-exporter:
+    enabled: false
+
+  prometheus-pushgateway:
+    enabled: false
