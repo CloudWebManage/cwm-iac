@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: httpbin
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
+      containers:
+        - name: httpbin
+          image: kennethreitz/httpbin:latest
