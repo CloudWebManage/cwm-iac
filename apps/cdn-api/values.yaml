@@ -33,6 +33,18 @@ prometheus:
               action: replace
               target_label: __address__
               replacement: $1:9999
+        - job_name: tenant
+          metrics_path: /metrics
+          kubernetes_sd_configs:
+            - role: pod
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_label_app]
+              action: keep
+              regex: "tenant"
+            - source_labels: [__meta_kubernetes_pod_ip]
+              action: replace
+              target_label: __address__
+              replacement: $1:9999
 
   alertmanager:
     enabled: false
