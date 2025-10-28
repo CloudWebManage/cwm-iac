@@ -13,7 +13,7 @@ module "api_app" {
       isPrimary = var.is_primary
       allowedPrimaryKey = var.is_primary ? "" : data.vault_kv_secret_v2.allowed_primary_key[0].data["key"]
     },
-    var.versions["cwm-cdn-api"] == "latest" ? {} : {
+    (var.versions["cwm-cdn-api"] == "latest" || startswith(var.versions["cwm-cdn-api"], "config/")) ? {} : {
       cwmCdnApi = {
         api = {
           image = "ghcr.io/cloudwebmanage/cwm-cdn-api:${var.versions["cwm-cdn-api"]}"
@@ -24,7 +24,11 @@ module "api_app" {
   configSource = var.argocdConfigSource
   configValueFiles = var.versions["cwm-cdn-api"] == "latest" ? [
     "config/auto-updated/cwm-cdn-api/api.yaml"
-  ] : []
+  ] : (
+    startswith(var.versions["cwm-cdn-api"], "config/") ? [
+    "${var.versions["cwm-cdn-api"]}/cwm-cdn-api/api.yaml"
+    ] : []
+  )
   autosync = true
 }
 

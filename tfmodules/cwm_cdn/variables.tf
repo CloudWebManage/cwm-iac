@@ -43,6 +43,11 @@ variable "geolocation_routing_policy" {
   default = {}
 }
 
+variable "geolocation_routing_policies" {
+  type = any
+  default = {}
+}
+
 variable "geolocation_set_identifier" {
   type = string
   default = ""
