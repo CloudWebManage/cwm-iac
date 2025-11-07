@@ -7,6 +7,8 @@ spec:
     - ReadWriteOnce
   local:
     path: /mnt/vmaggregator_storage/main-vmsingle
+  capacity:
+    storage: 4Ti
   nodeAffinity:
     required:
       nodeSelectorTerms:
