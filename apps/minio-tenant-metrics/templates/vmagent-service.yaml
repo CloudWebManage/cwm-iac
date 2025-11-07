@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: vmagent
+  labels:
+    app: vmagent
 spec:
   ports:
     - name: http
