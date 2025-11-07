@@ -64,3 +64,7 @@ variable "vmagentRemoteWriteConfig" {
   type = any
   default = {}
 }
+
+variable "cluster_name" {
+  type = string
+}
