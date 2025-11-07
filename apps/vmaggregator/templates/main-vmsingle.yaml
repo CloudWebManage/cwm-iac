@@ -12,6 +12,6 @@ spec:
       requests:
         storage: 4Ti
   tolerations:
-    - key: cwmc-role
+    - key: cwm-iac-worker-role
       value: vmaggregator
       effect: NoSchedule
