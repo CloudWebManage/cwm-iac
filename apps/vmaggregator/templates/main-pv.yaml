@@ -7,3 +7,11 @@ spec:
     - ReadWriteOnce
   local:
     path: /mnt/vmaggregator_storage/main-vmsingle
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cwmc-prod-eu-objstore-vmaggregator
