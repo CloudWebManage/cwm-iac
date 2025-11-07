@@ -6,7 +6,6 @@ data:
   promscrape.yaml: |
     scrape_configs:
       - job_name: federate
-        honor_labels: true
         scrape_interval: 60s
         metrics_path: /federate
         scheme: http
@@ -17,5 +16,5 @@ data:
         static_configs:
           - targets: ['minio-tenant-main-metrics-prometheus-server:80']
         metric_relabel_configs:
-          - regex: '(server|job|type|exported_bucket)'
+          - regex: '^(server|job|type|exported_bucket)$'
             action: labeldrop
