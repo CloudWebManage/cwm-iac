@@ -13,6 +13,6 @@ spec:
     matchNames:
       - minio-tenant-main-metrics
   endpoints:
-    - port: 8429
+    - port: http
       path: /metrics
       interval: 30s

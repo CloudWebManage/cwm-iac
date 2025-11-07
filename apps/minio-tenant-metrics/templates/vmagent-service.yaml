@@ -4,6 +4,7 @@ metadata:
   name: vmagent
 spec:
   ports:
-    - port: 8429
+    - name: http
+      port: 8429
   selector:
     app: vmagent
