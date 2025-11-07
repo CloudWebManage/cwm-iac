@@ -1,0 +1,16 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMSingle
+metadata:
+  name: main
+spec:
+  storage:
+    volumeName: main-vmsingle
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 4000Gi
+  tolerations:
+    - key: cwmc-role
+      value: vmaggregator
+      effect: NoSchedule
