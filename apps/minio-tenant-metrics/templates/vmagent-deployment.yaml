@@ -28,12 +28,7 @@ spec:
           volumeMounts:
             - mountPath: /etc/vmagent/config
               name: config
-            - mountPath: /etc/vmagent/secrets
-              name: secrets
       volumes:
         - name: config
           configMap:
             name: vmagent-config
-        - name: secrets
-          secret:
-            secretName: vmagent-secrets
