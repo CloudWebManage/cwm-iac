@@ -5,20 +5,35 @@ metadata:
 data:
   promscrape.yaml: |
     scrape_configs:
-      - job_name: federate
+      - job_name: federate_minio
         scrape_interval: 60s
         metrics_path: /federate
         scheme: http
         params:
           'match[]':
-            - '{__name__=~"minio_cluster_usage_buckets_.*"}'
-            - '{__name__=~"minio_bucket_api_.*"}'
+            - '{__name__="minio_cluster_usage_buckets_total_bytes"}'
+            - '{__name__="minio_bucket_api_traffic_received_bytes"}'
+            - '{__name__="minio_bucket_api_traffic_sent_bytes"}'
+            - '{__name__="minio_bucket_api_total"}'
         static_configs:
           - targets: ['minio-tenant-main-metrics-prometheus-server:80']
         metric_relabel_configs:
-          - regex: '^(instance|server|job|type|exported_bucket|exported_instance|exported_job)$'
+          - regex: '^(instance|server|job|type|exported_bucket|exported_instance|exported_job|name)$'
             action: labeldrop
           - target_label: cluster
             replacement: {{ .Values.vmagent.clusterLabel }}
           - target_label: tenant
             replacement: {{ .Values.vmagent.tenantLabel }}
+  streamAggr.yaml: |
+    - name: minio_gauges
+      match:
+        - '{__name__="minio_cluster_usage_buckets_total_bytes"}'
+      interval: 1h
+      outputs: [avg, min, max, last]
+    - name: minio_counters
+      match:
+        - '{__name__="minio_bucket_api_traffic_received_bytes"}'
+        - '{__name__="minio_bucket_api_traffic_sent_bytes"}'
+        - '{__name__="minio_bucket_api_total"}'
+      interval: 1h
+      outputs: [increase_prometheus]
