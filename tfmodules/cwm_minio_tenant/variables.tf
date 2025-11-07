@@ -59,3 +59,8 @@ variable "minio_domain" {
 variable "zone_id" {
   type = string
 }
+
+variable "vmagentRemoteWriteConfig" {
+  type = any
+  default = {}
+}

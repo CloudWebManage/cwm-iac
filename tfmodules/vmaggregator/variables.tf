@@ -19,3 +19,15 @@ variable "tools" {
 variable "config" {
   type = any
 }
+
+variable "ingress_star_domain" {
+  type = string
+}
+
+variable "vault_mount" {
+  type = string
+}
+
+variable "vault_path" {
+  type = string
+}

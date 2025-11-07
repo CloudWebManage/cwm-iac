@@ -35,6 +35,9 @@ module "metrics_app" {
   create_namespace = false
   path = "apps/minio-tenant-metrics"
   values = {
+    vmagent = {
+      remoteWrite = var.vmagentRemoteWriteConfig
+    }
     prometheus = {
       serverFiles = {
         "prometheus.yml" = {

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vmagent-config
+data:
+  promscrape.yaml: |
+    scrape_configs:
+      - job_name: federate
+        honor_labels: true
+        scrape_interval: 60s
+        metrics_path: /federate
+        scheme: http
+        params:
+          'match[]':
+            - '{__name__=~"minio_cluster_usage_buckets_.*"}'
+            - '{__name__=~"minio_bucket_api_.*"}'
+        static_configs:
+          - targets: ['minio-tenant-main-metrics-prometheus-server:80']
