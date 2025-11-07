@@ -47,7 +47,7 @@ module "metrics_app" {
               http_sd_configs = [
                 {
                   refresh_interval = "30s"
-                  url = "http://minio-tenant-${var.name}-cwm-api.${kubernetes_namespace.tenant.metadata[0].name}:8000/buckets/list_prometheus_sd?targets=${local.cluster_scrape_config["static_configs"][0]["targets"][0]}"
+                  url = "http://cwm-minio-api.${kubernetes_namespace.tenant.metadata[0].name}:8000/buckets/list_prometheus_sd?targets=${local.cluster_scrape_config["static_configs"][0]["targets"][0]}"
                 }
               ],
               relabel_configs = [
