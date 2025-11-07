@@ -5,6 +5,7 @@ metadata:
 spec:
   storage:
     volumeName: main-vmsingle
+    storageClassName: ""
     accessModes:
       - ReadWriteOnce
     resources:
