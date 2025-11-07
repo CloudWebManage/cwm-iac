@@ -11,6 +11,8 @@ spec:
     resources:
       requests:
         storage: 4Ti
+  nodeSelector:
+    kubernetes.io/hostname: cwmc-prod-eu-objstore-vmaggregator
   tolerations:
     - key: cwm-iac-worker-role
       value: vmaggregator
