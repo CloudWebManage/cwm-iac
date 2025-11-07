@@ -25,6 +25,7 @@ module "minio_tenant_main" {
             enabled = true
             annotations = {
               "cert-manager.io/cluster-issuer" = "letsencrypt"
+              "nginx.ingress.kubernetes.io/whitelist-source-range" = var.console_ingress_whitelist_source_range
             }
             host = "minio-tenant-${var.name}-console.${var.ingress_star_domain}"
             tls = [

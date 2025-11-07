@@ -68,3 +68,8 @@ variable "vmagentRemoteWriteConfig" {
 variable "cluster_name" {
   type = string
 }
+
+variable "console_ingress_whitelist_source_range" {
+  type    = string
+  default = ""
+}
