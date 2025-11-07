@@ -10,7 +10,7 @@ spec:
       - ReadWriteOnce
     resources:
       requests:
-        storage: 4000Gi
+        storage: 4Ti
   tolerations:
     - key: cwmc-role
       value: vmaggregator
