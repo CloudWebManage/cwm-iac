@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     release: monitoring
-  name: monitoring-kube-state-metrics
+  name: vmagent
   namespace: monitoring
 spec:
   selector:
