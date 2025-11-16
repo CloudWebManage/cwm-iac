@@ -12,6 +12,10 @@ module "api_app" {
     {
       isPrimary = var.is_primary
       allowedPrimaryKey = var.is_primary ? "" : data.vault_kv_secret_v2.allowed_primary_key[0].data["key"]
+      vmagent = {
+        clusterLabel = var.name_prefix
+        remoteWrite = var.vmagentRemoteWriteConfig
+      }
     },
     (var.versions["cwm-cdn-api"] == "latest" || startswith(var.versions["cwm-cdn-api"], "config/")) ? {} : {
       cwmCdnApi = {
