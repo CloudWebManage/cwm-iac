@@ -37,6 +37,6 @@ data:
         - '{__name__="nginx_http_request_size_bytes_bucket"}'
         - '{__name__="nginx_http_requests_total"}'
         - '{__name__="nginx_stream_connections_total"}'
-      interval: 2m
+      interval: 1h
       enable_windows: true
       outputs: [rate_sum]
