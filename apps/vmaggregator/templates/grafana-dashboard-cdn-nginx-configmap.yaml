@@ -123,7 +123,7 @@ data:
           "targets": [
             {
               "expr": "sum(nginx_stream_connections_total:2m_rate_sum{cluster=~\"$cluster\", server_name=~\"$server_name\"})",
-              "legendFormat": "{{server_name}}"
+              "legendFormat": "{{ `{{server_name}}` }}"
             }
           ]
         },
