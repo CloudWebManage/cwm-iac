@@ -16,7 +16,7 @@ data:
       "datasource": {
         "type": "prometheus",
         "uid": "PF4B74AA7F0FE8DA4"
-      }
+      },
 
       "templating": {
         "list": [
