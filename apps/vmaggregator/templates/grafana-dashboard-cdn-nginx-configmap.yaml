@@ -24,10 +24,7 @@ data:
             "name": "cluster",
             "type": "query",
             "label": "Cluster",
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PF4B74AA7F0FE8DA4"
-            }
+            "datasource": "vmaggregator",
             "query": "label_values(nginx_http_requests_total:2m_rate_sum, cluster)",
             "includeAll": true,
             "multi": true
@@ -36,10 +33,7 @@ data:
             "name": "namespace",
             "type": "query",
             "label": "Namespace",
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PF4B74AA7F0FE8DA4"
-            }
+            "datasource": "vmaggregator",
             "query": "label_values(nginx_http_requests_total:2m_rate_sum{cluster=~\"$cluster\"}, namespace)",
             "includeAll": true,
             "multi": true
@@ -48,10 +42,7 @@ data:
             "name": "job",
             "type": "query",
             "label": "Job",
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PF4B74AA7F0FE8DA4"
-            }
+            "datasource": "vmaggregator",
             "query": "label_values(nginx_http_requests_total:2m_rate_sum{cluster=~\"$cluster\", namespace=~\"$namespace\"}, job)",
             "includeAll": true,
             "multi": true
@@ -60,10 +51,7 @@ data:
             "name": "server_name",
             "type": "query",
             "label": "Stream Server",
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PF4B74AA7F0FE8DA4"
-            }
+            "datasource": "vmaggregator",
             "query": "label_values(nginx_stream_connections_total:2m_rate_sum{cluster=~\"$cluster\"}, server_name)",
             "includeAll": true,
             "multi": true
