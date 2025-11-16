@@ -13,6 +13,7 @@ data:
       "schemaVersion": 36,
       "version": 1,
       "refresh": "30s",
+      "datasource": "vmaggregator"
 
       "templating": {
         "list": [
