@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vmagent-config
+data:
+  promscrape.yaml: |
+    scrape_configs:
+      - job_name: federate
+        scrape_interval: 60s
+        metrics_path: /federate
+        scheme: http
+        params:
+          'match[]':
+            - '{__name__="nginx_http_requests_total"}'
+        static_configs:
+          - targets: ['cdn-api-prometheus-server:80']
+        metric_relabel_configs:
+          - regex: '^(instance|host)$'
+            action: labeldrop
+          - target_label: cluster
+            replacement: {{ .Values.vmagent.clusterLabel }}
+  streamAggr.yaml: |
+    - name: nginx_counters
+      match:
+        - '{__name__="nginx_http_request_duration_seconds_sum"}'
+        - '{__name__="nginx_http_request_duration_seconds_count"}'
+        - '{__name__="nginx_http_request_duration_seconds_bucket"}'
+        - '{__name__="nginx_http_request_size_bytes_sum"}'
+        - '{__name__="nginx_http_request_size_bytes_count"}'
+        - '{__name__="nginx_http_request_size_bytes_bucket"}'
+        - '{__name__="nginx_http_requests_total"}'
+        - '{__name__="nginx_stream_connections_total"}'
+      interval: 1h
+      enable_windows: true
+      outputs: [rate_sum]

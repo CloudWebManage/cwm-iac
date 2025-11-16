@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmagent
+spec:
+  selector:
+    matchLabels:
+      app: vmagent
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vmagent
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
+      containers:
+        - name: vmagent
+          image: victoriametrics/vmagent:v1.129.1-scratch
+          args:
+            - -promscrape.config=/etc/vmagent/config/promscrape.yaml
+            - -remoteWrite.url={{ .Values.vmagent.remoteWrite.baseUrl }}/api/v1/write
+            - -remoteWrite.basicAuth.username={{ .Values.vmagent.remoteWrite.username }}
+            - -remoteWrite.basicAuth.password={{ .Values.vmagent.remoteWrite.password }}
+            - -remoteWrite.streamAggr.config=/etc/vmagent/config/streamAggr.yaml
+          volumeMounts:
+            - mountPath: /etc/vmagent/config
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            name: vmagent-config
