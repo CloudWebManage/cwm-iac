@@ -74,3 +74,13 @@ variable "argocdConfigSource" {
   type = any
   default = {}
 }
+
+variable "geo_prefix" {
+  type = string
+  default = "geo"
+}
+
+variable "vmagentRemoteWriteConfig" {
+  type = any
+  default = {}
+}

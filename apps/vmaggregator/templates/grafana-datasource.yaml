@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-vmaggregator
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+data:
+  vmaggregator.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: vmaggregator
+        type: prometheus
+        access: proxy
+        url: http://vmsingle-main.vmaggregator.svc:8429
+        isDefault: false
+        editable: false
+        jsonData:
+          httpMethod: GET
