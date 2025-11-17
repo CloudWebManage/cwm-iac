@@ -12,6 +12,7 @@ module "minio_tenant_main" {
             enabled = true
             annotations = {
               "cert-manager.io/cluster-issuer" = "letsencrypt"
+              "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
             }
             host = "minio-tenant-${var.name}-api.${var.ingress_star_domain}"
             tls = [
@@ -26,6 +27,7 @@ module "minio_tenant_main" {
             annotations = {
               "cert-manager.io/cluster-issuer" = "letsencrypt"
               "nginx.ingress.kubernetes.io/whitelist-source-range" = var.console_ingress_whitelist_source_range
+              "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
             }
             host = "minio-tenant-${var.name}-console.${var.ingress_star_domain}"
             tls = [
