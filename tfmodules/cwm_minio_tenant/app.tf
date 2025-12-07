@@ -69,15 +69,15 @@ module "minio_tenant_main" {
                 }
               ]
             }, pool)
-          ]
-        },
-        sideCars = {
-          containers = [
-            {
-              name = "cwm-iac-minio-log-metrics"
-              image = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:1265b80eb117c47b34ea044e34ba315a2d173d71"
-            }
-          ]
+          ],
+          sideCars = {
+            containers = [
+              {
+                name = "cwm-iac-minio-log-metrics"
+                image = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:1265b80eb117c47b34ea044e34ba315a2d173d71"
+              }
+            ]
+          }
         }
       }
     },
