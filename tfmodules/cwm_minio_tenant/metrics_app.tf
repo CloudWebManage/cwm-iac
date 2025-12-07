@@ -62,6 +62,31 @@ module "metrics_app" {
                   replacement = "/minio/metrics/v3/bucket/api/$1"
                 }
               ]
+            },
+            {
+              job_name = "minio-audit-metrics"
+              scheme = "http"
+              metrics_path = "/metrics"
+              kubernetes_sd_configs = [
+                {
+                  role = "pod"
+                  namespaces = {
+                    names = [kubernetes_namespace.tenant.metadata[0].name]
+                  }
+                }
+              ]
+              relabel_configs = [
+                {
+                  source_labels = ["__meta_kubernetes_pod_label_cwm_minio_tenant"]
+                  regex = "true"
+                  action = "keep"
+                },
+                {
+                  source_labels = ["__meta_kubernetes_pod_ip"]
+                  target_label = "__address__"
+                  replacement = "$1:8799"
+                }
+              ]
             }
           ]
         }
