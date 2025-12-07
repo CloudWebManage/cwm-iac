@@ -12,6 +12,8 @@ resource "kubernetes_secret" "env-config" {
       export MINIO_STORAGE_CLASS_STANDARD="${var.erasure_code_standard}"
       export MINIO_STORAGE_CLASS_RRS="${var.erasure_code_reduced}"
       export MINIO_DOMAIN="${var.minio_domain}"
+      export MINIO_AUDIT_QUEUE_DIR="/export/audit-queue"
+      export MINIO_AUDIT_QUEUE_DIR_MAX_SIZE="1000000"
     EOT
   }
 }
