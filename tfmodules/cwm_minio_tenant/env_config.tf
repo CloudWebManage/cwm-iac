@@ -12,8 +12,10 @@ resource "kubernetes_secret" "env-config" {
       export MINIO_STORAGE_CLASS_STANDARD="${var.erasure_code_standard}"
       export MINIO_STORAGE_CLASS_RRS="${var.erasure_code_reduced}"
       export MINIO_DOMAIN="${var.minio_domain}"
-      export MINIO_AUDIT_QUEUE_DIR="/export/audit-queue"
-      export MINIO_AUDIT_QUEUE_DIR_MAX_SIZE="1000000"
+      export MINIO_AUDIT_WEBHOOK_QUEUE_DIR_METRICS="/export/audit-queue/metrics"
+      export MINIO_AUDIT_WEBHOOK_QUEUE_DIR_MAX_SIZE_METRICS="1000000"
+      export MINIO_AUDIT_WEBHOOK_ENABLE_METRICS="on"
+      export MINIO_AUDIT_WEBHOOK_ENDPOINT_METRICS="http://localhost:8791"
     EOT
   }
 }
