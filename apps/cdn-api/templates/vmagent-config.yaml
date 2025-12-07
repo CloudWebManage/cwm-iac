@@ -22,7 +22,7 @@ data:
         static_configs:
           - targets: ['cdn-api-prometheus-server:80']
         metric_relabel_configs:
-          - regex: '^(instance|host)$'
+          - regex: '^(instance|host|exported_instance)$'
             action: labeldrop
           - target_label: cluster
             replacement: {{ .Values.vmagent.clusterLabel }}

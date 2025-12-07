@@ -1,0 +1,25 @@
+name: Docker Minio Log Metrics CI
+on:
+  push:
+    paths:
+      - .github/workflows/docker-minio-log-metrics-ci.yaml
+      - docker/minio-log-metrics/**
+env:
+  PYTHON_VERSION: "3.12"
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
+        with:
+          image_suffix: cwm-iac-minio-log-metrics
+          context: docker/minio-log-metrics
+          dockerfile: docker/minio-log-metrics/Dockerfile
+          deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
+          deploy_file_path: config/auto-updated/cwm-iac/minio-log-metrics.yaml
+          deploy_content_template: |
+            cwmIac:
+              minioLogMetrics:
+                image: "__IMAGE__"
+          deploy_commit_message: "Update cwm-iac/minio-log-metrics"

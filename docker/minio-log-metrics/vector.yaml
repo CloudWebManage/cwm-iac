@@ -1,0 +1,92 @@
+sources:
+  minio_audit:
+    type: http_server
+    address: 0.0.0.0:8791
+    decoding:
+      codec: json
+    path: ""
+    strict_path: false
+
+transforms:
+  minio_audit_normalized:
+    type: remap
+    inputs:
+      - minio_audit
+    source: |
+      if !exists(.api) {
+        .api = {}
+      }
+      if exists(.api.bucket) {
+        .bucket, err = to_string(.api.bucket)
+        if err != null {
+          .bucket = "unknown"
+        }
+      } else {
+        .bucket = "unknown"
+      }
+      if exists(.accessKey) {
+        .access_key, err = to_string(.accessKey)
+        if err != null {
+          .access_key = "unknown"
+        }
+      } else {
+        .access_key = "unknown"
+      }
+      if exists(.api.rx) {
+        .rx, err = to_int(.api.rx)
+        if err != null {
+          .rx = 0
+        }
+      } else {
+        .rx = 0
+      }
+      if exists(.api.txHeaders) {
+        .txHeaders, err = to_int(.api.txHeaders)
+        if err != null {
+          .txHeaders = 0
+        }
+      } else {
+        .txHeaders = 0
+      }
+      if exists(.api.tx) {
+        .tx, err = to_int(.api.tx)
+        if err != null {
+          .tx = 0
+        }
+      } else {
+        .tx = 0
+      }
+      .tx = .tx + .txHeaders
+
+  minio_audit_metrics:
+    type: log_to_metric
+    inputs:
+      - minio_audit_normalized
+    metrics:
+      - type: counter
+        field: bucket
+        name: minio_audit_operations
+        tags:
+          bucket: "{{bucket}}"
+          access_key: "{{access_key}}"
+      - type: counter
+        field: rx
+        name: minio_audit_bytes_received
+        increment_by_value: true
+        tags:
+          bucket: "{{bucket}}"
+          access_key: "{{access_key}}"
+      - type: counter
+        field: tx
+        name: minio_audit_bytes_sent
+        increment_by_value: true
+        tags:
+          bucket: "{{bucket}}"
+          access_key: "{{access_key}}"
+
+sinks:
+  prom_exporter:
+    type: prometheus_exporter
+    inputs:
+      - minio_audit_metrics
+    address: 0.0.0.0:8799
