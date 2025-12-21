@@ -4,89 +4,197 @@ sources:
     address: 0.0.0.0:8791
     decoding:
       codec: json
-    path: ""
-    strict_path: false
 
 transforms:
-  minio_audit_normalized:
+  parse_and_route:
     type: remap
     inputs:
       - minio_audit
     source: |
-      if !exists(.api) {
-        .api = {}
+      # Extract bucket from api.bucket (primary source)
+      bucket_value = "unknown"
+      if exists(.api) && exists(.api.bucket) {
+          bucket_value = to_string!(.api.bucket)
       }
-      if exists(.api.bucket) {
-        .bucket, err = to_string(.api.bucket)
-        if err != null {
-          .bucket = "unknown"
-        }
-      } else {
-        .bucket = "unknown"
-      }
-      if exists(.accessKey) {
-        .access_key, err = to_string(.accessKey)
-        if err != null {
-          .access_key = "unknown"
-        }
-      } else {
-        .access_key = "unknown"
-      }
-      if exists(.api.rx) {
-        .rx, err = to_int(.api.rx)
-        if err != null {
-          .rx = 0
-        }
-      } else {
-        .rx = 0
-      }
-      if exists(.api.txHeaders) {
-        .txHeaders, err = to_int(.api.txHeaders)
-        if err != null {
-          .txHeaders = 0
-        }
-      } else {
-        .txHeaders = 0
-      }
-      if exists(.api.tx) {
-        .tx, err = to_int(.api.tx)
-        if err != null {
-          .tx = 0
-        }
-      } else {
-        .tx = 0
-      }
-      .tx = .tx + .txHeaders
+      .bucket = bucket_value
 
-  minio_audit_metrics:
+      # Extract access key - prefer parentUser for proper attribution
+      # parentUser = actual root user, accessKey = temporary credential (STS)
+      access_key_value = "unknown"
+      if exists(.parentUser) {
+          access_key_value = to_string!(.parentUser)
+      } else if exists(.accessKey) {
+          access_key_value = to_string!(.accessKey)
+      }
+      .access_key = access_key_value
+
+      # Classify direction based on actual data transfer
+      # OUT = operations that transfer object data OUT of MinIO (downloads)
+      # IN = operations that transfer object data INTO MinIO (uploads) + all metadata operations
+      # Reference: https://docs.min.io/enterprise/aistor-object-store/developers/s3-api-compatibility/
+
+      direction_value = "in"
+      if exists(.api) && exists(.api.name) {
+          api_op = to_string!(.api.name)
+
+          # ============================================================
+          # OUT: Data Download Operations (1 operation)
+          # ============================================================
+          if api_op == "GetObject" {
+              direction_value = "out"
+
+          # ============================================================
+          # IN: Data Upload Operations
+          # ============================================================
+          } else if api_op == "PutObject" ||
+                    api_op == "UploadPart" ||
+                    api_op == "CompleteMultipartUpload" ||
+                    api_op == "CreateMultipartUpload" ||
+                    api_op == "CopyObject" ||
+                    api_op == "RestoreObject" ||
+                    api_op == "UploadPartCopy" {
+              direction_value = "in"
+
+          # ============================================================
+          # IN: Object Metadata Operations
+          # ============================================================
+          } else if api_op == "HeadObject" ||
+                    api_op == "DeleteObject" ||
+                    api_op == "DeleteObjects" ||
+                    api_op == "GetObjectAttributes" ||
+                    api_op == "SelectObjectContent" ||
+                    api_op == "GetObjectTagging" ||
+                    api_op == "PutObjectTagging" ||
+                    api_op == "DeleteObjectTagging" ||
+                    api_op == "GetObjectRetention" ||
+                    api_op == "PutObjectRetention" ||
+                    api_op == "GetObjectLegalHold" ||
+                    api_op == "PutObjectLegalHold" ||
+                    api_op == "GetObjectLockConfiguration" ||
+                    api_op == "PutObjectLockConfiguration" ||
+                    api_op == "ListMultipartUploads" ||
+                    api_op == "ListParts" ||
+                    api_op == "AbortMultipartUpload" {
+              direction_value = "in"
+
+          # ============================================================
+          # IN: Bucket Operations
+          # ============================================================
+          } else if api_op == "CreateBucket" ||
+                    api_op == "DeleteBucket" ||
+                    api_op == "HeadBucket" ||
+                    api_op == "ListBuckets" ||
+                    api_op == "ListDirectoryBuckets" ||
+                    api_op == "GetBucketLocation" ||
+                    api_op == "CreateSession" ||
+                    api_op == "ListObjects" ||
+                    api_op == "ListObjectsV2" ||
+                    api_op == "ListObjectVersions" {
+              direction_value = "in"
+
+          # ============================================================
+          # IN: Bucket Configuration Operations
+          # ============================================================
+          } else if api_op == "GetBucketEncryption" ||
+                    api_op == "PutBucketEncryption" ||
+                    api_op == "DeleteBucketEncryption" ||
+                    api_op == "GetBucketTagging" ||
+                    api_op == "PutBucketTagging" ||
+                    api_op == "DeleteBucketTagging" ||
+                    api_op == "GetBucketVersioning" ||
+                    api_op == "PutBucketVersioning" ||
+                    api_op == "GetBucketPolicy" ||
+                    api_op == "PutBucketPolicy" ||
+                    api_op == "DeleteBucketPolicy" ||
+                    api_op == "GetBucketPolicyStatus" ||
+                    api_op == "GetBucketLifecycle" ||
+                    api_op == "GetBucketLifecycleConfiguration" ||
+                    api_op == "PutBucketLifecycle" ||
+                    api_op == "PutBucketLifecycleConfiguration" ||
+                    api_op == "DeleteBucketLifecycle" ||
+                    api_op == "GetBucketReplication" ||
+                    api_op == "PutBucketReplication" ||
+                    api_op == "DeleteBucketReplication" ||
+                    api_op == "GetBucketNotification" ||
+                    api_op == "GetBucketNotificationConfiguration" ||
+                    api_op == "PutBucketNotification" ||
+                    api_op == "PutBucketNotificationConfiguration" ||
+                    api_op == "PutBucketCors" ||
+                    api_op == "DeleteBucketCors" ||
+                    api_op == "PutBucketAnalyticsConfiguration" ||
+                    api_op == "ListBucketAnalyticsConfigurations" ||
+                    api_op == "DeleteBucketAnalyticsConfiguration" {
+              direction_value = "in"
+
+          # ============================================================
+          # IN: MinIO Admin Operations (default for unknown operations)
+          # ============================================================
+          } else {
+              # All other operations including admin APIs
+              # (StorageInfo, DataUsageInfo, ServerInfo, AccountInfo, etc.)
+              direction_value = "in"
+          }
+      }
+      .direction = direction_value
+
+      # Extract API name
+      api_name_value = "unknown"
+      if exists(.api) && exists(.api.name) {
+          api_name_value = to_string!(.api.name)
+      }
+      .api_name = api_name_value
+
+      # Extract bytes received (rx)
+      rx_value = 0
+      if exists(.api) && exists(.api.rx) {
+          rx_value = to_int!(.api.rx)
+      }
+      .rx_bytes = rx_value
+
+      # Extract bytes transmitted (tx)
+      tx_value = 0
+      if exists(.api) && exists(.api.tx) {
+          tx_value = to_int!(.api.tx)
+      }
+      .tx_bytes = tx_value
+
+      # Extract status code
+      status_value = "unknown"
+      if exists(.api) && exists(.api.statusCode) {
+          status_value = to_string!(.api.statusCode)
+      }
+      .status_code = status_value
+
+  # Convert to metrics
+  to_metrics:
     type: log_to_metric
     inputs:
-      - minio_audit_normalized
+      - parse_and_route
     metrics:
       - type: counter
-        field: bucket
+        field: direction
         name: minio_audit_operations
         tags:
           bucket: "{{bucket}}"
           access_key: "{{access_key}}"
+          direction: "{{direction}}"
       - type: counter
-        field: rx
+        field: rx_bytes
         name: minio_audit_bytes_received
-        increment_by_value: true
         tags:
           bucket: "{{bucket}}"
           access_key: "{{access_key}}"
+        increment_by_value: true
       - type: counter
-        field: tx
+        field: tx_bytes
         name: minio_audit_bytes_sent
-        increment_by_value: true
         tags:
           bucket: "{{bucket}}"
           access_key: "{{access_key}}"
-
+        increment_by_value: true
 sinks:
-  prom_exporter:
+  prom:
     type: prometheus_exporter
     inputs:
-      - minio_audit_metrics
+      - to_metrics
     address: 0.0.0.0:8799
