@@ -4,6 +4,7 @@ output "minio_tenant" {
     console_url = "https://minio-tenant-${var.name}-console.${var.ingress_star_domain}"
     admin_username = random_password.admin-user.result
     admin_password = random_password.admin-password.result
+    api_bucket_url = "https://<BUCKET_NAME>.${var.minio_domain}"
   }
   sensitive = true
 }
