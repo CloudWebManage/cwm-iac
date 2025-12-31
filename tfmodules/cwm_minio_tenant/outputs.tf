@@ -1,6 +1,6 @@
 output "minio_tenant" {
   value = {
-    api_url = "https://minio-tenant-${var.name}-api.${var.ingress_star_domain}"
+    api_url = "https://${var.minio_domain}"
     console_url = "https://minio-tenant-${var.name}-console.${var.ingress_star_domain}"
     admin_username = random_password.admin-user.result
     admin_password = random_password.admin-password.result
