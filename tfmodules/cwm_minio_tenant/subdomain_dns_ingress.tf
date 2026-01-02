@@ -23,6 +23,7 @@ resource "kubernetes_ingress_v1" "subdomain_star" {
     namespace = kubernetes_namespace.tenant.metadata[0].name
     annotations = {
       "cert-manager.io/cluster-issuer": "letsencrypt"
+      "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
     }
   }
   spec {
@@ -58,6 +59,7 @@ resource "kubernetes_ingress_v1" "subdomain" {
     namespace = kubernetes_namespace.tenant.metadata[0].name
     annotations = {
       "cert-manager.io/cluster-issuer": "letsencrypt"
+      "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
     }
   }
   spec {
