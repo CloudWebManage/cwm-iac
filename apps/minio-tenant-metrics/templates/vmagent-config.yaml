@@ -6,7 +6,7 @@ data:
   promscrape.yaml: |
     scrape_configs:
       - job_name: federate_minio
-        scrape_interval: 60s
+        scrape_interval: 15s
         metrics_path: /federate
         scheme: http
         params:
@@ -42,4 +42,4 @@ data:
         - '{__name__="minio_audit_bytes_sent"}'
         - '{__name__="minio_audit_operations"}'
       interval: 1h
-      outputs: [increase_prometheus]
+      outputs: [increase_prometheus, increase]
