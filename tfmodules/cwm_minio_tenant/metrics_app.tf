@@ -66,6 +66,7 @@ module "metrics_app" {
             {
               job_name = "minio-audit-metrics"
               scheme = "http"
+              scrape_interval = "15s"
               metrics_path = "/metrics"
               kubernetes_sd_configs = [
                 {

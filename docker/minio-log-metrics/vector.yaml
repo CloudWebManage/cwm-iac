@@ -8,14 +8,12 @@ sources:
     strict_path: false
 
 transforms:
-  minio_audit_normalized:
+  parse_and_route:
     type: remap
     inputs:
       - minio_audit
     source: |
-      if !exists(.api) {
-        .api = {}
-      }
+      # Extract bucket from api.bucket
       if exists(.api.bucket) {
         .bucket, err = to_string(.api.bucket)
         if err != null {
@@ -24,7 +22,14 @@ transforms:
       } else {
         .bucket = "unknown"
       }
-      if exists(.accessKey) {
+
+      # Extract access key - prefer parentUser for proper attribution with STS tokens
+      if exists(.parentUser) {
+        .access_key, err = to_string(.parentUser)
+        if err != null {
+          .access_key = "unknown"
+        }
+      } else if exists(.accessKey) {
         .access_key, err = to_string(.accessKey)
         if err != null {
           .access_key = "unknown"
@@ -32,6 +37,20 @@ transforms:
       } else {
         .access_key = "unknown"
       }
+
+      .direction = "in"
+      if exists(.api.name) {
+          api_op, err = to_string(.api.name)
+          if err == null {
+            if api_op == "GetObject" {
+                .direction = "out"
+            } else {
+                .direction = "in"
+            }
+          }
+      }
+
+      # Extract bytes received (rx) - data only, no headers
       if exists(.api.rx) {
         .rx, err = to_int(.api.rx)
         if err != null {
@@ -40,14 +59,8 @@ transforms:
       } else {
         .rx = 0
       }
-      if exists(.api.txHeaders) {
-        .txHeaders, err = to_int(.api.txHeaders)
-        if err != null {
-          .txHeaders = 0
-        }
-      } else {
-        .txHeaders = 0
-      }
+
+      # Extract bytes transmitted (tx) - response body
       if exists(.api.tx) {
         .tx, err = to_int(.api.tx)
         if err != null {
@@ -56,12 +69,24 @@ transforms:
       } else {
         .tx = 0
       }
+
+      # Extract bytes transmitted headers (txHeaders) - response headers
+      if exists(.api.txHeaders) {
+        .txHeaders, err = to_int(.api.txHeaders)
+        if err != null {
+          .txHeaders = 0
+        }
+      } else {
+        .txHeaders = 0
+      }
+
+      # Total bytes sent = response body + response headers
       .tx = .tx + .txHeaders
 
-  minio_audit_metrics:
+  to_metrics:
     type: log_to_metric
     inputs:
-      - minio_audit_normalized
+      - parse_and_route
     metrics:
       - type: counter
         field: bucket
@@ -69,24 +94,25 @@ transforms:
         tags:
           bucket: "{{bucket}}"
           access_key: "{{access_key}}"
+          direction: "{{direction}}"
       - type: counter
         field: rx
         name: minio_audit_bytes_received
-        increment_by_value: true
         tags:
           bucket: "{{bucket}}"
           access_key: "{{access_key}}"
+        increment_by_value: true
       - type: counter
         field: tx
         name: minio_audit_bytes_sent
-        increment_by_value: true
         tags:
           bucket: "{{bucket}}"
           access_key: "{{access_key}}"
+        increment_by_value: true
 
 sinks:
   prom_exporter:
     type: prometheus_exporter
     inputs:
-      - minio_audit_metrics
+      - to_metrics
     address: 0.0.0.0:8799
