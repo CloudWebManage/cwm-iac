@@ -4,6 +4,7 @@ on:
     paths:
       - .github/workflows/docker-minio-log-metrics-ci.yaml
       - docker/minio-log-metrics/**
+      - tests/minio_log_metrics/**
 env:
   PYTHON_VERSION: "3.12"
 jobs:
@@ -13,6 +14,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
         with:
+          test_script: |
+            uv sync
+            uv run pytest -svv tests/minio_log_metrics
           image_suffix: cwm-iac-minio-log-metrics
           context: docker/minio-log-metrics
           dockerfile: docker/minio-log-metrics/Dockerfile
