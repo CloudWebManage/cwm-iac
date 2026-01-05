@@ -1,0 +1,19 @@
+[project]
+name = "cwm-iac"
+version = "0.0.0"
+requires-python = ">=3.10"
+dependencies = [
+    "prometheus-client>=0.23.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
+#[build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
+
+#[project.scripts]
+#hasadna-iac = "hasadna_iac.cli:main"
