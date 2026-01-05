@@ -14,4 +14,5 @@ services:
       MINIO_AUDIT_WEBHOOK_ENABLE_METRICS: "on"
       MINIO_AUDIT_WEBHOOK_ENDPOINT_METRICS: "http://minio-log-metrics:8791"
   minio-log-metrics:
+    image: ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:latest
     build: ../../docker/minio-log-metrics

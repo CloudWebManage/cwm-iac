@@ -24,7 +24,7 @@ def test():
         dc("down", "-v")
     except subprocess.CalledProcessError:
         pass
-    dc("up", "-d", "--build", "--force-recreate", "--remove-orphans", "--wait")
+    dc("up", "-d", "--force-recreate", "--remove-orphans", "--wait")
     time.sleep(1)
     try:
         mc("alias", "set", "local", "http://localhost:9000", "admin", "12345678")
