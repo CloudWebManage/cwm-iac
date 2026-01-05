@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
       - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
         with:
           test_script: |
