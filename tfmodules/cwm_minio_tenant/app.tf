@@ -74,7 +74,7 @@ module "minio_tenant_main" {
             containers = [
               {
                 name = "cwm-iac-minio-log-metrics"
-                image = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:1265b80eb117c47b34ea044e34ba315a2d173d71"
+                image = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:c6a5bfff6872857b257d93e8b83d9dd719eea5f1"
               }
             ]
           }
