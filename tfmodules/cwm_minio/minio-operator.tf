@@ -7,6 +7,7 @@ module "minio_operator" {
     # https://github.com/minio/operator/blob/master/helm/operator/values.yaml
     operator: {
       operator: {
+        replicaCount: 1
         tolerations: [
           {
             key: "cwm-iac-worker-role"

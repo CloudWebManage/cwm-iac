@@ -49,6 +49,10 @@ locals {
 }
 
 resource "kubernetes_manifest" "app" {
+  field_manager {
+    name = "cwm-iac-terraform-argocd-app"
+    force_conflicts = true
+  }
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
