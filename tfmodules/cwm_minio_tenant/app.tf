@@ -55,7 +55,7 @@ module "minio_tenant_main" {
               name             = name
               servers          = 1
               volumesPerServer = 1
-              volumeSize       = "999Gi"
+              size       = "999Gi"
               storageClassName = "directpv-min-io"
               labels = {
                 "cwm-minio-tenant" = "true"
