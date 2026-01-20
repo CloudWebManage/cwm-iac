@@ -34,6 +34,7 @@ module "metrics_app" {
   autosync = true
   create_namespace = false
   path = "apps/minio-tenant-metrics"
+  targetRevision = var.metrics_app_target_revision
   values = {
     vmagent = {
       remoteWrite = var.vmagentRemoteWriteConfig

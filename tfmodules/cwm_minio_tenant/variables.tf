@@ -73,3 +73,13 @@ variable "console_ingress_whitelist_source_range" {
   type    = string
   default = ""
 }
+
+variable "metrics_app_target_revision" {
+  type    = string
+  default = "main"
+}
+
+variable "log_metrics_sidecar_image" {
+  type    = string
+  default = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:c6a5bfff6872857b257d93e8b83d9dd719eea5f1"
+}
