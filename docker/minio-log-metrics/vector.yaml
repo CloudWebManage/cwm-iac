@@ -116,3 +116,4 @@ sinks:
     inputs:
       - to_metrics
     address: 0.0.0.0:8799
+    flush_period_secs: 43200  # 12 hours - ensuring series are preserved over long periods
