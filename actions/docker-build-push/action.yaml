@@ -68,6 +68,7 @@ runs:
         tags: |
           ghcr.io/cloudwebmanage/${{ inputs.image_suffix }}:${{ github.sha }}
           ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && format('ghcr.io/cloudwebmanage/{0}:latest', inputs.image_suffix) || '' }}
+          ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) && format('ghcr.io/cloudwebmanage/{0}:{1}', inputs.image_suffix, github.ref_name) || '' }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: ${{ inputs.build_args }}
