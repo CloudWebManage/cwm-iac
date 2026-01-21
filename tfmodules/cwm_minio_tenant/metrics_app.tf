@@ -49,6 +49,7 @@ module "metrics_app" {
               job_name     = "minio-job-buckets"
               bearer_token = local.cluster_scrape_config["bearer_token"]
               scheme       = "https"
+              honor_timestamps = false
               http_sd_configs = [
                 {
                   refresh_interval = "30s"
@@ -68,6 +69,7 @@ module "metrics_app" {
               scheme = "http"
               scrape_interval = "15s"
               metrics_path = "/metrics"
+              honor_timestamps = false
               kubernetes_sd_configs = [
                 {
                   role = "pod"
