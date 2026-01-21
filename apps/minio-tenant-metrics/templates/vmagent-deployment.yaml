@@ -26,6 +26,7 @@ spec:
             - -remoteWrite.basicAuth.username={{ .Values.vmagent.remoteWrite.username }}
             - -remoteWrite.basicAuth.password={{ .Values.vmagent.remoteWrite.password }}
             - -remoteWrite.streamAggr.config=/etc/vmagent/config/streamAggr.yaml
+            - -remoteWrite.streamAggr.dropInput
           volumeMounts:
             - mountPath: /etc/vmagent/config
               name: config

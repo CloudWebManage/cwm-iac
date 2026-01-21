@@ -21,8 +21,6 @@ data:
         static_configs:
           - targets: ['minio-tenant-main-metrics-prometheus-server:80']
         metric_relabel_configs:
-          - regex: '^(instance|server|job|type|exported_bucket|exported_instance|exported_job|name)$'
-            action: labeldrop
           - target_label: cluster
             replacement: {{ .Values.vmagent.clusterLabel }}
           - target_label: tenant
@@ -33,13 +31,25 @@ data:
         - '{__name__="minio_cluster_usage_buckets_total_bytes"}'
       interval: 1h
       outputs: [avg, min, max, last]
-    - name: minio_counters
+      by: [cluster, tenant, bucket]
+    - name: minio_counters_bucket_api
       match:
         - '{__name__="minio_bucket_api_traffic_received_bytes"}'
         - '{__name__="minio_bucket_api_traffic_sent_bytes"}'
         - '{__name__="minio_bucket_api_total"}'
+      interval: 1h
+      outputs: [increase_prometheus, increase]
+      by: [cluster, tenant, bucket]
+    - name: minio_counters_audit_bytes
+      match:
         - '{__name__="minio_audit_bytes_received"}'
         - '{__name__="minio_audit_bytes_sent"}'
+      interval: 1h
+      outputs: [increase_prometheus, increase]
+      by: [cluster, tenant, bucket, access_key]
+    - name: minio_counters_audit_operations
+      match:
         - '{__name__="minio_audit_operations"}'
       interval: 1h
       outputs: [increase_prometheus, increase]
+      by: [cluster, tenant, bucket, access_key, direction]
