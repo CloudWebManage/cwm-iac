@@ -16,3 +16,11 @@ variable "workers" {
     datacenter_id = string
   }))
 }
+
+variable "data_path" {
+  type = string
+}
+
+variable "locust_env_config" {
+  type = map(string)
+}
