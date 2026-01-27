@@ -11,10 +11,10 @@ resource "kamatera_server" "workers" {
   image_id = data.kamatera_image.workers_ubuntu_2404[each.key].id
   name = "${var.name_prefix}-${each.key}"
   billing_cycle = "hourly"
-  cpu_cores = 2
+  cpu_cores = 4
   cpu_type = "B"
   disk_sizes_gb = [20]
-  ram_mb = 2048
+  ram_mb = 8192
   ssh_pubkey = var.ssh_pubkey
   network {
     name = "wan"
