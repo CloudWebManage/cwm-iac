@@ -83,3 +83,8 @@ variable "log_metrics_sidecar_image" {
   type    = string
   default = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:c6a5bfff6872857b257d93e8b83d9dd719eea5f1"
 }
+
+variable "vmagent_cluster_label" {
+  type    = string
+  default = ""
+}

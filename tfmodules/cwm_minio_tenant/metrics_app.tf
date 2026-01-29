@@ -38,7 +38,7 @@ module "metrics_app" {
   values = {
     vmagent = {
       remoteWrite = var.vmagentRemoteWriteConfig
-      clusterLabel = var.cluster_name
+      clusterLabel = var.vmagent_cluster_label == "" ? var.cluster_name : var.vmagent_cluster_label
       tenantLabel = var.name
     }
     prometheus = {
