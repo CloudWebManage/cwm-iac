@@ -10,9 +10,8 @@ spec:
   pgbouncer:
     poolMode: transaction
   template:
-    affinity:
-      tolerations:
-        - key: cwm-iac-worker-role
-          operator: Equal
-          value: system
-          effect: NoExecute
+    tolerations:
+      - key: cwm-iac-worker-role
+        operator: Equal
+        value: system
+        effect: NoExecute
