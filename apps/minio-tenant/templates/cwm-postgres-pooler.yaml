@@ -1,0 +1,11 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: cwm-minio-api-pooler
+spec:
+  cluster:
+    name: cwm
+  instances: 1
+  type: rw
+  pgbouncer:
+    poolMode: transaction
