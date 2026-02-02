@@ -88,6 +88,7 @@ resource "terraform_data" "init_locust_workers" {
         -M 0 \
         -N \
         -L 172.17.0.1:5557:localhost:5557 \
+        -L 172.17.0.1:6379:localhost:6379 \
         -o ExitOnForwardFailure=yes \
         -o ServerAliveInterval=30 \
         -o ServerAliveCountMax=3 \
@@ -103,7 +104,7 @@ resource "terraform_data" "init_locust_workers" {
       EOZ
         systemctl daemon-reload
         systemctl enable --now locust-ssh-tunnel.service
-        systemctl start locust-ssh-tunnel
+        systemctl restart locust-ssh-tunnel
         echo "${local.locust_env_config}" > /root/locust.env
         chmod +x /root/start_worker.sh
       EOF
