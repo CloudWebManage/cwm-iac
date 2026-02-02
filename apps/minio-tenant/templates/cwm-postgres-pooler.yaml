@@ -5,10 +5,13 @@ metadata:
 spec:
   cluster:
     name: cwm
-  instances: 1
+  instances: 2
   type: rw
   pgbouncer:
     poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "100"
   template:
     spec:
       containers: []
