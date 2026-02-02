@@ -21,6 +21,6 @@ resource "kubernetes_secret" "cwm-minio-api-db" {
   }
   type = "Opaque"
   data = {
-    DB_CONNSTRING = "postgresql://postgres:${urlencode(random_password.cwm-postgres-superuser-password.result)}@cwm-rw/postgres"
+    DB_CONNSTRING = "postgresql://postgres:${urlencode(random_password.cwm-postgres-superuser-password.result)}@cwm-minio-api-pooler/postgres"
   }
 }
