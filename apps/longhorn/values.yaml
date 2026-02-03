@@ -5,20 +5,12 @@ longhorn:
         operator: "Equal"
         value: "system"
         effect: "NoExecute"
-    nodeSelector:
-      "cwm-iac-worker-role": "system"
-  longhornManager:
-    nodeSelector:
-      "cwm-iac-systemlogging-role": "true"
-    tolerations:
-      - key: "cwm-iac-worker-role"
-        operator: "Equal"
-        value: "system"
-        effect: "NoExecute"
       - key: "cwm-iac-worker-role"
         operator: "Equal"
         value: "logging"
         effect: "NoExecute"
+    nodeSelector:
+      "cwm-iac-systemlogging-role": "true"
   csi:
     kubeletRootDir: "/var/lib/kubelet"
     attacherReplicaCount: 1
