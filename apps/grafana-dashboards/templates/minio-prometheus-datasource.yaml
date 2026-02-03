@@ -1,0 +1,21 @@
+{{ if .Values.minio.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-minio-prometheus
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+data:
+  minio-prometheus.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: MinIO Prometheus
+        type: prometheus
+        access: proxy
+        url: {{ .Values.minioPrometheus.url }}
+        isDefault: false
+        editable: false
+        jsonData:
+          httpMethod: GET
+{{ end }}

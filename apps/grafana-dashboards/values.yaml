@@ -1,0 +1,9 @@
+minio:
+  enabled: false
+  prometheusUrl: ""
+  namespaces:
+    tenant: ""
+    metrics: ""
+    directpv: "directpv"
+    operator: "minio-operator"
+  grafanaFolder: "MinIO"
