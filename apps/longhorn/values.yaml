@@ -7,7 +7,7 @@ longhorn:
         effect: "NoExecute"
     nodeSelector:
       "cwm-iac-worker-role": "system"
-  longhornDriver:
+  longhornManager:
     tolerations:
       - key: "cwm-iac-worker-role"
         operator: "Equal"
