@@ -7,7 +7,7 @@ metadata:
   labels:
     grafana_dashboard: "1"
   annotations:
-    grafana_folder: {{ .Values.minio.grafanaFolders | quote }}
+    grafana_folder: {{ .Values.minio.grafanaFolder | quote }}
 data:
   minio-workloads-use.json: |
     {
