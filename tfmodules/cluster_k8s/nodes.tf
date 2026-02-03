@@ -52,3 +52,16 @@ resource "kubernetes_labels" "node_worker_role" {
     "cwm-iac-worker-role" = each.value["worker-role"]
   }
 }
+
+resource "kubernetes_labels" "node_systemlogging_role" {
+  field_manager = "Terraform_labels_node_systemlogging_role"
+  for_each = var.workers
+  api_version = "v1"
+  kind = "Node"
+  metadata {
+    name = each.key
+  }
+  labels = {
+    "cwm-iac-systemlogging-role" = contains(["system", "logging"], each.value["worker-role"]) ? "true" : "false"
+  }
+}
