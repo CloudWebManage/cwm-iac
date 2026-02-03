@@ -91,6 +91,33 @@ module "metrics_app" {
                   replacement = "$1:8799"
                 }
               ]
+            },
+            {
+              job_name = "cwm-minio-api"
+              scheme = "http"
+              scrape_interval = "15s"
+              metrics_path = "/metrics"
+              honor_timestamps = false
+              kubernetes_sd_configs = [
+                {
+                  role = "pod"
+                  namespaces = {
+                    names = [kubernetes_namespace.tenant.metadata[0].name]
+                  }
+                }
+              ]
+              relabel_configs = [
+                {
+                  source_labels = ["__meta_kubernetes_pod_label_app"]
+                  regex = "cwm-minio-api"
+                  action = "keep"
+                },
+                {
+                  source_labels = ["__meta_kubernetes_pod_ip"]
+                  target_label = "__address__"
+                  replacement = "$1:8000"
+                }
+              ]
             }
           ]
         }
