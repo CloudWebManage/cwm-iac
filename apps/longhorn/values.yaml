@@ -7,6 +7,16 @@ longhorn:
         effect: "NoExecute"
     nodeSelector:
       "cwm-iac-worker-role": "system"
+  longhornDriver:
+    tolerations:
+      - key: "cwm-iac-worker-role"
+        operator: "Equal"
+        value: "system"
+        effect: "NoExecute"
+      - key: "cwm-iac-worker-role"
+        operator: "Equal"
+        value: "logging"
+        effect: "NoExecute"
   csi:
     kubeletRootDir: "/var/lib/kubelet"
     attacherReplicaCount: 1
