@@ -8,6 +8,7 @@ longhorn:
     nodeSelector:
       "cwm-iac-worker-role": "system"
   longhornManager:
+    nodeSelector: {}
     tolerations:
       - key: "cwm-iac-worker-role"
         operator: "Equal"
