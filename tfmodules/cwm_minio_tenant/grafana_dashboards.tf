@@ -6,6 +6,7 @@ module "app" {
   autosync = true
   values = {
     minio = {
+      enabled = true
       prometheusUrl = "http://minio-tenant-${var.name}-metrics-prometheus-server.minio-tenant-${var.name}-metrics:80"
       namespaces = {
         tenant   = "minio-tenant-${var.name}"

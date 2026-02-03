@@ -13,7 +13,7 @@ data:
       - name: MinIO Prometheus
         type: prometheus
         access: proxy
-        url: {{ .Values.minioPrometheus.url }}
+        url: {{ .Values.minio.prometheusUrl }}
         isDefault: false
         editable: false
         jsonData:
