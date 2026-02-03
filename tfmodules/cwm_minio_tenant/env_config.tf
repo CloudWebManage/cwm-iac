@@ -16,6 +16,9 @@ resource "kubernetes_secret" "env-config" {
       export MINIO_AUDIT_WEBHOOK_QUEUE_SIZE_METRICS="1000000"
       export MINIO_AUDIT_WEBHOOK_ENABLE_METRICS="on"
       export MINIO_AUDIT_WEBHOOK_ENDPOINT_METRICS="http://localhost:8791"
+      export MINIO_ETCD_ENDPOINTS=http://minio-main-etcd.minio-tenant-main:2379
+      export MINIO_ETCD_PATH_PREFIX=/minio-tenant-${var.name}
+      export MINIO_PUBLIC_IPS=localhost
     EOT
   }
 }
