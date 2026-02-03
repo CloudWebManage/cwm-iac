@@ -1,6 +1,7 @@
-replicas: 3
-tolerations:
-  - key: "cwm-iac-worker-role"
-    operator: "Equal"
-    value: "system"
-    effect: "NoExecute"
+etcd:
+  replicas: 3
+  tolerations:
+    - key: "cwm-iac-worker-role"
+      operator: "Equal"
+      value: "system"
+      effect: "NoExecute"
