@@ -1,3 +1,4 @@
+{{ if .Values.minio.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,7 +7,7 @@ metadata:
   labels:
     grafana_dashboard: "1"
   annotations:
-    grafana_folder: {{ .Values.grafanaFolder | quote }}
+    grafana_folder: {{ .Values.minio.grafanaFolders | quote }}
 data:
   minio-workloads-use.json: |
     {
@@ -67,7 +68,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"$pod\", container!=\"\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"$pod\", container!=\"\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }}",
               "refId": "A"
             }
@@ -115,7 +116,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\", container!=\"\"}[5m])) by (namespace, pod)",
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\", container!=\"\"}[5m])) by (namespace, pod)",
               "legendFormat": "{{ `{{namespace}}/{{pod}}` }}",
               "refId": "A"
             }
@@ -163,7 +164,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\", container!=\"\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\", container!=\"\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }}",
               "refId": "A"
             }
@@ -219,7 +220,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"$pod\", container!=\"\"}) by (pod)",
+              "expr": "sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"$pod\", container!=\"\"}) by (pod)",
               "legendFormat": "{{ `{{pod}}` }}",
               "refId": "A"
             }
@@ -267,7 +268,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\", container!=\"\"}) by (namespace, pod)",
+              "expr": "sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\", container!=\"\"}) by (namespace, pod)",
               "legendFormat": "{{ `{{namespace}}/{{pod}}` }}",
               "refId": "A"
             }
@@ -315,7 +316,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\", container!=\"\"}) by (pod)",
+              "expr": "sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\", container!=\"\"}) by (pod)",
               "legendFormat": "{{ `{{pod}}` }}",
               "refId": "A"
             }
@@ -371,13 +372,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_network_receive_bytes_total{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"$pod\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_network_receive_bytes_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"$pod\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }} RX",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_network_transmit_bytes_total{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"$pod\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_network_transmit_bytes_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"$pod\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }} TX",
               "refId": "B"
             }
@@ -425,13 +426,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_network_receive_bytes_total{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_network_receive_bytes_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }} RX",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_network_transmit_bytes_total{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_network_transmit_bytes_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"cwm-minio-api.*\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }} TX",
               "refId": "B"
             }
@@ -487,7 +488,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\", pod=~\"$pod\", container!=\"\"}[5m])) by (pod) / sum(rate(container_cpu_cfs_periods_total{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\", pod=~\"$pod\", container!=\"\"}[5m])) by (pod)",
+              "expr": "sum(rate(container_cpu_cfs_throttled_seconds_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\", pod=~\"$pod\", container!=\"\"}[5m])) by (pod) / sum(rate(container_cpu_cfs_periods_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\", pod=~\"$pod\", container!=\"\"}[5m])) by (pod)",
               "legendFormat": "{{ `{{pod}}` }}",
               "refId": "A"
             }
@@ -535,7 +536,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "100 * sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"$pod\", container!=\"\"}) by (pod) / sum(kube_pod_container_resource_limits{namespace=~\"{{ .Values.namespaces.tenant }}\", pod=~\"$pod\", resource=\"memory\"}) by (pod)",
+              "expr": "100 * sum(container_memory_working_set_bytes{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"$pod\", container!=\"\"}) by (pod) / sum(kube_pod_container_resource_limits{namespace=~\"{{ .Values.minio.namespaces.tenant }}\", pod=~\"$pod\", resource=\"memory\"}) by (pod)",
               "legendFormat": "{{ `{{pod}}` }}",
               "refId": "A"
             }
@@ -591,7 +592,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\"}[1h])) by (namespace, pod)",
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\"}[1h])) by (namespace, pod)",
               "legendFormat": "{{ `{{namespace}}/{{pod}}` }}",
               "refId": "A"
             }
@@ -625,7 +626,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "kube_pod_status_phase{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\", phase!=\"Running\", phase!=\"Succeeded\"} == 1",
+              "expr": "kube_pod_status_phase{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\", phase!=\"Running\", phase!=\"Succeeded\"} == 1",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
@@ -659,7 +660,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "kube_pod_container_status_last_terminated_reason{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\", reason=~\"OOMKilled|Error\"}",
+              "expr": "kube_pod_container_status_last_terminated_reason{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\", reason=~\"OOMKilled|Error\"}",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
@@ -697,14 +698,14 @@ data:
             "allValue": ".*",
             "current": { "selected": true, "text": "All", "value": "$__all" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(kube_pod_info{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\"}, pod)",
+            "definition": "label_values(kube_pod_info{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\"}, pod)",
             "hide": 0,
             "includeAll": true,
             "label": "Pod",
             "multi": true,
             "name": "pod",
             "options": [],
-            "query": { "qryType": 1, "query": "label_values(kube_pod_info{namespace=~\"{{ .Values.namespaces.tenant }}|{{ .Values.namespaces.directpv }}|{{ .Values.namespaces.operator }}\"}, pod)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "query": { "qryType": 1, "query": "label_values(kube_pod_info{namespace=~\"{{ .Values.minio.namespaces.tenant }}|{{ .Values.minio.namespaces.directpv }}|{{ .Values.minio.namespaces.operator }}\"}, pod)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
             "refresh": 2,
             "regex": "",
             "skipUrlSync": false,
@@ -721,3 +722,4 @@ data:
       "version": 1,
       "weekStart": ""
     }
+{{ end }}

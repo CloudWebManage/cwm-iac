@@ -1,13 +1,9 @@
-# MinIO tenant's dedicated Prometheus URL
-minioPrometheus:
-  url: "http://minio-tenant-main-metrics-prometheus-server.minio-tenant-main-metrics:80"
-
-# Namespaces containing MinIO workloads (for USE metrics)
-namespaces:
-  tenant: "minio-tenant-main"
-  metrics: "minio-tenant-main-metrics"
-  directpv: "directpv"
-  operator: "minio-operator"
-
-# Grafana folder for dashboards
-grafanaFolder: "MinIO"
+minio:
+  enabled: false
+  prometheusUrl: ""
+  namespaces:
+    tenant: ""
+    metrics: ""
+    directpv: "directpv"
+    operator: "minio-operator"
+  grafanaFolder: "MinIO"
