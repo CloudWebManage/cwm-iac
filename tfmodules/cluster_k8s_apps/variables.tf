@@ -72,3 +72,8 @@ variable "aws_route53_secret_key" {
   type = string
   sensitive = true
 }
+
+variable "longhorn_use_systemlogging_role" {
+  type    = bool
+  default = false
+}

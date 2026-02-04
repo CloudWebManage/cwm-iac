@@ -19,21 +19,45 @@ resource "null_resource" "longhorn_init_nodes" {
   }
 }
 
-
 module "longhorn-app" {
   depends_on = [null_resource.longhorn_init_nodes]
-  source = "../argocd-app"
-  name = "longhorn"
+  source    = "../argocd-app"
+  name      = "longhorn"
   namespace = "longhorn-system"
-  autosync = true
-  values = {
-    "htpasswdVaultPath": "${var.vault_path}/longhorn/htpasswd"
+  autosync  = true
+  values = jsondecode(jsonencode({
+    "htpasswdVaultPath" = "${var.vault_path}/longhorn/htpasswd"
     longhorn = {
       ingress = {
         host = "longhorn.${var.ingress_star_domain}"
       }
+      global = {
+        tolerations = [
+          for val in (var.longhorn_use_systemlogging_role ? ["system", "logging"] : ["system"]) :
+          {
+            key = "cwm-iac-worker-role"
+            operator = "Equal"
+            value = val
+            effect = "NoExecute"
+          }
+        ]
+        nodeSelector = (var.longhorn_use_systemlogging_role ? {
+          "cwm-iac-systemlogging-role" = "true"
+        } : {
+          "cwm-iac-worker-role" = "system"
+        })
+      }
     }
-  }
+    overrideSettings = (var.longhorn_use_systemlogging_role ? {
+      "taint-toleration" = "cwm-iac-worker-role=system:NoExecute;cwm-iac-worker-role=logging:NoExecute"
+      "system-managed-components-node-selector" = "cwm-iac-systemlogging-role:true"
+      "default-replica-count" = "1"
+    } : {
+      "taint-toleration" = "cwm-iac-worker-role=system:NoExecute"
+      "system-managed-components-node-selector" = "cwm-iac-worker-role:system"
+      "default-replica-count" = "1"
+    })
+  }))
 }
 
 module "longhorn_htpasswd" {

@@ -88,3 +88,8 @@ variable "vmagent_cluster_label" {
   type    = string
   default = ""
 }
+
+variable "etcd_use_systemlogging_role" {
+  type    = bool
+  default = false
+}

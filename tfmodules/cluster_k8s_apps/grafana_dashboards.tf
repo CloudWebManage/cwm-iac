@@ -1,4 +1,4 @@
-module "app" {
+module "cluster-grafana-dashboards-app" {
   source           = "../argocd-app"
   name             = "cluster-grafana-dashboards"
   namespace        = "monitoring"

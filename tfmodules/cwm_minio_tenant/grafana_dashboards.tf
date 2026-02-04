@@ -1,4 +1,4 @@
-module "app" {
+module "tenant-grafana-dashboards-app" {
   source           = "../argocd-app"
   name             = "minio-tenant-${var.name}-grafana-dashboards"
   namespace        = "monitoring"

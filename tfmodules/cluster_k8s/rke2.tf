@@ -110,6 +110,8 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
           config:
             # this is required for cert-manager, see https://cert-manager.io/docs/releases/release-notes/release-notes-1.18/
             strict-validate-path-type: false
+          extraArgs:
+            "metrics-per-host": "false"
           admissionWebhooks:
             patch:
               tolerations:

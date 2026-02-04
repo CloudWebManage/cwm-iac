@@ -10,4 +10,17 @@ module "etcd" {
       selfHeal = true
     }
   }
+  values = {
+    etcd = {
+      tolerations = [
+        for val in (var.etcd_use_systemlogging_role ? ["system", "logging"] : ["system"]) :
+        {
+          key = "cwm-iac-worker-role"
+          operator = "Equal"
+          value = val
+          effect = "NoExecute"
+        }
+      ]
+    }
+  }
 }
