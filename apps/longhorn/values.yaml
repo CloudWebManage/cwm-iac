@@ -1,12 +1,4 @@
 longhorn:
-  global:
-    tolerations:
-      - key: "cwm-iac-worker-role"
-        operator: "Equal"
-        value: "system"
-        effect: "NoExecute"
-    nodeSelector:
-      "cwm-iac-worker-role": "system"
   csi:
     kubeletRootDir: "/var/lib/kubelet"
     attacherReplicaCount: 1
@@ -25,10 +17,5 @@ longhorn:
       "nginx.ingress.kubernetes.io/auth-type": "basic"
       "nginx.ingress.kubernetes.io/auth-secret": "htpasswd"
       "nginx.ingress.kubernetes.io/auth-realm": "Protected Area"
-
-overrideSettings:
-  taint-toleration: "cwm-iac-worker-role=system:NoExecute"
-  default-replica-count: "1"
-  system-managed-components-node-selector: "cwm-iac-worker-role:system"
 
 htpasswdVaultPath: ""
