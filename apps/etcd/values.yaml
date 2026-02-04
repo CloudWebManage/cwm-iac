@@ -1,15 +1,5 @@
 etcd:
   replicas: 3
-  tolerations:
-    - key: "cwm-iac-worker-role"
-      operator: "Equal"
-      value: "system"
-      effect: "NoExecute"
-    # we don't always have 3 system nodes, so allow scheduling on logging nodes too
-    - key: "cwm-iac-worker-role"
-      operator: "Equal"
-      value: "logging"
-      effect: "NoExecute"
   storage:
     requestedSize: "10Gi"
     className: longhorn
