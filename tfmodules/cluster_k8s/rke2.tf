@@ -95,6 +95,13 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
             value: "system"
             effect: "NoExecute"
         controller:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              namespace: monitoring
+              additionalLabels:
+                release: monitoring
           tolerations:
             - key: "cwm-iac-worker-role"
               operator: "Equal"
