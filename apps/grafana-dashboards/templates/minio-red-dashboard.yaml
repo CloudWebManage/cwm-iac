@@ -98,7 +98,7 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "normal" },
+                "stacking": { "group": "A", "mode": "none" },
                 "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
@@ -146,7 +146,7 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "normal" },
+                "stacking": { "group": "A", "mode": "none" },
                 "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
@@ -356,7 +356,7 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "normal" },
+                "stacking": { "group": "A", "mode": "none" },
                 "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
@@ -422,7 +422,7 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "normal" },
+                "stacking": { "group": "A", "mode": "none" },
                 "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],

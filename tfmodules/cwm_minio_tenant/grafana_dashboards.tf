@@ -1,8 +1,9 @@
 module "app" {
   source           = "../argocd-app"
-  name             = "grafana-dashboards"
+  name             = "minio-tenant-${var.name}-grafana-dashboards"
   namespace        = "monitoring"
   create_namespace = false
+  path = "apps/grafana-dashboards"
   autosync = true
   values = {
     minio = {

@@ -36,7 +36,7 @@ data:
                 "fillOpacity": 10,
                 "lineWidth": 1,
                 "showPoints": "never",
-                "stacking": { "group": "A", "mode": "normal" }
+                "stacking": { "group": "A", "mode": "none" }
               },
               "unit": "reqps"
             },
@@ -91,7 +91,7 @@ data:
                 "fillOpacity": 10,
                 "lineWidth": 1,
                 "showPoints": "never",
-                "stacking": { "group": "A", "mode": "normal" }
+                "stacking": { "group": "A", "mode": "none" }
               },
               "unit": "reqps"
             },
