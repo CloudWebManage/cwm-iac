@@ -54,8 +54,8 @@ kube-prometheus-stack:
       patch:
         tolerations: *tolerations
     tolerations: *tolerations
-    namespaces:
-      releaseNamespace: true
+    namespaces: {}
+    denyNamespaces: []
     resources:
       requests:
         cpu: 200m
