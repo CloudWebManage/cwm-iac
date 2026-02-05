@@ -24,3 +24,7 @@ variable "data_path" {
 variable "locust_env_config" {
   type = map(string)
 }
+
+variable "cluster_name" {
+  type = string
+}
