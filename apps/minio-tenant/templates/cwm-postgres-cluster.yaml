@@ -20,6 +20,8 @@ spec:
         operator: Equal
         value: system
         effect: NoExecute
+  monitoring:
+    enablePodMonitor: true
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ImageCatalog
