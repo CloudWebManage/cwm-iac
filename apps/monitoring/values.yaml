@@ -80,9 +80,8 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 100Gi
-      podMonitorNamespaceSelector:
+      podMonitorSelector:
         matchLabels: {}
-
   kubeEtcd:
     enabled: false
 
