@@ -20,3 +20,14 @@ spec:
           operator: Equal
           value: system
           effect: NoExecute
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: cwm-minio-api-pooler
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/poolerName: cwm-minio-api-pooler
+  podMetricsEndpoints:
+    - port: metrics
