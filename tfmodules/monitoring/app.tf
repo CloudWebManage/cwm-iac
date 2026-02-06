@@ -2,6 +2,8 @@ module "app" {
   source = "../argocd-app"
   name = "monitoring"
   create_namespace = false
+  versions = var.versions
+  targetRevisionFromVersionByName = true
   values = {
     "kube-prometheus-stack" = {
       alertmanager = {

@@ -25,6 +25,8 @@ module "longhorn-app" {
   name      = "longhorn"
   namespace = "longhorn-system"
   autosync  = true
+  versions = var.versions
+  targetRevisionFromVersionByName = true
   values = jsondecode(jsonencode({
     "htpasswdVaultPath" = "${var.vault_path}/longhorn/htpasswd"
     longhorn = {

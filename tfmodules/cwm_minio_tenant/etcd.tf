@@ -4,6 +4,8 @@ module "etcd" {
   path = "apps/etcd"
   namespace = kubernetes_namespace.tenant.metadata[0].name
   create_namespace = false
+  versions = var.versions
+  targetRevisionFromVersionByName = true
   sync_policy = {
     automated = {
       prune = true

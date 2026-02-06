@@ -3,6 +3,8 @@ module "minio_tenant_main" {
   name = "minio-tenant-${var.name}"
   create_namespace = false
   path = "apps/minio-tenant"
+  versions = var.versions
+  targetRevisionFromVersionByName = true
   values = merge(
     {
       initialize = var.initialize

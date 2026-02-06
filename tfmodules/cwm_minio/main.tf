@@ -22,3 +22,8 @@ variable "with_cloudnative_pg" {
   type    = bool
   default = true
 }
+
+variable "versions" {
+  type = any
+  default = {}
+}

@@ -68,3 +68,13 @@ variable "configValueFiles" {
   type = list(string)
   default = null
 }
+
+variable "versions" {
+  type = any
+  default = {}
+}
+
+variable "targetRevisionFromVersionByName" {
+  type = bool
+  default = false
+}

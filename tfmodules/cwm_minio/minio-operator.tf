@@ -3,6 +3,8 @@ module "minio_operator" {
   source = "../argocd-app"
   name = "minio-operator"
   autosync = true
+  versions = var.versions
+  targetRevisionFromVersionByName = true
   values = {
     # https://github.com/minio/operator/blob/master/helm/operator/values.yaml
     operator: {

@@ -9,7 +9,7 @@ locals {
   source_spec = (var.sources == null && var.configValueFiles == null) ? {
     source = {
       repoURL        = "https://github.com/CloudWebManage/cwm-iac"
-      targetRevision = var.targetRevision
+      targetRevision = coalesce(var.targetRevisionFromVersionByName ? lookup(var.versions, "cwm-iac-${var.name}", null) : null, var.targetRevision)
       path           = coalesce(var.path, "apps/${var.name}")
       helm = {
         valuesObject = var.values

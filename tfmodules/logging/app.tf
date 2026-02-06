@@ -3,6 +3,8 @@ module "app" {
   name = "logging"
   create_namespace = false
   autosync = true
+  versions = var.versions
+  targetRevisionFromVersionByName = true
   values = {
     tenant = {
       ingress = {

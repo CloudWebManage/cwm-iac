@@ -20,7 +20,7 @@ resource "kubernetes_manifest" "external-secrets-operator-app" {
       project : "default"
       source : {
         repoURL : "https://github.com/CloudWebManage/cwm-iac"
-        targetRevision : "main"
+        targetRevision : coalesce(lookup(var.versions, "cwm-iac-external-secrets-operator", null), "main")
         path : "apps/external-secrets-operator"
         helm : {
           valuesObject : {

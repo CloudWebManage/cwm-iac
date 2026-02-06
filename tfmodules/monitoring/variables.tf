@@ -27,3 +27,8 @@ variable "slack_alerts_watchdog_webhook_url" {
 variable "cluster_name" {
   type = string
 }
+
+variable "versions" {
+  type = any
+  default = {}
+}
