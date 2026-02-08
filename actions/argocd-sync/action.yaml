@@ -38,9 +38,13 @@ runs:
             local cluster_name="$1"
             local app_name="$2"
             local kubeconfig="$3"
+            local sync_options="$(kubectl --kubeconfig=$kubeconfig -n argocd get "$app_name" -o jsonpath='{.spec.syncPolicy.syncOptions}')"
+            if [ "$sync_options" == "" ]; then
+              sync_options='[]'
+            fi
             if ! [ "$(kubectl --kubeconfig=$kubeconfig -n argocd get "$app_name" -o jsonpath='{.spec.syncPolicy.automated}')" == "" ]; then
               echo "${cluster_name}/${app_name}"
-              kubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncStrategy": {"hook": {}}}}}' --type=merge
+              kubectl --kubeconfig=$kubeconfig -n argocd patch "$app_name" -p '{"operation": {"initiatedBy": {"username": "github-actions"}, "sync": {"syncOptions":'$sync_options',"syncStrategy": {"hook": {}}}}}' --type=merge
             fi
           }
           
