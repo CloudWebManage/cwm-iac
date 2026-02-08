@@ -18,14 +18,22 @@ spec:
           operator: Equal
           value: system
           effect: NoExecute
+      volumes:
+        - name: prometheus-multiproc
+          emptyDir: {}
       containers:
         - name: api
           image: {{ .Values.cwmMinioApi.api.image | quote }}
           imagePullPolicy: Always
           resources: {{ .Values.cwmMinioApi.resources | toYaml | nindent 12 }}
+          volumeMounts:
+            - name: prometheus-multiproc
+              mountPath: /tmp/prometheus
           env:
             - name: GUNICORN_WORKERS
               value: "10"
+            - name: PROMETHEUS_MULTIPROC_DIR
+              value: "/tmp/prometheus"
             - name: DB_CONNSTRING
               valueFrom:
                 secretKeyRef:
