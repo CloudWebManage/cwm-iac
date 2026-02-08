@@ -112,7 +112,7 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
             strict-validate-path-type: false
           extraArgs:
             "metrics-per-host": "false"
-            "time-buckets": "0.1, 0.25, 0.5, 1, 2.5, 5, 10, 25, 50, 120, 360"
+            "time-buckets": "0.1,0.25,0.5,1,2.5,5,10,25,50,120,360"
           admissionWebhooks:
             patch:
               tolerations:
