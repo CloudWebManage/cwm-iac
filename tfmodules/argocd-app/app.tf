@@ -60,6 +60,6 @@ resource "kubernetes_manifest" "app" {
       name      = var.name
       namespace = "argocd"
     }
-    spec = merge(local.base_spec, local.source_spec, local.config_sources_spec, local.sources_spec, local.sync_policy_spec)
+    spec = jsondecode(jsonencode(merge(local.base_spec, local.source_spec, local.config_sources_spec, local.sources_spec, local.sync_policy_spec)))
   }
 }
