@@ -112,3 +112,5 @@ kube-prometheus-stack:
       - key: "cwm-iac-worker-role"
         operator: "Exists"
         effect: "NoExecute"
+      - key: CriticalAddonsOnly
+        operator: Exists
