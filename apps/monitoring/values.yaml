@@ -96,3 +96,16 @@ kube-prometheus-stack:
 
   kube-state-metrics:
     tolerations: *tolerations
+
+  nodeExporter:
+    enabled: true
+    operatingSystems:
+      linux:
+        enabled: true
+      aix:
+        enabled: false
+      darwin:
+        enabled: false
+
+  prometheus-node-exporter:
+    tolerations: *tolerations
