@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-docker pull ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest
 docker rm -f locust || true
+docker pull ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest
 
 systemctl restart locust-ssh-tunnel
 

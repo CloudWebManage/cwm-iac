@@ -14,7 +14,7 @@ resource "kamatera_server" "workers" {
   cpu_cores = 4
   cpu_type = "B"
   disk_sizes_gb = [20]
-  ram_mb = 8192
+  ram_mb = 32768
   ssh_pubkey = var.ssh_pubkey
   network {
     name = "wan"

@@ -2,18 +2,17 @@
 
 set -euo pipefail
 
-docker network create locust || true
-
 docker rm -f redis || true
-docker run --name redis -d --network locust -p 127.0.0.1:6379:6379 redis:8
+docker rm -f locust || true
+docker network create locust || true
+docker pull ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest
 
 . $1
 
 mkdir -p "${2}"
 chmod -R 777 "${2}"
 
-docker pull ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest
-docker rm -f locust || true
+docker run --name redis -d --network locust -p 127.0.0.1:6379:6379 -v /root/.data/redis:/data redis:8
 docker run --name locust --network locust \
   -d -p 127.0.0.1:8089:8089 -p 127.0.0.1:5557:5557 \
   --env-file /root/locust.env --env-file $1 \

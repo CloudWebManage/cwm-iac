@@ -20,6 +20,12 @@ fi
 
 testid=$(date +%Y-%m-%d-%H%M)
 echo Starting distributed load test testid $testid
+for NAME in ${WORKER_SERVER_NAMES}; do
+  echo "Stopping old worker $NAME if exists"
+  ssh -F $DATA_PATH/ssh_config ${NAME_PREFIX}-$NAME docker rm -f locust || true
+done
+echo Stopping old main server if exists
+ssh -F $DATA_PATH/ssh_config ${NAME_PREFIX}-main docker rm -f locust || true
 cp "$LOAD_TESTS_DIR/latest.env" "$LOAD_TESTS_DIR/$testid.env"
 echo Copying env file to servers
 scp -F $DATA_PATH/ssh_config "$LOAD_TESTS_DIR/$testid.env" ${NAME_PREFIX}-main:/root/test$testid.env
