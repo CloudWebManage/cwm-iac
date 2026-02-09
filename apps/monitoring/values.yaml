@@ -108,4 +108,7 @@ kube-prometheus-stack:
         enabled: false
 
   prometheus-node-exporter:
-    tolerations: *tolerations
+    tolerations:
+      - key: "cwm-iac-worker-role"
+        operator: "Exists"
+        effect: "NoExecute"
