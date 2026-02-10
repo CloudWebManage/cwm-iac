@@ -5,6 +5,9 @@ cwmMinioApi:
 
 initialize: false
 
+nodeLocal:
+  enabled: false
+
 tenant:
   # Root key for MinIO Tenant Chart
   tenant:

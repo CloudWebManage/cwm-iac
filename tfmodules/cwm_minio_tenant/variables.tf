@@ -93,3 +93,8 @@ variable "etcd_use_systemlogging_role" {
   type    = bool
   default = false
 }
+
+variable "node_local_enabled" {
+  type    = bool
+  default = false
+}

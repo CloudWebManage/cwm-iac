@@ -1,0 +1,13 @@
+{{ if .Values.nodeLocal.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-tenant-node-local
+spec:
+  ports:
+    - port: 80
+      targetPort: 9000
+  selector:
+    v1.min.io/tenant: {{ .Values.tenant.tenant.name }}
+  internalTrafficPolicy: Local
+{{ end }}

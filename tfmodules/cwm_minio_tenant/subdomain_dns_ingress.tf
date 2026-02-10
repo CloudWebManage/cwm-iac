@@ -24,6 +24,7 @@ resource "kubernetes_ingress_v1" "subdomain_star" {
     annotations = {
       "cert-manager.io/cluster-issuer": "letsencrypt"
       "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
+      "nginx.ingress.kubernetes.io/service-upstream" = "true"
     }
   }
   spec {
@@ -40,7 +41,7 @@ resource "kubernetes_ingress_v1" "subdomain_star" {
           path_type = "Prefix"
           backend {
             service {
-              name = "minio"
+              name = var.node_local_enabled ? "minio-tenant-node-local" : "minio"
               port {
                 name = "http-minio"
               }
@@ -60,6 +61,7 @@ resource "kubernetes_ingress_v1" "subdomain" {
     annotations = {
       "cert-manager.io/cluster-issuer": "letsencrypt"
       "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
+      "nginx.ingress.kubernetes.io/service-upstream" = "true"
     }
   }
   spec {
@@ -76,7 +78,7 @@ resource "kubernetes_ingress_v1" "subdomain" {
           path_type = "Prefix"
           backend {
             service {
-              name = "minio"
+              name = var.node_local_enabled ? "minio-tenant-node-local" : "minio"
               port {
                 name = "http-minio"
               }
