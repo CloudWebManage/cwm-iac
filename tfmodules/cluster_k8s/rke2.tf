@@ -120,6 +120,10 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
                   operator: "Equal"
                   value: "system"
                   effect: "NoExecute"
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 800Mi
         defaultBackend:
           tolerations:
             - key: "cwm-iac-worker-role"
