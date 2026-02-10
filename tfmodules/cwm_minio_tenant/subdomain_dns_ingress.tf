@@ -43,7 +43,7 @@ resource "kubernetes_ingress_v1" "subdomain_star" {
             service {
               name = var.node_local_enabled ? "minio-tenant-node-local" : "minio"
               port {
-                name = "http-minio"
+                number = 80
               }
             }
           }
@@ -80,7 +80,7 @@ resource "kubernetes_ingress_v1" "subdomain" {
             service {
               name = var.node_local_enabled ? "minio-tenant-node-local" : "minio"
               port {
-                name = "http-minio"
+                number = 80
               }
             }
           }
