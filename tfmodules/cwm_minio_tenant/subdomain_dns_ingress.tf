@@ -16,16 +16,29 @@ resource "aws_route53_record" "subdomain" {
   records = ["ingress.${var.ingress_star_domain}"]
 }
 
+locals {
+  subdomain_ingress_annotations = {
+      "cert-manager.io/cluster-issuer": "letsencrypt"
+      "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
+      "nginx.ingress.kubernetes.io/service-upstream" = "true"
+      "nginx.ingress.kubernetes.io/proxy-connect-timeout" = "60"
+      "nginx.ingress.kubernetes.io/proxy-send-timeout" = "3600"
+      "nginx.ingress.kubernetes.io/proxy-read-timeout" = "3600"
+      "nginx.ingress.kubernetes.io/proxy-buffering" = "on"
+      "nginx.ingress.kubernetes.io/proxy-buffers-number" = "64"
+      "nginx.ingress.kubernetes.io/proxy-buffer-size" = "32k"
+      "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOT
+        limit_req zone=cwminio burst=20000;
+      EOT
+    }
+}
+
 resource "kubernetes_ingress_v1" "subdomain_star" {
   depends_on = [kubernetes_namespace.tenant]
   metadata {
     name = "subdomain-star"
     namespace = kubernetes_namespace.tenant.metadata[0].name
-    annotations = {
-      "cert-manager.io/cluster-issuer": "letsencrypt"
-      "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
-      "nginx.ingress.kubernetes.io/service-upstream" = "true"
-    }
+    annotations = local.subdomain_ingress_annotations
   }
   spec {
     ingress_class_name = "nginx"
@@ -58,11 +71,7 @@ resource "kubernetes_ingress_v1" "subdomain" {
   metadata {
     name = "subdomain"
     namespace = kubernetes_namespace.tenant.metadata[0].name
-    annotations = {
-      "cert-manager.io/cluster-issuer": "letsencrypt"
-      "nginx.ingress.kubernetes.io/proxy-body-size" = "5g"
-      "nginx.ingress.kubernetes.io/service-upstream" = "true"
-    }
+    annotations = local.subdomain_ingress_annotations
   }
   spec {
     ingress_class_name = "nginx"

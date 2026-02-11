@@ -24,6 +24,157 @@ data "vault_kv_secret_v2" "minio_tenant_main_mc_metrics_prometheus_config" {
 
 locals {
   cluster_scrape_config = var.metrics ? yamldecode(data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config[0].data.config)["scrape_configs"][0] : null
+  metrics_bearer_token = var.metrics ? local.cluster_scrape_config["bearer_token"] : null
+  base_scrape_configs = var.metrics ? [
+    {
+      job_name = "minio-audit-metrics"
+      scheme = "http"
+      scrape_interval = "15s"
+      metrics_path = "/metrics"
+      honor_timestamps = false
+      kubernetes_sd_configs = [
+        {
+          role = "pod"
+          namespaces = {
+            names = [kubernetes_namespace.tenant.metadata[0].name]
+          }
+        }
+      ]
+      relabel_configs = [
+        {
+          source_labels = ["__meta_kubernetes_pod_label_cwm_minio_tenant"]
+          regex = "true"
+          action = "keep"
+        },
+        {
+          source_labels = ["__meta_kubernetes_pod_ip"]
+          target_label = "__address__"
+          replacement = "$1:8799"
+        }
+      ]
+    },
+    {
+      job_name = "cwm-minio-api"
+      scheme = "http"
+      scrape_interval = "15s"
+      metrics_path = "/metrics"
+      honor_timestamps = false
+      kubernetes_sd_configs = [
+        {
+          role = "pod"
+          namespaces = {
+            names = [kubernetes_namespace.tenant.metadata[0].name]
+          }
+        }
+      ]
+      relabel_configs = [
+        {
+          source_labels = ["__meta_kubernetes_pod_label_app"]
+          regex = "cwm-minio-api"
+          action = "keep"
+        },
+        {
+          source_labels = ["__meta_kubernetes_pod_ip"]
+          target_label = "__address__"
+          replacement = "$1:8000"
+        }
+      ]
+    }
+  ] : null
+  scrape_configs = var.metrics ? concat(
+    local.base_scrape_configs,
+    [
+      {
+        job_name     = "minio-job-cluster"
+        bearer_token = local.metrics_bearer_token
+        scheme       = "http"
+        metrics_path = "/minio/v2/metrics/cluster"
+        static_configs = [
+          {
+            targets = ["minio.${kubernetes_namespace.tenant.metadata[0].name}.svc.cluster.local:80"]
+          }
+        ]
+      },
+      {
+        job_name     = "minio-job-node"
+        bearer_token = local.metrics_bearer_token
+        scheme       = "http"
+        metrics_path = "/minio/v2/metrics/node"
+        kubernetes_sd_configs = [
+          {
+            role = "pod"
+            namespaces = {
+              names = [kubernetes_namespace.tenant.metadata[0].name]
+            }
+          }
+        ]
+        relabel_configs = [
+          {
+            source_labels = ["__meta_kubernetes_pod_label_v1_min_io_tenant"]
+            regex = var.name
+            action = "keep"
+          },
+          {
+            source_labels = ["__meta_kubernetes_pod_ip"]
+            target_label = "__address__"
+            replacement = "$1:9000"
+          }
+        ]
+      },
+      {
+        job_name     = "minio-job-bucket"
+        bearer_token = local.metrics_bearer_token
+        scheme       = "http"
+        metrics_path = "/minio/v2/metrics/bucket"
+        kubernetes_sd_configs = [
+          {
+            role = "pod"
+            namespaces = {
+              names = [kubernetes_namespace.tenant.metadata[0].name]
+            }
+          }
+        ]
+        relabel_configs = [
+          {
+            source_labels = ["__meta_kubernetes_pod_label_v1_min_io_tenant"]
+            regex = var.name
+            action = "keep"
+          },
+          {
+            source_labels = ["__meta_kubernetes_pod_ip"]
+            target_label = "__address__"
+            replacement = "$1:9000"
+          }
+        ]
+      },
+      {
+        job_name     = "minio-job-resource"
+        bearer_token = local.metrics_bearer_token
+        scheme       = "http"
+        metrics_path = "/minio/v2/metrics/resource"
+        kubernetes_sd_configs = [
+          {
+            role = "pod"
+            namespaces = {
+              names = [kubernetes_namespace.tenant.metadata[0].name]
+            }
+          }
+        ]
+        relabel_configs = [
+          {
+            source_labels = ["__meta_kubernetes_pod_label_v1_min_io_tenant"]
+            regex = var.name
+            action = "keep"
+          },
+          {
+            source_labels = ["__meta_kubernetes_pod_ip"]
+            target_label = "__address__"
+            replacement = "$1:9000"
+          }
+        ]
+      }
+    ]
+  ) : null
 }
 
 module "metrics_app" {
@@ -44,82 +195,7 @@ module "metrics_app" {
     prometheus = {
       serverFiles = {
         "prometheus.yml" = {
-          scrape_configs = [
-            local.cluster_scrape_config,
-            {
-              job_name     = "minio-job-buckets"
-              bearer_token = local.cluster_scrape_config["bearer_token"]
-              scheme       = "https"
-              honor_timestamps = false
-              http_sd_configs = [
-                {
-                  refresh_interval = "30s"
-                  url = "http://cwm-minio-api.${kubernetes_namespace.tenant.metadata[0].name}:8000/buckets/list_prometheus_sd?targets=${local.cluster_scrape_config["static_configs"][0]["targets"][0]}"
-                }
-              ],
-              relabel_configs = [
-                {
-                  source_labels = ["bucket"]
-                  target_label = "__metrics_path__"
-                  replacement = "/minio/metrics/v3/bucket/api/$1"
-                }
-              ]
-            },
-            {
-              job_name = "minio-audit-metrics"
-              scheme = "http"
-              scrape_interval = "15s"
-              metrics_path = "/metrics"
-              honor_timestamps = false
-              kubernetes_sd_configs = [
-                {
-                  role = "pod"
-                  namespaces = {
-                    names = [kubernetes_namespace.tenant.metadata[0].name]
-                  }
-                }
-              ]
-              relabel_configs = [
-                {
-                  source_labels = ["__meta_kubernetes_pod_label_cwm_minio_tenant"]
-                  regex = "true"
-                  action = "keep"
-                },
-                {
-                  source_labels = ["__meta_kubernetes_pod_ip"]
-                  target_label = "__address__"
-                  replacement = "$1:8799"
-                }
-              ]
-            },
-            {
-              job_name = "cwm-minio-api"
-              scheme = "http"
-              scrape_interval = "15s"
-              metrics_path = "/metrics"
-              honor_timestamps = false
-              kubernetes_sd_configs = [
-                {
-                  role = "pod"
-                  namespaces = {
-                    names = [kubernetes_namespace.tenant.metadata[0].name]
-                  }
-                }
-              ]
-              relabel_configs = [
-                {
-                  source_labels = ["__meta_kubernetes_pod_label_app"]
-                  regex = "cwm-minio-api"
-                  action = "keep"
-                },
-                {
-                  source_labels = ["__meta_kubernetes_pod_ip"]
-                  target_label = "__address__"
-                  replacement = "$1:8000"
-                }
-              ]
-            }
-          ]
+          scrape_configs = local.scrape_configs
         }
       }
     }

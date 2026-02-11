@@ -8,18 +8,41 @@ resource "null_resource" "rke2_node_settings" {
   triggers = {
     command = <<-EOF
       set -euo pipefail
-      echo 'vm.max_map_count = 262144' > /etc/sysctl.d/99-cwm.conf
-      echo 'net.ipv4.tcp_retries2 = 8' >> /etc/sysctl.d/99-cwm.conf
-      echo 'fs.inotify.max_user_instances = 1024' >> /etc/sysctl.d/99-cwm.conf
-      echo 'fs.inotify.max_user_watches   = 2097152' >> /etc/sysctl.d/99-cwm.conf
-      echo 'fs.inotify.max_queued_events  = 65536' >> /etc/sysctl.d/99-cwm.conf
-      echo 'net.core.somaxconn = 65535' >> /etc/sysctl.d/99-cwm.conf
-      echo 'net.core.netdev_max_backlog = 16384' >> /etc/sysctl.d/99-cwm.conf
-      echo 'net.ipv4.tcp_max_syn_backlog = 8192' >> /etc/sysctl.d/99-cwm.conf
+      cat > /etc/sysctl.d/99-cwm.conf <<EOL
+        vm.max_map_count = 262144
+        net.ipv4.tcp_retries2 = 8
+        fs.inotify.max_user_instances = 1024
+        fs.inotify.max_user_watches   = 2097152
+        fs.inotify.max_queued_events  = 65536
+        net.core.somaxconn = 65535
+        net.core.netdev_max_backlog = 250000
+        net.ipv4.tcp_max_syn_backlog = 8192
+        net.core.default_qdisc = fq
+        net.core.rps_sock_flow_entries = 65536
+      EOL
       sysctl --system
       rm -f /etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
+      cat > /etc/systemd/system/rps.service <<'EOL'
+        [Unit]
+        Description=Enable RPS
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/sh -c '\
+        for q in /sys/class/net/eth*/queues/rx-*; do \
+          echo ff > \$q/rps_cpus; \
+          echo 32768 > \$q/rps_flow_cnt; \
+        done'
+
+        [Install]
+        WantedBy=multi-user.target
+      EOL
       systemctl daemon-reload
-      systemctl restart systemd-networkd-wait-online.service
+      systemctl restart systemd-networkd-wait-online.service || true
+      systemctl enable rps.service
+      systemctl start rps.service
       if ! [ -e /root/.ssh/id_rsa ]; then ssh-keygen -t rsa -b 4096 -N '' -f /root/.ssh/id_rsa; fi
       echo 'export PATH="/var/lib/rancher/rke2/bin/:$PATH"' > /etc/profile.d/00-cwm.sh
       echo 'export CRI_CONFIG_FILE=/var/lib/rancher/rke2/agent/etc/crictl.yaml' >> /etc/profile.d/00-cwm.sh

@@ -1,0 +1,17 @@
+{{ if .Values.minio.enabled }}
+{{- range $path, $file := .Files.Glob "dashboards/minio-*.json" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-{{ base $path | replace ".json" "" }}
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: {{ $.Values.minio.grafanaFolder | quote }}
+data:
+  {{ base $path }}: |-
+{{ $file | toString | indent 4 }}
+---
+{{ end }}
+{{ end }}
