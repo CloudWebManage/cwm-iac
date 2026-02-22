@@ -7,7 +7,7 @@ data "kamatera_image" "main_ubuntu_2404" {
 resource "kamatera_server" "main" {
   datacenter_id = var.main_server_datacenter_id
   image_id = data.kamatera_image.main_ubuntu_2404.id
-  name = "${var.name_prefix}-main"
+  name = "${var.name_prefix}-${var.main_server_name_suffix}"
   billing_cycle = "hourly"
   cpu_cores = 4
   cpu_type = "B"

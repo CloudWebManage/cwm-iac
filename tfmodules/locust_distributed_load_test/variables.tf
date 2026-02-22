@@ -28,3 +28,8 @@ variable "locust_env_config" {
 variable "cluster_name" {
   type = string
 }
+
+variable "main_server_name_suffix" {
+  type = string
+  default = "main"
+}

@@ -25,3 +25,8 @@ docker run --name locust --network locust \
   -e CWM_INIT_FROM_JSON_FILE \
   ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest \
   --master $LOCUST_MAIN_ARGS --csv /tmp/data/report
+
+if [ "$(docker exec locust bash -c 'echo $MINIO_API_URL')" != "" ]; then
+  echo "setting up minio cwm profile in locust"
+  docker exec locust bash -c 'mc alias set cwm "$MINIO_API_URL" "$MINIO_API_ADMIN_USERNAME" "$MINIO_API_ADMIN_PASSWORD"'
+fi
