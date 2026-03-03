@@ -62,3 +62,8 @@ variable "ingress_dns_zone_domain" {
 variable "cluster_name" {
   type = string
 }
+
+variable "server_network_interfaces" {
+  type = map(any)
+  default = {}
+}

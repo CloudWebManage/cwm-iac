@@ -10,6 +10,8 @@ resource "null_resource" "longhorn_init_nodes" {
         apt-get update -y
         apt-get install -y open-iscsi nfs-common cryptsetup dmsetup
         modprobe iscsi_tcp
+        systemctl disable --now rpcbind.socket
+        systemctl disable --now rpcbind
       "
     EOT
   }

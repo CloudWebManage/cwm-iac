@@ -1,3 +1,30 @@
+resource "kubernetes_manifest" "rke2-canal-helm-chart-config" {
+  field_manager {
+    force_conflicts = true
+  }
+  manifest = {
+    apiVersion = "helm.cattle.io/v1"
+    kind       = "HelmChartConfig"
+    metadata = {
+      name      = "rke2-canal"
+      namespace = "kube-system"
+    }
+    spec = {
+      valuesContent = <<-EOT
+        flannel:
+          backend: "vxlan"
+        calico:
+          felixDefaultEndpointToHostAction: ACCEPT
+          # calico inbound failsafe ports. Empty string means defaults. Use 'none' to disable failsafe if you have your own rules.
+          felixFailsafeInboundHostPorts: ""
+          # calico outbound failsafe ports. Empty string means defaults. Use 'none' to disable failsafe if you have your own rules.
+          felixFailsafeOutboundHostPorts: ""
+          calicoKubeControllers: false
+      EOT
+    }
+  }
+}
+
 resource "kubernetes_manifest" "rke2-coredns-helm-chart-config" {
   field_manager {
     force_conflicts = true
@@ -143,6 +170,8 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
 resource "null_resource" "rke2-fix-helm-install-jobs" {
   triggers = {
     hash = sha256(jsonencode([
+      var.versions["rke2_version_suffix"], var.versions["kube"],
+      kubernetes_manifest.rke2-canal-helm-chart-config.manifest,
       kubernetes_manifest.rke2-coredns-helm-chart-config.manifest,
       kubernetes_manifest.rke2-metrics-server-helm-chart-config.manifest,
       kubernetes_manifest.rke2-snapshot-controller-helm-chart-config.manifest,
