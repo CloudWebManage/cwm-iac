@@ -38,3 +38,14 @@ resource "kubernetes_manifest" "firewall_calico_hostendpoint-external" {
   }
 }
 
+resource "kubernetes_manifest" "firewall_global_network_policies" {
+  for_each = var.firewall_global_network_policies
+  manifest = {
+    apiVersion = "crd.projectcalico.org/v1"
+    kind = "GlobalNetworkPolicy"
+    metadata = {
+      name = each.key
+    }
+    spec = each.value
+  }
+}

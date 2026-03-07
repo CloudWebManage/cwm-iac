@@ -13,6 +13,7 @@ resource "kubernetes_manifest" "rke2-canal-helm-chart-config" {
       valuesContent = <<-EOT
         flannel:
           backend: "vxlan"
+          iface: "eth1"
         calico:
           felixDefaultEndpointToHostAction: ACCEPT
           # calico inbound failsafe ports. Empty string means defaults. Use 'none' to disable failsafe if you have your own rules.

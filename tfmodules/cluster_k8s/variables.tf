@@ -67,3 +67,8 @@ variable "server_network_interfaces" {
   type = map(any)
   default = {}
 }
+
+variable "firewall_global_network_policies" {
+  type = any
+  default = {}
+}
