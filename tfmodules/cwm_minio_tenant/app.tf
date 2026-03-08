@@ -98,5 +98,5 @@ module "minio_tenant_main" {
   configValueFiles = startswith(var.versions["cwm-minio-api"], "config/") ? [
     "${var.versions["cwm-minio-api"]}/cwm-minio-api/api.yaml"
   ] : null
-  autosync = true
+  autosync = var.argocd_autosync
 }

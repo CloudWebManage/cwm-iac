@@ -2,7 +2,7 @@ module "app" {
   source = "../argocd-app"
   name = "logging"
   create_namespace = false
-  autosync = true
+  autosync = var.argocd_autosync
   versions = var.versions
   targetRevisionFromVersionByName = true
   values = {

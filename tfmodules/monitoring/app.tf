@@ -63,11 +63,8 @@ module "app" {
       }
     }
   }
+  autosync = var.argocd_autosync
   sync_policy = {
-    automated = {
-      prune = true
-      selfHeal = true
-    }
     syncOptions = [
       "ServerSideApply=true"
     ]

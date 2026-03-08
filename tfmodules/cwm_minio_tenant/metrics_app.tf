@@ -182,7 +182,7 @@ module "metrics_app" {
   depends_on = [kubernetes_namespace.minio-tenant-metrics]
   source = "../argocd-app"
   name = "minio-tenant-${var.name}-metrics"
-  autosync = true
+  autosync = var.argocd_autosync
   create_namespace = false
   path = "apps/minio-tenant-metrics"
   targetRevision = var.metrics_app_target_revision

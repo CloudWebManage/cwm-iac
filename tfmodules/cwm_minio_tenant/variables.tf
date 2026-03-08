@@ -98,3 +98,8 @@ variable "node_local_enabled" {
   type    = bool
   default = false
 }
+
+variable "argocd_autosync" {
+  type = bool
+  default = false
+}

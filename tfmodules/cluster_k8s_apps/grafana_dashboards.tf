@@ -6,7 +6,7 @@ module "cluster-grafana-dashboards-app" {
   versions = var.versions
   targetRevisionFromVersionByName = true
   path = "apps/grafana-dashboards"
-  autosync = true
+  autosync = var.argocd_autosync
   values = {
     nginxIngress = {
       enabled = true

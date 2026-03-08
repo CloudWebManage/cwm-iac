@@ -6,12 +6,7 @@ module "etcd" {
   create_namespace = false
   versions = var.versions
   targetRevisionFromVersionByName = true
-  sync_policy = {
-    automated = {
-      prune = true
-      selfHeal = true
-    }
-  }
+  autosync = var.argocd_autosync
   values = {
     etcd = {
       tolerations = [

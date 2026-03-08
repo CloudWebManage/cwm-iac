@@ -6,7 +6,7 @@ module "tenant-grafana-dashboards-app" {
   versions = var.versions
   targetRevisionFromVersionByName = true
   path = "apps/grafana-dashboards"
-  autosync = true
+  autosync = var.argocd_autosync
   values = {
     minio = {
       enabled = true

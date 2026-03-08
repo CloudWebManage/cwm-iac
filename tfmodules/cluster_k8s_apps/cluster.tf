@@ -3,5 +3,5 @@ module "cluster-app" {
   name = "cluster"
   namespace = "default"
   create_namespace = false
-  autosync = true
+  autosync = var.argocd_autosync
 }

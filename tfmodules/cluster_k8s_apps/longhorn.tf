@@ -41,7 +41,7 @@ module "longhorn-app" {
   source    = "../argocd-app"
   name      = "longhorn"
   namespace = "longhorn-system"
-  autosync  = true
+  autosync = var.argocd_autosync
   versions = var.versions
   targetRevisionFromVersionByName = true
   values = jsondecode(jsonencode({

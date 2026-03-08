@@ -77,3 +77,8 @@ variable "longhorn_use_systemlogging_role" {
   type    = bool
   default = false
 }
+
+variable "argocd_autosync" {
+  type    = bool
+  default = false
+}

@@ -4,11 +4,8 @@ module "cloudnative_pg" {
   name = "cloudnative-pg"
   versions = var.versions
   targetRevisionFromVersionByName = true
+  autosync = var.argocd_autosync
   sync_policy = {
-    automated = {
-      prune = true
-      selfHeal = true
-    }
     syncOptions : [
       "ServerSideApply=true"
     ]
