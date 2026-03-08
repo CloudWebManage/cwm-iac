@@ -7,6 +7,7 @@ locals {
 
 
 resource "aws_route53_record" "controlplane" {
+  count = var.ingress_dns_zone_id == "" ? 0 : 1
   provider = aws.route53
   name    = "controlplane.${var.name_prefix}.${var.ingress_dns_zone_domain}"
   type    = "A"
