@@ -198,8 +198,11 @@ data "external" "admin_kubeconfig" {
       FILENAME=${var.admin_kubeconfig_path}
       if ! [ -f "$FILENAME" ]; then
         mkdir -p "$(dirname "$FILENAME")"
-        ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"
-        sed -i 's|https://127.0.0.1:6443|https://controlplane.${var.name_prefix}.${var.ingress_dns_zone_domain}:6443|' "$FILENAME"
+        if ${local.controlplane1_ssh_command} "cat /etc/rancher/rke2/rke2.yaml" > "$FILENAME"; then
+          sed -i 's|https://127.0.0.1:6443|https://controlplane.${var.name_prefix}.${var.ingress_dns_zone_domain}:6443|' "$FILENAME"
+        else
+          rm -f "$FILENAME"
+        fi
       fi
       echo '{}'
     EOT
