@@ -1,6 +1,6 @@
 resource "null_resource" "longhorn_init_nodes" {
   for_each = {
-    for name, worker in var.workers : name => worker if worker.worker-role == "system"
+    for name, worker in var.workers : name => worker if worker.worker-role == "system" || (var.longhorn_use_systemlogging_role && worker.worker-role == "logging")
   }
   triggers = {
     counter = lookup(var.force_reinstall_counters, "longhorn_init_nodes", 0)
