@@ -17,9 +17,9 @@ resource "kubernetes_manifest" "rke2-canal-helm-chart-config" {
         calico:
           felixDefaultEndpointToHostAction: ACCEPT
           # calico inbound failsafe ports. Empty string means defaults. Use 'none' to disable failsafe if you have your own rules.
-          felixFailsafeInboundHostPorts: ""
+          felixFailsafeInboundHostPorts: "none"
           # calico outbound failsafe ports. Empty string means defaults. Use 'none' to disable failsafe if you have your own rules.
-          felixFailsafeOutboundHostPorts: ""
+          felixFailsafeOutboundHostPorts: "none"
           calicoKubeControllers: false
       EOT
     }

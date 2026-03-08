@@ -20,6 +20,9 @@ resource "kubernetes_manifest" "firewall_calico_hostendpoint-internal" {
 
 resource "kubernetes_manifest" "firewall_calico_hostendpoint-external" {
   for_each = var.server_network_interfaces
+  field_manager {
+    force_conflicts = true
+  }
   manifest = {
     apiVersion = "crd.projectcalico.org/v1"
     kind = "HostEndpoint"

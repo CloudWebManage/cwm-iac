@@ -54,6 +54,7 @@ data "external" "directpv_discover" {
         OLD_DRIVES_HASH="$(sha256sum ${var.data_path}/directpv/drives.yaml | cut -d' ' -f1)"
       fi
       export KUBECONFIG=${var.kubeconfig_path}
+      mkdir -p "${var.data_path}/directpv"
       if ${var.tools.kubectl_directpv} discover --quiet --output-file "${var.data_path}/directpv/drives.yaml" >/dev/null; then
         echo '{"drives_hash": "'$(sha256sum ${var.data_path}/directpv/drives.yaml | cut -d' ' -f1)'"}'
       else

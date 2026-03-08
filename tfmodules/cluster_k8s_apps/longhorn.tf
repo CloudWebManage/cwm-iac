@@ -12,6 +12,21 @@ resource "null_resource" "longhorn_init_nodes" {
         modprobe iscsi_tcp
         systemctl disable --now rpcbind.socket
         systemctl disable --now rpcbind
+        multipath -F || true
+        systemctl disable --now multipathd.socket || true
+        systemctl disable --now multipathd || true
+        cat > /etc/multipath.conf <<'EOF'
+        defaults {
+          user_friendly_names yes
+        }
+        blacklist {
+          device {
+            vendor "LIO-ORG"
+            product "*"
+          }
+        }
+        EOF
+
       "
     EOT
   }
