@@ -60,13 +60,14 @@ locals {
 
 resource "terraform_data" "app" {
   triggers_replace = {
-    command = <<-EOT
+    command = nonsensitive(<<-EOT
 set -euo pipefail
 export KUBECONFIG=${var.kubeconfig_path}
-cat <<'EOF' | ${var.tools.kubectl} apply -f -
+cat <<'EOF' | ${var.tools.kubectl} replace --force --grace-period=0 -f -
 ${yamlencode(local.manifest)}
 EOF
 EOT
+)
   }
   provisioner "local-exec" {
     command = self.triggers_replace.command
