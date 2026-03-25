@@ -45,37 +45,37 @@ resource "null_resource" "directpv_install" {
   }
 }
 
-data "external" "directpv_discover" {
-  program = [
-    "bash", "-c", <<-EOT
-      set -euo pipefail
-      OLD_DRIVES_HASH=""
-      if [ -f "${var.data_path}/directpv/drives.yaml" ]; then
-        OLD_DRIVES_HASH="$(sha256sum ${var.data_path}/directpv/drives.yaml | cut -d' ' -f1)"
-      fi
-      export KUBECONFIG=${var.kubeconfig_path}
-      mkdir -p "${var.data_path}/directpv"
-      if ${var.tools.kubectl_directpv} discover --quiet --output-file "${var.data_path}/directpv/drives.yaml" >/dev/null; then
-        echo '{"drives_hash": "'$(sha256sum ${var.data_path}/directpv/drives.yaml | cut -d' ' -f1)'"}'
-      else
-        echo '{"drives_hash": "'$OLD_DRIVES_HASH'"}'
-      fi
-    EOT
-  ]
-}
-
-resource "null_resource" "directpv_init_drives" {
-  triggers = {
-    drives_hash = data.external.directpv_discover.result.drives_hash
-    command = <<-EOT
-      set -euo pipefail
-      if [ -f "${var.data_path}/directpv/drives.yaml" ]; then
-        KUBECONFIG=${var.kubeconfig_path} ${var.tools.kubectl_directpv} init "${var.data_path}/directpv/drives.yaml" --dangerous
-      fi
-    EOT
-  }
-  provisioner "local-exec" {
-    command = self.triggers.command
-    interpreter = ["bash", "-c"]
-  }
-}
+# directpv drive discovery / initialization must be run manually
+# data "external" "directpv_discover" {
+#   program = [
+#     "bash", "-c", <<-EOT
+#       set -euo pipefail
+#       OLD_DRIVES_HASH=""
+#       if [ -f "${var.data_path}/directpv/drives.yaml" ]; then
+#         OLD_DRIVES_HASH="$(sha256sum ${var.data_path}/directpv/drives.yaml | cut -d' ' -f1)"
+#       fi
+#       export KUBECONFIG=${var.kubeconfig_path}
+#       mkdir -p "${var.data_path}/directpv"
+#       if ${var.tools.kubectl_directpv} discover --quiet --output-file "${var.data_path}/directpv/drives.yaml" >/dev/null; then
+#         echo '{"drives_hash": "'$(sha256sum ${var.data_path}/directpv/drives.yaml | cut -d' ' -f1)'"}'
+#       else
+#         echo '{"drives_hash": "'$OLD_DRIVES_HASH'"}'
+#       fi
+#     EOT
+#   ]
+# }
+# resource "null_resource" "directpv_init_drives" {
+#   triggers = {
+#     drives_hash = data.external.directpv_discover.result.drives_hash
+#     command = <<-EOT
+#       set -euo pipefail
+#       if [ -f "${var.data_path}/directpv/drives.yaml" ]; then
+#         KUBECONFIG=${var.kubeconfig_path} ${var.tools.kubectl_directpv} init "${var.data_path}/directpv/drives.yaml" --dangerous
+#       fi
+#     EOT
+#   }
+#   provisioner "local-exec" {
+#     command = self.triggers.command
+#     interpreter = ["bash", "-c"]
+#   }
+# }
