@@ -27,6 +27,8 @@ spec:
         - name: sender
           image: {{ .Values.cwmIac.prometheus_nagios_checks_sender.image | quote }}
           imagePullPolicy: Always
+          args:
+            - "/etc/prometheus-nagios-sender/config.yaml"
           resources:
             requests:
               cpu: "100m"
