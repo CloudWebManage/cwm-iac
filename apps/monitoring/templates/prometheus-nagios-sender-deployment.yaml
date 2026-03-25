@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-nagios-sender
+spec:
+  selector:
+    matchLabels:
+      app: prometheus-nagios-sender
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prometheus-nagios-sender
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
+      volumes:
+        - name: secret
+          secret:
+            secretName: prometheus-nagios-sender-etc
+      containers:
+        - name: sender
+          image: {{ .Values.cwmIac.prometheus_nagios_checks_sender.image | quote }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          volumeMounts:
+            - name: secret
+              mountPath: /etc/prometheus-nagios-sender
+              readOnly: true
+          envFrom:
+            - secretRef:
+                name: prometheus-nagios-sender-env
+          env:
+            - name: SEND_NSCA_BINARY
+              value: "send_nsca"
+            - name: SEND_NSCA_CONFIG
+              value: "/etc/prometheus-nagios-sender/send_nsca.cfg"

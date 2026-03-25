@@ -1,4 +1,4 @@
-name: Docker OpenResty CI
+name: Docker Prometheus Nagios Checks Sender CI
 on:
   push:
     paths:
