@@ -48,3 +48,5 @@ spec:
               value: "send_nsca"
             - name: SEND_NSCA_CONFIG
               value: "/etc/prometheus-nagios-sender/send_nsca.cfg"
+            - name: PYTHONUNBUFFERED
+              value: "1"
