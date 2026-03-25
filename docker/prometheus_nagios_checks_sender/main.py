@@ -36,7 +36,7 @@ def get_instance_name(instance):
 def prom_vector_query(promql, row_key_labels, parse_instance=True):
     res = requests.get(os.path.join(PROM_API_URL, 'v1', 'query'), params={
         'query': promql,
-    })
+    }, timeout=15)
     assert res.status_code == 200
     data = res.json()
     assert data['status'] == 'success'
