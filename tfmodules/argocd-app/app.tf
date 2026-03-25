@@ -12,7 +12,6 @@ locals {
       targetRevision = coalesce(var.targetRevisionFromVersionByName ? lookup(var.versions, "cwm-iac-${var.name}", null) : null, var.targetRevision)
       path           = coalesce(var.path, "apps/${var.name}")
       helm = {
-        valuesObject = {}
         values = yamlencode(var.values)
       }
     }
@@ -24,7 +23,7 @@ locals {
         targetRevision = var.targetRevision
         path           = coalesce(var.path, "apps/${var.name}")
         helm = merge(
-          var.values == null ? {valuesObject = {}, values = "{}"} : { valuesObject = {}, values = yamlencode(var.values) },
+          var.values == null ? {} : {values = yamlencode(var.values)},
           {valueFiles = [for vf in var.configValueFiles : "$configValues/${vf}"]}
         )
       },
