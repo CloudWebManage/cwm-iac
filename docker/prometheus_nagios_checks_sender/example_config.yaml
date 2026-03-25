@@ -1,0 +1,27 @@
+checks:
+  disks:
+    title: "Disk space (bytes)"
+    promqls:
+      size: 'node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}'
+      avail: 'node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}'
+    labels: [instance, device]
+    warning: "avail / size < .2"
+    critical: "avail / size < .1"
+  cpu:
+    title: "CPU load percent"
+    promql_timestamp: 'timestamp(node_cpu_seconds_total{mode="idle",cpu="0"})'
+    promqls:
+      load1: 'node_load1 / on(instance) count(node_cpu_seconds_total{mode="idle"}) by (instance) * 100'
+      load5: 'node_load5 / on(instance) count(node_cpu_seconds_total{mode="idle"}) by (instance) * 100'
+      load15: 'node_load15 / on(instance) count(node_cpu_seconds_total{mode="idle"}) by (instance) * 100'
+    labels: [instance]
+    warning: "load1 > 5 or load5 > 10 or load15 > 15"
+    critical: "load1 > 10 or load5 > 20 or load15 > 30"
+  ram:
+    title: "RAM usage (bytes)"
+    promqls:
+      total: 'node_memory_MemTotal_bytes'
+      available: 'node_memory_MemAvailable_bytes'
+    labels: [instance]
+    warning: "available / total < .85"
+    critical: "available / total < .8"

@@ -1,0 +1,23 @@
+name: Docker OpenResty CI
+on:
+  push:
+    paths:
+      - .github/workflows/docker-prometheus-nagios-checks-sender-ci.yaml
+      - docker/prometheus_nagios_checks_sender/**
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
+        with:
+          image_suffix: cwm-iac-prometheus-nagios-checks-sender
+          context: docker/prometheus_nagios_checks_sender
+          dockerfile: docker/prometheus_nagios_checks_sender/Dockerfile
+          deploy_key_b64: ${{ secrets.CWM_WORKER_CLUSTER_DEPLOY_KEY_B64 }}
+          deploy_file_path: config/auto-updated/cwm-iac/prometheus_nagios_checks_sender.yaml
+          deploy_content_template: |
+            cwmIac:
+              prometheus_nagios_checks_sender:
+                image: "__IMAGE__"
+          deploy_commit_message: "Update cwm-iac/prometheus_nagios_checks_sender"
