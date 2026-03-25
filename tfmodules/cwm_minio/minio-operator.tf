@@ -5,6 +5,8 @@ module "minio_operator" {
   autosync = var.argocd_autosync
   versions = var.versions
   targetRevisionFromVersionByName = true
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = {
     # https://github.com/minio/operator/blob/master/helm/operator/values.yaml
     operator: {

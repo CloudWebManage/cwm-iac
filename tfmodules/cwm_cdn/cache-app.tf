@@ -2,6 +2,8 @@ module "cache-app" {
   source = "../argocd-app"
   name = "cdn-cache"
   create_namespace = false
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = (var.versions["cwm-cdn-api-cache-nginx"] == "latest" || startswith(var.versions["cwm-cdn-api-cache-nginx"], "config/")) ? null : {
     cwmCdnApi = {
       cacheNginx = {

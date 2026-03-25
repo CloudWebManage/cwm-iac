@@ -185,6 +185,8 @@ module "metrics_app" {
   autosync = var.argocd_autosync
   create_namespace = false
   path = "apps/minio-tenant-metrics"
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   targetRevision = var.metrics_app_target_revision
   values = {
     vmagent = {

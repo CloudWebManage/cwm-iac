@@ -13,7 +13,6 @@ locals {
       path           = coalesce(var.path, "apps/${var.name}")
       helm = {
         values = yamlencode(var.values)
-        valuesObject = null
       }
     }
   } : {}
@@ -24,7 +23,7 @@ locals {
         targetRevision = var.targetRevision
         path           = coalesce(var.path, "apps/${var.name}")
         helm = merge(
-          var.values == null ? {valuesObject = null} : {values = yamlencode(var.values), valuesObject = null},
+          var.values == null ? {} : {values = yamlencode(var.values)},
           {valueFiles = [for vf in var.configValueFiles : "$configValues/${vf}"]}
         )
       },
@@ -48,19 +47,6 @@ locals {
     } : {}
   )
   merged_spec = jsondecode(jsonencode(merge(local.base_spec, local.source_spec, local.config_sources_spec, local.sources_spec, local.sync_policy_spec)))
-}
-
-# resource "terraform_data" "debug_app_spec" {
-#   triggers_replace = {
-#     spec = nonsensitive(local.merged_spec)
-#   }
-# }
-
-resource "kubernetes_manifest" "app" {
-  field_manager {
-    name = "cwm-iac-terraform-argocd-app"
-    force_conflicts = true
-  }
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
@@ -70,4 +56,20 @@ resource "kubernetes_manifest" "app" {
     }
     spec = local.merged_spec
   }
+}
+
+resource "terraform_data" "app" {
+  triggers_replace = {
+    command = <<-EOT
+set -euo pipefail
+export KUBECONFIG=${var.kubeconfig_path}
+cat <<'EOF' | ${var.tools.kubectl} apply -f -
+${yamlencode(local.manifest)}
+EOF
+EOT
+  }
+  provisioner "local-exec" {
+    command = self.triggers_replace.command
+    interpreter = ["bash", "-c"]
+   }
 }

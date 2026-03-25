@@ -11,3 +11,11 @@ variable "argocd_autosync" {
   type        = bool
   default     = false
 }
+
+variable "tools" {
+  type = map(string)
+}
+
+variable "kubeconfig_path" {
+  type = string
+}

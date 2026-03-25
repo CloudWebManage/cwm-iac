@@ -5,6 +5,8 @@ module "minio_tenant_main" {
   path = "apps/minio-tenant"
   versions = var.versions
   targetRevisionFromVersionByName = true
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = merge(
     {
       initialize = var.initialize

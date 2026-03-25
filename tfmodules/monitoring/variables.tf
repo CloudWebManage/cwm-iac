@@ -57,3 +57,7 @@ variable "prometheus_nagios_sender_config_yaml" {
   type = string
   default = ""
 }
+
+variable "kubeconfig_path" {
+  type = string
+}

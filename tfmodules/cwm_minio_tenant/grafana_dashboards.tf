@@ -6,6 +6,8 @@ module "tenant-grafana-dashboards-app" {
   versions = var.versions
   targetRevisionFromVersionByName = true
   path = "apps/grafana-dashboards"
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   autosync = var.argocd_autosync
   values = {
     minio = {

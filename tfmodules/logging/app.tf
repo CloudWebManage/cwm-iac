@@ -5,6 +5,8 @@ module "app" {
   autosync = var.argocd_autosync
   versions = var.versions
   targetRevisionFromVersionByName = true
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = {
     tenant = {
       ingress = {

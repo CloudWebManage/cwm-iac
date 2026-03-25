@@ -10,4 +10,6 @@ module "cloudnative_pg" {
       "ServerSideApply=true"
     ]
   }
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
 }

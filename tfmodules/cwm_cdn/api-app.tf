@@ -8,6 +8,8 @@ module "api_app" {
   source = "../argocd-app"
   name = "cdn-api"
   create_namespace = false
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = merge(
     {
       isPrimary = var.is_primary

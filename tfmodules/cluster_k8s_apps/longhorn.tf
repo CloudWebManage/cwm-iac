@@ -43,6 +43,8 @@ module "longhorn-app" {
   namespace = "longhorn-system"
   autosync = var.argocd_autosync
   versions = var.versions
+  kubeconfig_path = var.admin_kubeconfig_path
+  tools = var.tools
   targetRevisionFromVersionByName = true
   values = jsondecode(jsonencode({
     "htpasswdVaultPath" = "${var.vault_path}/longhorn/htpasswd"

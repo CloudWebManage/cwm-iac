@@ -78,3 +78,11 @@ variable "targetRevisionFromVersionByName" {
   type = bool
   default = false
 }
+
+variable "tools" {
+  type = map(string)
+}
+
+variable "kubeconfig_path" {
+  type = string
+}

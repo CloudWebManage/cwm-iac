@@ -4,6 +4,8 @@ module "app" {
   create_namespace = false
   versions = var.versions
   targetRevisionFromVersionByName = true
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = {
     "kube-prometheus-stack" = {
       alertmanager = {

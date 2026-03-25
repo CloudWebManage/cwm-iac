@@ -7,6 +7,8 @@ module "etcd" {
   versions = var.versions
   targetRevisionFromVersionByName = true
   autosync = var.argocd_autosync
+  tools = var.tools
+  kubeconfig_path = var.kubeconfig_path
   values = {
     etcd = {
       tolerations = [

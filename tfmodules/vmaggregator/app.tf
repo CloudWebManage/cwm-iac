@@ -10,6 +10,8 @@ module "app" {
   source = "../argocd-app"
   name = "vmaggregator"
   create_namespace = false
+  tools = var.tools
+  kubeconfig_path = var.admin_kubeconfig_path
   values = {}
   sync_policy = {
     # automated = {
