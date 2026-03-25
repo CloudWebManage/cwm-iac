@@ -12,7 +12,7 @@ locals {
       targetRevision = coalesce(var.targetRevisionFromVersionByName ? lookup(var.versions, "cwm-iac-${var.name}", null) : null, var.targetRevision)
       path           = coalesce(var.path, "apps/${var.name}")
       helm = {
-        valuesObject = var.values
+        values = yamlencode(var.values)
       }
     }
   } : {}
@@ -23,7 +23,7 @@ locals {
         targetRevision = var.targetRevision
         path           = coalesce(var.path, "apps/${var.name}")
         helm = merge(
-          var.values == null ? {} : { valuesObject = var.values },
+          var.values == null ? {} : { values = yamlencode(var.values) },
           {valueFiles = [for vf in var.configValueFiles : "$configValues/${vf}"]}
         )
       },
@@ -46,7 +46,14 @@ locals {
       syncPolicy = var.sync_policy
     } : {}
   )
+  merged_spec = jsondecode(jsonencode(merge(local.base_spec, local.source_spec, local.config_sources_spec, local.sources_spec, local.sync_policy_spec)))
 }
+
+# resource "terraform_data" "debug_app_spec" {
+#   triggers_replace = {
+#     spec = nonsensitive(local.merged_spec)
+#   }
+# }
 
 resource "kubernetes_manifest" "app" {
   field_manager {
@@ -60,6 +67,6 @@ resource "kubernetes_manifest" "app" {
       name      = var.name
       namespace = "argocd"
     }
-    spec = jsondecode(jsonencode(merge(local.base_spec, local.source_spec, local.config_sources_spec, local.sources_spec, local.sync_policy_spec)))
+    spec = local.merged_spec
   }
 }

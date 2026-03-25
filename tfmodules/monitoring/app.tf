@@ -63,6 +63,10 @@ module "app" {
       }
     }
   }
+  configSource = var.argocdConfigSource
+  configValueFiles = startswith(var.versions["cwm-iac-prometheus-nagios-sender"], "config/") ? [
+    "${var.versions["cwm-iac-prometheus-nagios-sender"]}/cwm-iac/prometheus_nagios_checks_sender.yaml"
+  ] : null
   autosync = var.argocd_autosync
   sync_policy = {
     syncOptions = [

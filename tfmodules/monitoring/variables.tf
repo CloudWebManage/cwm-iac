@@ -37,3 +37,23 @@ variable "argocd_autosync" {
   type    = bool
   default = false
 }
+
+variable "argocdConfigSource" {
+  type = any
+  default = {}
+}
+
+variable "send_nsca_cfg" {
+  type = string
+  default = ""
+}
+
+variable "send_nsca_host" {
+  type = string
+  default = ""
+}
+
+variable "prometheus_nagios_sender_config_yaml" {
+  type = string
+  default = ""
+}
