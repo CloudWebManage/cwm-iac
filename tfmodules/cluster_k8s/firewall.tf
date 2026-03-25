@@ -1,5 +1,8 @@
 resource "kubernetes_manifest" "firewall_calico_hostendpoint-internal" {
   for_each = var.server_network_interfaces
+  field_manager {
+    force_conflicts = true
+  }
   manifest = {
     apiVersion = "crd.projectcalico.org/v1"
     kind = "HostEndpoint"
@@ -43,6 +46,9 @@ resource "kubernetes_manifest" "firewall_calico_hostendpoint-external" {
 
 resource "kubernetes_manifest" "firewall_global_network_policies" {
   for_each = var.firewall_global_network_policies
+  field_manager {
+    force_conflicts = true
+  }
   manifest = {
     apiVersion = "crd.projectcalico.org/v1"
     kind = "GlobalNetworkPolicy"
