@@ -18,6 +18,23 @@ locals {
         spec:
           template:
             spec:
+              containers:
+              - name: manager
+                env:
+                - name: WATCH_NAMESPACE
+                  value: "vmaggregator"
+                - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
+                  value: "false"
+                - name: VM_ENABLEDPROMETHEUSCONVERTER_SERVICESCRAPE
+                  value: "false"
+                - name: VM_ENABLEDPROMETHEUSCONVERTER_PROMETHEUSRULE
+                  value: "false"
+                - name: VM_ENABLEDPROMETHEUSCONVERTER_PROBE
+                  value: "false"
+                - name: VM_ENABLEDPROMETHEUSCONVERTER_ALERTMANAGERCONFIG
+                  value: "false"
+                - name: VM_ENABLEDPROMETHEUSCONVERTER_SCRAPECONFIG
+                  value: "false"
               tolerations:
               - key: "cwm-iac-worker-role"
                 operator: "Equal"
