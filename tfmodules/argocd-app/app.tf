@@ -13,6 +13,7 @@ locals {
       path           = coalesce(var.path, "apps/${var.name}")
       helm = {
         values = yamlencode(var.values)
+        valuesObject = null
       }
     }
   } : {}
@@ -23,7 +24,7 @@ locals {
         targetRevision = var.targetRevision
         path           = coalesce(var.path, "apps/${var.name}")
         helm = merge(
-          var.values == null ? {} : {values = yamlencode(var.values)},
+          var.values == null ? {valuesObject = null} : {values = yamlencode(var.values), valuesObject = null},
           {valueFiles = [for vf in var.configValueFiles : "$configValues/${vf}"]}
         )
       },
@@ -70,3 +71,20 @@ resource "kubernetes_manifest" "app" {
     spec = local.merged_spec
   }
 }
+
+# resource "terraform_data" "validate_app" {
+#   triggers_replace = {
+#     spec = local.merged_spec
+#     command = <<-EOT
+# set -euo pipefail
+# if cat <<-EOF | grep valuesObject; then echo valuesObject is not supported must use values; exit 1; fi
+# ${jsonencode(kubernetes_manifest.app.object.spec)}
+# EOF
+# echo spec is valid
+# EOT
+#   }
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command = self.triggers_replace.command
+#   }
+# }
