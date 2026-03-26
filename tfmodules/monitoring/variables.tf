@@ -61,3 +61,13 @@ variable "prometheus_nagios_sender_config_yaml" {
 variable "kubeconfig_path" {
   type = string
 }
+
+variable "slack_alerts_channel" {
+  type = string
+  default = "cwm-alerts"
+}
+
+variable "slack_alerts_watchdog_channel" {
+  type = string
+  default = "cwm-watchdog"
+}

@@ -29,7 +29,7 @@ module "app" {
               slack_configs = [
                 {
                   api_url = var.slack_alerts_webhook_url
-                  channel = "#cwm-alerts"
+                  channel = "#${var.slack_alerts_channel}"
                   send_resolved = true
                   text = <<-EOT
                     ${var.cluster_name}
@@ -49,7 +49,7 @@ module "app" {
               slack_configs = [
                 {
                   api_url = var.slack_alerts_watchdog_webhook_url
-                  channel = "#cloudwm-watchdog"
+                  channel = "#${var.slack_alerts_watchdog_channel}"
                   send_resolved = false
                   text = var.cluster_name
                 }
