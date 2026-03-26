@@ -19,6 +19,7 @@ SEND_NSCA_HOST = os.getenv("SEND_NSCA_HOST")
 STALENESS_THRESHOLD_SECONDS = int(os.getenv("STALENESS_THRESHOLD_SECONDS", "120"))
 DAEMON_ITERATIONS_TTL = int(os.getenv("DAEMON_ITERATIONS_TTL", "60"))
 CLUSTER_INSTANCE_NAME = os.getenv("CLUSTER_INSTANCE_NAME", "cwmc-local")
+SEND_NSCA_DEBUG = os.getenv("SEND_NSCA_DEBUG") == 'yes'
 
 
 @functools.lru_cache()
@@ -138,14 +139,18 @@ def send_nsca(data):
     for line in data:
         assert len(line) in [3,4], f'invalid nsca line: {line}'
         input_lines.append("\t".join([str(item).replace("\t", " ").replace("\n", " ") for item in line]))
+    input = "\n".join(input_lines) + "\n"
+    if SEND_NSCA_DEBUG:
+        print(input)
     p = subprocess.run(
         [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
-        input="\n".join(input_lines) + "\n",
+        input=input,
         text=True, stdout=subprocess.PIPE
     )
     assert p.returncode == 0, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
     assert p.stdout.strip().startswith(f'{len(input_lines)} data packet(s) sent to host successfully.'), f'unexpected send_nsca output: {p.stdout}'
-    print(p.stdout.strip())
+    if SEND_NSCA_DEBUG:
+        print(p.stdout.strip())
 
 
 def get_nsca_returncode(state):
@@ -157,24 +162,24 @@ def get_nsca_returncode(state):
 
 
 def check_all_send(config):
+    checked_ids = set()
     for check_id in config['checks']:
-        print(f'checking {check_id}...')
         nsca_data = []
         for hostname, state, msg in get_check_states(config, check_id):
             nsca_data.append([
                 hostname, f'cwmc-{check_id}', get_nsca_returncode(state), msg
             ])
         send_nsca(nsca_data)
+        checked_ids.add(check_id)
+    print(datetime.datetime.now().isoformat(), f'checked ids: {checked_ids}')
 
 
 def daemon_iteration(config, state):
     if state['last_check'] is None or time.time() - state['last_check'] > DAEMON_ITERATIONS_TTL:
         state['last_check'] = time.time()
-        print(datetime.datetime.now().isoformat(), 'Starting checks...')
         state['in_progress'] = True
         check_all_send(config)
         state['in_progress'] = False
-        print(datetime.datetime.now().isoformat(), 'Done checks')
 
 
 def daemon(config):
