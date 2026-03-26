@@ -17,5 +17,6 @@ resource "kubernetes_secret" "prometheus_nagios_sender_env" {
   data = {
     PROM_API_URL = "http://${module.monitoring_htpasswd.username}:${module.monitoring_htpasswd.password}@monitoring-kube-prometheus-prometheus:9090/api"
     SEND_NSCA_HOST = var.send_nsca_host
+    CLUSTER_INSTANCE_NAME = var.cluster_name
   }
 }
