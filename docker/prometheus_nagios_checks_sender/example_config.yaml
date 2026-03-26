@@ -25,3 +25,11 @@ checks:
     labels: [instance]
     warning: "available / total < .85"
     critical: "available / total < .8"
+  volumes:
+    title: "Kubernetes Persistent Volumes (bytes)"
+    promqls:
+      size: 'kubelet_volume_stats_available_bytes'
+      avail: 'kubelet_volume_stats_capacity_bytes'
+    labels: [persistentvolumeclaim]
+    warning: "avail / size < .2"
+    critical: "avail / size < .1"

@@ -3,7 +3,7 @@ import os
 import time
 import functools
 import json
-from typing import Iterable
+import types
 import subprocess
 import signal
 import datetime
@@ -18,6 +18,7 @@ SEND_NSCA_CONFIG = os.getenv("SEND_NSCA_CONFIG")
 SEND_NSCA_HOST = os.getenv("SEND_NSCA_HOST")
 STALENESS_THRESHOLD_SECONDS = int(os.getenv("STALENESS_THRESHOLD_SECONDS", "120"))
 DAEMON_ITERATIONS_TTL = int(os.getenv("DAEMON_ITERATIONS_TTL", "60"))
+CLUSTER_INSTANCE_NAME = os.getenv("CLUSTER_INSTANCE_NAME", "cwmc-local")
 
 
 @functools.lru_cache()
@@ -61,22 +62,22 @@ def update_rows_staleness(instance, row_val, rows):
 
 
 def get_check_rows(promqls, labels, promql_timestamp):
-    assert 'instance' in labels, f'Invalid labels, missing instance: {labels}'
+    has_instance = 'instance' in labels
     rows = {}
     for promql_name, promql in promqls.items():
         for row_key, row_val in prom_vector_query(promql, labels):
-            instance = row_key.pop('instance')
+            instance = row_key.pop('instance') if has_instance else CLUSTER_INSTANCE_NAME
             if len(row_key) == 0:
                 rows.setdefault(instance, {}).setdefault('.', {})[promql_name] = row_val
             else:
                 rows.setdefault(instance, {}).setdefault(",".join([f'{k}={v}' for k, v in row_key.items()]), {})[promql_name] = row_val
         if not promql_timestamp:
             for row_key, row_val in prom_vector_query(f'timestamp({promql})', labels):
-                instance = row_key.pop('instance')
+                instance = row_key.pop('instance') if has_instance else CLUSTER_INSTANCE_NAME
                 update_rows_staleness(instance, row_val, rows)
     if promql_timestamp:
         for row_key, row_val in prom_vector_query(promql_timestamp, labels):
-            instance = row_key.pop('instance')
+            instance = row_key.pop('instance') if has_instance else CLUSTER_INSTANCE_NAME
             update_rows_staleness(instance, row_val, rows)
     return rows
 
@@ -95,6 +96,7 @@ def has_check_state(data, state_eval):
 def get_check_states(config, check_id):
     check = config['checks'][check_id]
     rows = get_check_rows(check['promqls'], check['labels'], check.get('promql_timestamp'))
+    has_instance = 'instance' in check['labels']
     checked_instances = set()
     for instance, data in rows.items():
         checked_instances.add(instance)
@@ -111,7 +113,7 @@ def get_check_states(config, check_id):
                     check_state = state
                     check_msgs.append(f'state {state} because {check_state_msg}')
                     break
-            if len(check['labels']) > 1:
+            if (has_instance and len(check['labels']) > 1) or (not has_instance and len(check['labels']) > 0):
                 for valsk in data:
                     if not valsk.startswith("__"):
                         check_msgs.append(
@@ -119,9 +121,10 @@ def get_check_states(config, check_id):
             else:
                 check_msgs.append(' '.join([f'{k}={data["."].get(k)}' for k in check['promqls'].keys()]))
         yield instance, check_state, ', '.join(check_msgs)
-    for hostname in get_instances().values():
-        if hostname not in checked_instances:
-            yield hostname, 'critical', f'{check["title"]}, instance is missing from metrics'
+    if has_instance:
+        for hostname in get_instances().values():
+            if hostname not in checked_instances:
+                yield hostname, 'critical', f'{check["title"]}, instance is missing from metrics'
 
 
 # data is a list of lists, where each list is either:
@@ -200,7 +203,7 @@ def main(*args):
         res = globals()[args[0]](config, *args[2:])
     else:
         res = globals()[args[0]](*args[1:])
-    if isinstance(res, Iterable):
+    if isinstance(res, types.GeneratorType):
         print('[')
         for i, o in enumerate(res):
             if i > 0:
