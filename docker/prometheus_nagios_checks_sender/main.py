@@ -38,7 +38,7 @@ def prom_vector_query(promql, row_key_labels, parse_instance=True):
     res = requests.get(os.path.join(PROM_API_URL, 'v1', 'query'), params={
         'query': promql,
     }, timeout=15)
-    assert res.status_code == 200
+    assert res.status_code == 200, res.content
     data = res.json()
     assert data['status'] == 'success'
     assert data['data']['resultType'] == 'vector'
@@ -88,8 +88,11 @@ def has_check_state(data, state_eval):
             for k, v in data[valsk].items():
                 if not k.startswith('__'):
                     locals()[k] = v
-            if eval(state_eval):
-                return state_eval
+            try:
+                if eval(state_eval):
+                    return state_eval
+            except Exception as e:
+                raise Exception(f'failed to evaluate expression:\n{state_eval}\nfor labels:\n{valsk}\nwith data:\n{data[valsk]}') from e
     return None
 
 
