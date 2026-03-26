@@ -9,7 +9,7 @@ prometheus:
     persistentVolume:
       storageClass: longhorn
 
-    retention: "365d"
+    retention: "2d"
 
   serverFiles:
     prometheus.yml:
