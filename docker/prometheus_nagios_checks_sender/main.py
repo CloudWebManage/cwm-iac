@@ -171,7 +171,7 @@ def check_all_send(config):
         nsca_data = []
         for hostname, state, msg in get_check_states(config, check_id):
             nsca_data.append([
-                hostname, f'cwmc-{check_id}', get_nsca_returncode(state), msg
+                hostname, check_id, get_nsca_returncode(state), msg
             ])
         send_nsca(nsca_data)
         checked_ids.add(check_id)
