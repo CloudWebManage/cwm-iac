@@ -7,6 +7,7 @@ module "app" {
   tools = var.tools
   kubeconfig_path = var.kubeconfig_path
   values = {
+    "prometheusNagiosSender" = var.prometheusNagiosSenderConfigValues
     "kube-prometheus-stack" = {
       alertmanager = {
         alertmanagerSpec = {

@@ -58,6 +58,15 @@ variable "prometheus_nagios_sender_config_yaml" {
   default = ""
 }
 
+variable "prometheusNagiosSenderConfigValues" {
+  type = any
+  default = {
+    enabled = false
+    debug = false
+    dryRun = false
+  }
+}
+
 variable "kubeconfig_path" {
   type = string
 }

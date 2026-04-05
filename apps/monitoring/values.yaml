@@ -1,4 +1,5 @@
 prometheusNagiosSender:
+  enabled: false
   debug: false
   dryRun: false
 
