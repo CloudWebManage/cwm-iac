@@ -50,3 +50,11 @@ spec:
               value: "/etc/prometheus-nagios-sender/send_nsca.cfg"
             - name: PYTHONUNBUFFERED
               value: "1"
+            {{ if .Values.prometheusNagiosSender.debug }}
+            - name: SEND_NSCA_DEBUG
+              value: "yes"
+            {{ end }}
+            {{ if .Values.prometheusNagiosSender.dryRun }}
+            - name: SEND_NSCA_DRY_RUN
+              value: "yes"
+            {{ end }}

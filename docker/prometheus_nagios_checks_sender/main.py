@@ -20,6 +20,7 @@ STALENESS_THRESHOLD_SECONDS = int(os.getenv("STALENESS_THRESHOLD_SECONDS", "120"
 DAEMON_ITERATIONS_TTL = int(os.getenv("DAEMON_ITERATIONS_TTL", "60"))
 CLUSTER_INSTANCE_NAME = os.getenv("CLUSTER_INSTANCE_NAME", "cwmc-local")
 SEND_NSCA_DEBUG = os.getenv("SEND_NSCA_DEBUG") == 'yes'
+SEND_NSCA_DRY_RUN = os.getenv("SEND_NSCA_DRY_RUN") == 'yes'
 
 
 @functools.lru_cache()
@@ -142,15 +143,18 @@ def send_nsca(data):
     input = "\n".join(input_lines) + "\n"
     if SEND_NSCA_DEBUG:
         print(input)
-    p = subprocess.run(
-        [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
-        input=input,
-        text=True, stdout=subprocess.PIPE
-    )
-    assert p.returncode == 0, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
-    assert p.stdout.strip().startswith(f'{len(input_lines)} data packet(s) sent to host successfully.'), f'unexpected send_nsca output: {p.stdout}'
-    if SEND_NSCA_DEBUG:
-        print(p.stdout.strip())
+    if SEND_NSCA_DRY_RUN:
+        print('dry run, not sending nsca data')
+    else:
+        p = subprocess.run(
+            [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
+            input=input,
+            text=True, stdout=subprocess.PIPE
+        )
+        assert p.returncode == 0, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
+        assert p.stdout.strip().startswith(f'{len(input_lines)} data packet(s) sent to host successfully.'), f'unexpected send_nsca output: {p.stdout}'
+        if SEND_NSCA_DEBUG:
+            print(p.stdout.strip())
 
 
 def get_nsca_returncode(state):

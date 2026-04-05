@@ -1,3 +1,7 @@
+prometheusNagiosSender:
+  debug: false
+  dryRun: false
+
 x-tolerations: &tolerations
   - key: "cwm-iac-worker-role"
     operator: "Equal"
