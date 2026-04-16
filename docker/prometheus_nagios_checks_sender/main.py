@@ -132,6 +132,28 @@ def get_check_states(config, check_id):
                 yield hostname, 'critical', f'{check["title"]}, instance is missing from metrics'
 
 
+def run_send_nsca(input_line, try_num=1, max_tries=5):
+    p = subprocess.run(
+        [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
+        input=input_line,
+        text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    if SEND_NSCA_DEBUG:
+        print(p.stdout.strip())
+    if p.returncode == 0:
+        if p.stdout.strip().startswith('1 data packet(s) sent to host successfully.'):
+            return True, None
+        else:
+            return False, f'unexpected output for input_line "{input_line.strip()}"\n{p.stdout.strip()}'
+    elif p.returncode == 2 and p.stdout.strip().startswith('Error: Timeout') and try_num < max_tries:
+        print(p.stdout.strip())
+        print("Retrying in 5 seconds... ({try_num}/{max_tries})")
+        time.sleep(5)
+        return run_send_nsca(input_line, try_num+1, max_tries)
+    else:
+        return False, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
+
+
 # data is a list of lists, where each list is either:
 # Service Check: <host_name>, <svc_description>, <return_code>, <plugin_output>
 # Host Check: <host_name>, <return_code>, <plugin_output>
@@ -150,16 +172,9 @@ def send_nsca(data):
                 print(input_line)
             input_line = input_line + "\n"
             if not SEND_NSCA_DRY_RUN:
-                p = subprocess.run(
-                    [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
-                    input=input_line,
-                    text=True, stdout=subprocess.PIPE
-                )
-                assert p.returncode == 0, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
-                if not p.stdout.strip().startswith('1 data packet(s) sent to host successfully.'):
-                    errors.append(f'unexpected output for input_line "{input_line.strip()}"\n{p.stdout.strip()}')
-                if SEND_NSCA_DEBUG:
-                    print(p.stdout.strip())
+                success, error_msg = run_send_nsca(input_line)
+                if not success:
+                    errors.append(error_msg)
     assert len(errors) == 0, "\n".join(errors)
 
 
