@@ -140,21 +140,27 @@ def send_nsca(data):
     for line in data:
         assert len(line) in [3,4], f'invalid nsca line: {line}'
         input_lines.append("\t".join([str(item).replace("\t", " ").replace("\n", " ") for item in line]))
-    input = "\n".join(input_lines) + "\n"
-    if SEND_NSCA_DEBUG:
-        print(input)
     if SEND_NSCA_DRY_RUN:
         print('dry run, not sending nsca data')
-    else:
-        p = subprocess.run(
-            [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
-            input=input,
-            text=True, stdout=subprocess.PIPE
-        )
-        assert p.returncode == 0, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
-        assert p.stdout.strip().startswith(f'{len(input_lines)} data packet(s) sent to host successfully.'), f'unexpected send_nsca output: {p.stdout}'
-        if SEND_NSCA_DEBUG:
-            print(p.stdout.strip())
+    errors = []
+    for input_line in input_lines:
+        input_line = input_line.strip()
+        if input_line:
+            if SEND_NSCA_DEBUG:
+                print(input_line)
+            input_line = input_line + "\n"
+            if not SEND_NSCA_DRY_RUN:
+                p = subprocess.run(
+                    [SEND_NSCA_BINARY, "-c", SEND_NSCA_CONFIG, "-H", SEND_NSCA_HOST],
+                    input=input_line,
+                    text=True, stdout=subprocess.PIPE
+                )
+                assert p.returncode == 0, f'send_nsca failed with exit code {p.returncode}\n{p.stdout}'
+                if not p.stdout.strip().startswith('1 data packet(s) sent to host successfully.'):
+                    errors.append(f'unexpected output for input_line "{input_line.strip()}"\n{p.stdout.strip()}')
+                if SEND_NSCA_DEBUG:
+                    print(p.stdout.strip())
+    assert len(errors) == 0, "\n".join(errors)
 
 
 def get_nsca_returncode(state):
