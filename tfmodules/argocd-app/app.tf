@@ -6,27 +6,26 @@ locals {
     }
     project = var.project
   }
+  default_base_source = {
+    repoURL        = "https://github.com/CloudWebManage/cwm-iac"
+    targetRevision = coalesce(var.targetRevisionFromVersionByName ? lookup(var.versions, "cwm-iac-${var.name}", null) : null, var.targetRevision)
+    path           = coalesce(var.path, "apps/${var.name}")
+  }
   source_spec = (var.sources == null && var.configValueFiles == null) ? {
-    source = {
-      repoURL        = "https://github.com/CloudWebManage/cwm-iac"
-      targetRevision = coalesce(var.targetRevisionFromVersionByName ? lookup(var.versions, "cwm-iac-${var.name}", null) : null, var.targetRevision)
-      path           = coalesce(var.path, "apps/${var.name}")
+    source = merge(local.default_base_source, {
       helm = {
         values = yamlencode(var.values)
       }
-    }
+    })
   } : {}
   config_sources_spec = (var.configValueFiles != null && var.configSource != null) ? {
     sources = [
-      {
-        repoURL        = "https://github.com/CloudWebManage/cwm-iac"
-        targetRevision = var.targetRevision
-        path           = coalesce(var.path, "apps/${var.name}")
+      merge(local.default_base_source, {
         helm = merge(
           var.values == null ? {} : {values = yamlencode(var.values)},
           {valueFiles = [for vf in var.configValueFiles : "$configValues/${vf}"]}
         )
-      },
+      }),
       merge(var.configSource, {ref = "configValues"})
     ]
   } : {}
