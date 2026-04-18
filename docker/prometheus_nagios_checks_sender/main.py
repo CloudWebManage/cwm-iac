@@ -146,8 +146,9 @@ def run_send_nsca(input_line, try_num=1, max_tries=5):
         else:
             return False, f'unexpected output for input_line "{input_line.strip()}"\n{p.stdout.strip()}'
     elif p.returncode == 2 and p.stdout.strip().startswith('Error: Timeout') and try_num < max_tries:
-        print(p.stdout.strip())
-        print("Retrying in 5 seconds... ({try_num}/{max_tries})")
+        if SEND_NSCA_DEBUG:
+            print(p.stdout.strip())
+            print("Retrying in 5 seconds... ({try_num}/{max_tries})")
         time.sleep(5)
         return run_send_nsca(input_line, try_num+1, max_tries)
     else:
@@ -191,12 +192,15 @@ def check_all_send(config):
     for check_id in config['checks']:
         nsca_data = []
         for hostname, state, msg in get_check_states(config, check_id):
+            if state in ['warning', 'critical']:
+                print(state, hostname, msg)
             nsca_data.append([
                 hostname, check_id, get_nsca_returncode(state), msg
             ])
         send_nsca(nsca_data)
         checked_ids.add(check_id)
-    print(datetime.datetime.now().isoformat(), f'checked ids: {checked_ids}')
+    if SEND_NSCA_DEBUG:
+        print(datetime.datetime.now().isoformat(), f'checked ids: {checked_ids}')
 
 
 def daemon_iteration(config, state):

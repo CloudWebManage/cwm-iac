@@ -5,4 +5,5 @@ WORKDIR /srv
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY main.py .
+ENV PYTHONUNBUFFERED=1
 ENTRYPOINT ["/usr/local/bin/python", "/srv/main.py", "daemon"]
