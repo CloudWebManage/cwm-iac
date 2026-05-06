@@ -19,5 +19,5 @@ module "cache-app" {
       "${var.versions["cwm-cdn-api-cache-nginx"]}/cwm-cdn-api/cache-nginx.yaml"
     ] : []
   )
-  autosync = true
+  autosync = var.argocd_autosync
 }

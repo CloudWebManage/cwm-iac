@@ -89,3 +89,8 @@ variable "cdn_operator_log_level" {
   type = string
   default = "1"
 }
+
+variable "argocd_autosync" {
+  type = bool
+  default = false
+}

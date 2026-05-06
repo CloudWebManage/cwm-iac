@@ -35,7 +35,7 @@ module "api_app" {
     "${var.versions["cwm-cdn-api"]}/cwm-cdn-api/api.yaml"
     ] : []
   )
-  autosync = true
+  autosync = var.argocd_autosync
 }
 
 resource "random_password" "primary_key" {

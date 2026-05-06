@@ -19,5 +19,5 @@ module "edge-app" {
       "${var.versions["cwm-cdn-edge-openresty"]}/cwm-iac/openresty.yaml"
     ] : null
   )
-  autosync = true
+  autosync = var.argocd_autosync
 }
