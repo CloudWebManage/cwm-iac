@@ -72,3 +72,8 @@ variable "firewall_global_network_policies" {
   type = any
   default = {}
 }
+
+variable "rke2_ingress_nginx_http_snippet" {
+  type = string
+  default = ""
+}

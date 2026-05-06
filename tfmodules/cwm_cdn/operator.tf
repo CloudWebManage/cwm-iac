@@ -21,6 +21,13 @@ locals {
             value:
               - name: CWM_CDN_TENANT_DEFAULT_IMAGE
                 value: "ghcr.io/cloudwebmanage/cwm-cdn-api-tenant-nginx:${var.versions["cwm-cdn-api-tenant-nginx"]}"
+          - op: replace
+            path: /spec/template/spec/containers/0/args
+            value:
+              - --metrics-bind-address=:8443
+              - --leader-elect
+              - --health-probe-bind-address=:8081
+              - --zap-log-level=${var.cdn_operator_log_level}
   EOT
 }
 

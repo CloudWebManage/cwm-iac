@@ -51,6 +51,7 @@ module "longhorn-app" {
     longhorn = {
       ingress = {
         host = "longhorn.${var.ingress_star_domain}"
+        tls = true
       }
       global = {
         tolerations = [

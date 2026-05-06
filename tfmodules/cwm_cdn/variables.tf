@@ -84,3 +84,8 @@ variable "vmagentRemoteWriteConfig" {
   type = any
   default = {}
 }
+
+variable "cdn_operator_log_level" {
+  type = string
+  default = "1"
+}

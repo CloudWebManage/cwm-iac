@@ -140,9 +140,8 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
             annotations-risk-level: "Critical"
             # this is required for cert-manager, see https://cert-manager.io/docs/releases/release-notes/release-notes-1.18/
             strict-validate-path-type: false
-            # this is for minio ingresses
             http-snippet: |
-              limit_req_zone $host$binary_remote_addr zone=cwminio:50m rate=5000r/s;
+              ${var.rke2_ingress_nginx_http_snippet}
           extraArgs:
             "metrics-per-host": "false"
             "time-buckets": "0.1,0.25,0.5,1,2.5,5,10,25,50,120,360"
