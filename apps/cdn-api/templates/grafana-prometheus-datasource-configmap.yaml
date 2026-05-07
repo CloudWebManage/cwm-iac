@@ -9,6 +9,6 @@ data:
   datasource.yaml: |
     apiVersion: 1
     datasources:
-      - name: cdn-prometheus
+      - name: cdn-prom
         type: prometheus
         url: http://cdn-api-prometheus-server.cdn-api:80/
