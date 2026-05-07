@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-datasource-loki
+  name: grafana-datasource-cdn-prom
   namespace: monitoring
   labels:
     grafana_datasource: "1"
@@ -11,4 +11,4 @@ data:
     datasources:
       - name: cdn-prometheus
         type: prometheus
-        url: http://cdn-api-prometheus-server.cdn-api/
+        url: http://cdn-api-prometheus-server.cdn-api:80/
