@@ -11,4 +11,4 @@ data:
     datasources:
       - name: cdn-prometheus
         type: prometheus
-        url: http://cdn-api-prometheus-server.cdn-api:9090/
+        url: http://cdn-api-prometheus-server.cdn-api/
