@@ -32,7 +32,9 @@ kube-prometheus-stack:
 
   grafana:
     tolerations: *tolerations
-    prune: true
+    deleteDatasources:
+      - name: "cdn-prometheus"
+        orgId: 1
     resources:
       requests:
         cpu: 500m
