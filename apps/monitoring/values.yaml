@@ -32,6 +32,7 @@ kube-prometheus-stack:
 
   grafana:
     tolerations: *tolerations
+    prune: true
     resources:
       requests:
         cpu: 500m
