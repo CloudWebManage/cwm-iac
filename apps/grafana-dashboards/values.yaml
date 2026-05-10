@@ -11,3 +11,7 @@ minio:
 nginxIngress:
   enabled: false
   grafanaFolder: "NginxIngress"
+
+cdn:
+  enabled: false
+  grafanaFolder: "CDN"

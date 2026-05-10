@@ -2,12 +2,15 @@
 
 set -euo pipefail
 
+. /root/locust.env
+. $1
+
+LOCUST_DOCKER_IMAGE="${LOCUST_DOCKER_IMAGE:-ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest}"
+
 docker rm -f redis || true
 docker rm -f locust || true
 docker network create locust || true
-docker pull ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest
-
-. $1
+docker pull $LOCUST_DOCKER_IMAGE
 
 mkdir -p "${2}"
 chmod -R 777 "${2}"
@@ -23,7 +26,7 @@ docker run --name locust --network locust \
   -e SHARED_STATE_REDIS_HOST=redis \
   -v "${2}:/tmp/data" \
   -e CWM_INIT_FROM_JSON_FILE \
-  ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest \
+  $LOCUST_DOCKER_IMAGE \
   --master $LOCUST_MAIN_ARGS --csv /tmp/data/report
 
 if [ "$(docker exec locust bash -c 'echo $MINIO_API_URL')" != "" ]; then

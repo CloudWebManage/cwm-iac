@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+. /root/locust.env
+. $1
+
+LOCUST_DOCKER_IMAGE="${LOCUST_DOCKER_IMAGE:-ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest}"
+
 docker rm -f locust || true
-docker pull ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest
+docker pull $LOCUST_DOCKER_IMAGE
 
 systemctl restart locust-ssh-tunnel
-
-. $1
 
 mkdir -p "${2}"
 chmod -R 777 "${2}"
@@ -20,5 +23,5 @@ docker run --name locust \
   -e SHARED_STATE_REDIS_HOST=172.17.0.1 \
   -v "${2}:/tmp/data" \
   -e CWM_INIT_FROM_JSON_FILE \
-  ghcr.io/cloudwebmanage/cwm-minio-api-locust:latest \
+  $LOCUST_DOCKER_IMAGE \
   --worker --master-host 172.17.0.1 $LOCUST_WORKER_ARGS
