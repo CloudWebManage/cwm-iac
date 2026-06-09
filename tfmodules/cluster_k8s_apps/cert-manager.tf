@@ -71,30 +71,6 @@ resource "local_file" "certmanager_cluster_issuer" {
         }
         solvers = [
           {
-            selector = {
-              matchLabels = {
-                "cdn.cloudwm-cdn.com/acme-http01-solver" = "true"
-              }
-            }
-            http01 = {
-              ingress = {
-                ingressClassName: "nginx"
-                podTemplate = {
-                  spec = {
-                    tolerations = [
-                      {
-                        key      = "cwm-iac-worker-role"
-                        operator = "Equal"
-                        value    = "system"
-                        effect   = "NoExecute"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          {
             dns01 = {
               route53 = {
                 region = var.aws_route53_region

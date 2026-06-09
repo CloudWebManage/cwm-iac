@@ -94,3 +94,7 @@ variable "argocd_autosync" {
   type = bool
   default = false
 }
+
+variable "tenant_certs_letsencrypt_email" {
+  type = string
+}
