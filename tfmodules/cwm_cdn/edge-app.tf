@@ -3,6 +3,7 @@ module "edge-app" {
   name = "cdn-edge"
   create_namespace = false
   tools = var.tools
+  versions = var.versions
   kubeconfig_path = var.kubeconfig_path
   values = (var.versions["cwm-cdn-edge-openresty"] == "latest" || startswith(var.versions["cwm-cdn-edge-openresty"], "config/")) ? null : {
     cwmIac = {
