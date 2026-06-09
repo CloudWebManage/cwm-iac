@@ -20,4 +20,5 @@ module "edge-app" {
     ] : null
   )
   autosync = var.argocd_autosync
+  targetRevisionFromVersionByName = true
 }
