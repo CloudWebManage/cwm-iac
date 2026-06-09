@@ -1,4 +1,5 @@
 cdnApiImage: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"
+acmeHttp01Upstream: "http://rke2-ingress-nginx-controller.kube-system.svc.cluster.local:80"
 
 cwmIac:
   openresty:
