@@ -3,3 +3,10 @@ cdnApiImage: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"
 cwmIac:
   openresty:
     image: "ghcr.io/cloudwebmanage/cwm-iac-openresty:latest"
+
+acmeHttp01:
+  # these are the defaults for the primary cluster
+  # for secondary clusters it will be changed to upstream to the primary cluster
+  upstreamScheme: http
+  upstreamHost: acme-ingress-upstream.kube-system.svc.cluster.local
+  upstreamPort: 80
