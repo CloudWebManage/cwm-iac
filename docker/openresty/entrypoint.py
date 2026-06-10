@@ -29,7 +29,7 @@ def main(etc_nginx_path="/etc/nginx", url_local_openresty_nginx_path="/usr/local
         ('WORKER_PROCESSES', r'(worker_processes )2(;)'),
         ('ERROR_LOG_LEVEL', r'(error_log  stderr  )error(;)'),
     ])
-    conf_replace_file(f"{etc_nginx_path}/metrics.conf", [
+    conf_replace_file(f"{etc_nginx_path}/metrics_shared_dict.conf", [
         ('METRICS_LUA_SHARED_DICT_SIZE', r'(lua_shared_dict prometheus_metrics )16m(;)'),
     ])
     conf_replace_file(f"{etc_nginx_path}/metrics_server.conf", [
