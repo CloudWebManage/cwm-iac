@@ -10,6 +10,28 @@ x-tolerations: &tolerations
     effect: "NoExecute"
 
 kube-prometheus-stack:
+  additionalPrometheusRulesMap:
+    cdn-cache-capacity:
+      groups:
+        - name: cdn-cache-capacity
+          rules:
+            - alert: CdnCacheShardDiskUsageHigh
+              expr: max by (namespace, pod) (container_fs_usage_bytes{job="kubelet", metrics_path="/metrics/cadvisor", namespace="cdn-cache", pod=~"cache.*"} / clamp_min(container_fs_limit_bytes{job="kubelet", metrics_path="/metrics/cadvisor", namespace="cdn-cache", pod=~"cache.*"}, 1)) > 0.85
+              for: 15m
+              labels:
+                severity: warning
+              annotations:
+                summary: CDN cache shard filesystem usage is high
+                description: Cache shard filesystem usage is above 85%; manually add or resize cache capacity.
+            - alert: CdnCacheShardInodeUsageHigh
+              expr: max by (namespace, pod) (container_fs_inodes_used{job="kubelet", metrics_path="/metrics/cadvisor", namespace="cdn-cache", pod=~"cache.*"} / clamp_min(container_fs_inodes_total{job="kubelet", metrics_path="/metrics/cadvisor", namespace="cdn-cache", pod=~"cache.*"}, 1)) > 0.85
+              for: 15m
+              labels:
+                severity: warning
+              annotations:
+                summary: CDN cache shard inode usage is high
+                description: Cache shard inode usage is above 85%; manually add or resize cache capacity.
+
   crds:
     upgradeJob:
       tolerations: *tolerations
