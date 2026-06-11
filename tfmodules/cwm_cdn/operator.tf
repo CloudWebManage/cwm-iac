@@ -21,6 +21,8 @@ locals {
             value:
               - name: CWM_CDN_TENANT_DEFAULT_IMAGE
                 value: "ghcr.io/cloudwebmanage/cwm-cdn-api-tenant-nginx:${var.versions["cwm-cdn-api-tenant-nginx"]}"
+              - name: CWM_CDN_IS_PRIMARY
+                value: "${var.is_primary}"
           - op: replace
             path: /spec/template/spec/containers/0/args
             value:
@@ -46,7 +48,7 @@ resource "null_resource" "cdn_operator_install" {
     EOT
   }
   provisioner "local-exec" {
-    command = self.triggers.command
+    command     = self.triggers.command
     interpreter = ["bash", "-c"]
   }
 }

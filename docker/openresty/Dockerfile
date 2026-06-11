@@ -7,6 +7,9 @@ COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
 COPY default.conf /etc/nginx/conf.d/default.conf
 COPY entrypoint.sh /entrypoint.sh
 COPY metrics.conf /etc/nginx/metrics.conf
+COPY metrics_shared_dict.conf /etc/nginx/metrics_shared_dict.conf
+COPY metrics_init.lua /etc/nginx/metrics_init.lua
+COPY metrics_log.lua /etc/nginx/metrics_log.lua
 COPY metrics_server.conf /etc/nginx/metrics_server.conf
 COPY entrypoint.py /docker-entrypoint.d/000-openresty-entrypoint.py
 

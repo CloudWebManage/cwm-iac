@@ -8,6 +8,9 @@ resource "kubernetes_node_taint" "controlplane1" {
     value  = "true"
     effect = "NoExecute"
   }
+  lifecycle {
+    ignore_changes = [taint]  # this is needed so that it won't remove automatically added taints
+  }
 }
 
 resource "kubernetes_node_taint" "controlplane_secondaries" {
@@ -20,6 +23,9 @@ resource "kubernetes_node_taint" "controlplane_secondaries" {
     key    = "CriticalAddonsOnly"
     value  = "true"
     effect = "NoExecute"
+  }
+  lifecycle {
+    ignore_changes = [taint]  # this is needed so that it won't remove automatically added taints
   }
 }
 

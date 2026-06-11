@@ -9,8 +9,9 @@ from . import entrypoint
 
 
 def get_metrics():
+    docker_host_addr = os.getenv("E2E_DOCKER_HOST_ADDR", "localhost")
     metrics = {}
-    for line in subprocess.check_output(["curl", "-s", "http://localhost:49999/metrics"]).decode().splitlines():
+    for line in subprocess.check_output(["curl", "-s", f"http://{docker_host_addr}:49999/metrics"]).decode().splitlines():
         line = line.strip()
         if line and not line.startswith("#"):
             metric, value = line.split(" ")
@@ -78,10 +79,15 @@ def test_entrypoint():
         localpath = os.path.dirname(__file__)
         shutil.copy(f'{localpath}/nginx.conf', f'{url_local_openresty_nginx_path}/conf/nginx.conf')
         shutil.copy(f'{localpath}/metrics.conf', f'{etc_nginx_path}/metrics.conf')
+        shutil.copy(f'{localpath}/metrics_shared_dict.conf', f'{etc_nginx_path}/metrics_shared_dict.conf')
+        shutil.copy(f'{localpath}/metrics_init.lua', f'{etc_nginx_path}/metrics_init.lua')
+        shutil.copy(f'{localpath}/metrics_log.lua', f'{etc_nginx_path}/metrics_log.lua')
         shutil.copy(f'{localpath}/metrics_server.conf', f'{etc_nginx_path}/metrics_server.conf')
         entrypoint.main(etc_nginx_path, url_local_openresty_nginx_path)
         assert_files_equal(f'{localpath}/nginx.conf', f'{url_local_openresty_nginx_path}/conf/nginx.conf')
         assert_files_equal(f'{localpath}/metrics.conf', f'{etc_nginx_path}/metrics.conf')
+        assert_files_equal(f'{localpath}/metrics_init.lua', f'{etc_nginx_path}/metrics_init.lua')
+        assert_files_equal(f'{localpath}/metrics_log.lua', f'{etc_nginx_path}/metrics_log.lua')
         assert_files_equal(f'{localpath}/metrics_server.conf', f'{etc_nginx_path}/metrics_server.conf')
         os.environ.update({
             'WORKER_CONNECTIONS': '2048',
@@ -94,5 +100,5 @@ def test_entrypoint():
         assert_file_contains(f'{url_local_openresty_nginx_path}/conf/nginx.conf', 'worker_connections  2048;')
         assert_file_contains(f'{url_local_openresty_nginx_path}/conf/nginx.conf', 'worker_processes 4;')
         assert_file_contains(f'{url_local_openresty_nginx_path}/conf/nginx.conf', 'error_log  stderr  warn;')
-        assert_file_contains(f'{etc_nginx_path}/metrics.conf', 'lua_shared_dict prometheus_metrics 32m;')
+        assert_file_contains(f'{etc_nginx_path}/metrics_shared_dict.conf', 'lua_shared_dict prometheus_metrics 32m;')
         assert_file_contains(f'{etc_nginx_path}/metrics_server.conf', 'listen 8888;')
