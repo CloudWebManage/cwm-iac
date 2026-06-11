@@ -9,14 +9,14 @@ locals {
   ]
 }
 
-module "keda_app" {
-  depends_on       = [kubernetes_namespace.namespaces]
+module "keda-app" {
+  count            = var.keda_enabled ? 1 : 0
   source           = "../argocd-app"
   name             = "keda"
   namespace        = "keda"
-  create_namespace = false
+  create_namespace = true
   tools            = var.tools
-  kubeconfig_path  = var.kubeconfig_path
+  kubeconfig_path  = var.admin_kubeconfig_path
   sources = [
     {
       repoURL        = "https://kedacore.github.io/charts"
