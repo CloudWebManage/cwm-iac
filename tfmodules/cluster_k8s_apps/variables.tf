@@ -82,3 +82,8 @@ variable "argocd_autosync" {
   type    = bool
   default = false
 }
+
+variable "keda_enabled" {
+  type    = bool
+  default = false
+}
