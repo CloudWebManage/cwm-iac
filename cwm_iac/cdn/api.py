@@ -1,6 +1,9 @@
+import time
+import sys
 import os
 import subprocess
 import socket
+import shlex
 
 import requests
 
@@ -21,7 +24,7 @@ SECONDARY_CLUSTER_NAME = os.getenv("SECONDARY_CLUSTER_NAME")
 DEFAULT_DOMAINS_SUFFIX = os.getenv("DEFAULT_DOMAINS_SUFFIX")
 
 
-def api_request(method, path, primary=False, secondary=False, **kwargs):
+def api_request(method, path, primary=False, secondary=False, return_res=False, **kwargs):
     if primary:
         assert not secondary, "Cannot specify both primary and secondary"
         assert PRIMARY_CDN_API_URL and PRIMARY_CDN_API_USER and PRIMARY_CDN_API_PASS, "missing primary url and creds env vars"
@@ -52,41 +55,50 @@ def api_request(method, path, primary=False, secondary=False, **kwargs):
         auth=(cdn_api_user, cdn_api_pass),
         **kwargs
     )
-    if res.status_code < 200 or res.status_code >= 400:
-        raise Exception(f"Error {res.status_code}: {res.text}")
-    return res.json()
+    if return_res:
+        return res
+    else:
+        if res.status_code < 200 or res.status_code >= 400:
+            raise Exception(f"Error {res.status_code}: {res.text}")
+        return res.json()
 
 
 def create_tenant(name, spec, primary=False, secondary=False):
     return api_request("POST", f"apply?cdn_tenant_name={name}", json=spec, primary=primary, secondary=secondary)
 
 
-def get_tenant(name, primary=False, secondary=False, wait_for=None, progress=None):
+def get_tenant(name, primary=False, secondary=False, wait_for=None, progress=None, wait_for_num=0):
     return utils.wait_for(
         lambda: api_request("GET", f"get?cdn_tenant_name={name}", primary=primary, secondary=secondary)['tenant'],
         wait_for=wait_for,
-        progress=progress
+        progress=progress,
+        wait_for_num=wait_for_num
     )
 
 
 def test_tenant_request(domain, path="/anything/hello/world", ip=None, insecure=False):
+    path = f'{path}?cb={time.time()}'
     if ip:
-        p = subprocess.run([
+        cmd = [
             "curl",
             "-fsvk",
             "--resolve", f"{domain}:443:{ip}",
             "-H", f"Host: {domain}",
             f"https://{domain}{path}"
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ]
+        print(shlex.join(cmd), file=sys.stderr)
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
         args = "-fsv"
         if insecure:
             args += "k"
+        cmd = ["curl", args, f"https://{domain}{path}"]
+        print(shlex.join(cmd), file=sys.stderr)
         p = subprocess.run(["curl", args, f"https://{domain}{path}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p.returncode, p.stdout.decode(), p.stderr.decode() if p.returncode != 0 else None
 
 
-def test_tenant(name, path="/anything/hello/world"):
+def test_tenant(name, path=f"/anything/hello/world"):
     primary_edge_domain = f'edge.{PRIMARY_CLUSTER_NAME}.{DEFAULT_DOMAINS_SUFFIX}'
     primary_edge_ip = socket.gethostbyname(primary_edge_domain)
     secondary_edge_domain = f'edge.{SECONDARY_CLUSTER_NAME}.{DEFAULT_DOMAINS_SUFFIX}'
