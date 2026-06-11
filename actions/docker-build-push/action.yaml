@@ -62,13 +62,25 @@ runs:
     - if: ${{ inputs.test_script != '' }}
       shell: bash
       run: ${{ inputs.test_script }}
+    - if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) }}
+      id: docker_safe_ref_name
+      shell: python
+      run: |
+        import os, re
+        safe_ref_name = os.environ["GITHUB_REF_NAME"].lower()
+        safe_ref_name = re.sub(r"[^a-z0-9_.-]+", "-", safe_ref_name).strip(".-")
+        short_sha = os.environ["GITHUB_SHA"][:7]
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+            print(f"safe_ref_name={safe_ref_name}", file=f)
+            print(f"short_sha={short_sha}", file=f)
     - uses: docker/build-push-action@v6
       with:
         push: true
         tags: |
           ghcr.io/cloudwebmanage/${{ inputs.image_suffix }}:${{ github.sha }}
           ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && format('ghcr.io/cloudwebmanage/{0}:latest', inputs.image_suffix) || '' }}
-          ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) && format('ghcr.io/cloudwebmanage/{0}:{1}', inputs.image_suffix, github.ref_name) || '' }}
+          ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) && format('ghcr.io/cloudwebmanage/{0}:{1}', inputs.image_suffix, steps.docker_safe_ref_name.outputs.safe_ref_name) || '' }}
+          ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) && format('ghcr.io/cloudwebmanage/{0}:{1}-{2}', inputs.image_suffix, steps.docker_safe_ref_name.outputs.safe_ref_name, steps.docker_safe_ref_name.outputs.short_sha) || '' }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: ${{ inputs.build_args }}
