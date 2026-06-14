@@ -42,4 +42,9 @@ module "keda-app" {
     }
   ]
   autosync = var.argocd_autosync
+  sync_policy = {
+    syncOptions = [
+      "ServerSideApply=true"
+    ]
+  }
 }
