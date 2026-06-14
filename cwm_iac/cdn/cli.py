@@ -4,6 +4,7 @@ import time
 
 import click
 import yaml
+from click.shell_completion import CompletionItem
 
 from . import api
 from .. import utils
@@ -12,6 +13,14 @@ from .. import utils
 @click.group()
 def cdn():
     pass
+
+
+def _complete_tenant_name(ctx, param, incomplete):
+    return [
+        CompletionItem(name)
+        for name in api.list_tenants()
+        if name.startswith(incomplete)
+    ]
 
 
 @cdn.command()
@@ -28,7 +37,7 @@ def create_tenant(name, specfile, primary, secondary, envsubst):
 
 
 @cdn.command()
-@click.argument("name")
+@click.argument("name", shell_complete=_complete_tenant_name)
 @click.option("--primary", is_flag=True)
 @click.option("--secondary", is_flag=True)
 @click.option("--wait-for")
@@ -89,12 +98,27 @@ def echo_test_tenant_results(results):
 
 
 @cdn.command()
-@click.argument("name")
+@click.argument("name", shell_complete=_complete_tenant_name)
 @click.option("--path", default="/anything/hello/world")
 @click.option("--wait-for-success", is_flag=True)
 @click.option("--wait-for-failures", type=int, default=0)
-def test_tenant(name, path, wait_for_success, wait_for_failures):
-    if wait_for_success:
+@click.option("--concurrency", type=int, default=0)
+@click.option("--concurrent-requests", type=int, default=100)
+def test_tenant(name, path, wait_for_success, wait_for_failures, concurrency, concurrent_requests):
+    if concurrency:
+        assert not wait_for_success and not wait_for_failures
+        num_failures = 0
+        for name, results in api.test_tenant_concurrent(name, concurrency, concurrent_requests, path=path).items():
+            for result in results:
+                if result[0] != 0:
+                    print(f"--- {name} --- {result}")
+                    num_failures += 1
+        if num_failures > 0:
+            click.echo(f"There were {num_failures} failures")
+            sys.exit(1)
+        else:
+            click.echo("OK")
+    elif wait_for_success:
         assert not wait_for_failures
         utils.wait_for(
             lambda: echo_test_tenant_results(api.test_tenant(name, path)),
@@ -111,7 +135,7 @@ def test_tenant(name, path, wait_for_success, wait_for_failures):
 
 
 @cdn.command()
-@click.argument("name")
+@click.argument("name", shell_complete=_complete_tenant_name)
 @click.option("--primary", is_flag=True)
 @click.option("--secondary", is_flag=True)
 def delete_tenant(name, primary, secondary):

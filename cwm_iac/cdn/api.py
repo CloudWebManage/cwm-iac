@@ -4,6 +4,7 @@ import os
 import subprocess
 import socket
 import shlex
+from concurrent.futures import ProcessPoolExecutor
 
 import requests
 
@@ -98,19 +99,36 @@ def test_tenant_request(domain, path="/anything/hello/world", ip=None, insecure=
     return p.returncode, p.stdout.decode(), p.stderr.decode() if p.returncode != 0 else None
 
 
-def test_tenant(name, path=f"/anything/hello/world"):
+def test_tenant_get_requests(name, path="/anything/hello/world"):
     primary_edge_domain = f'edge.{PRIMARY_CLUSTER_NAME}.{DEFAULT_DOMAINS_SUFFIX}'
     primary_edge_ip = socket.gethostbyname(primary_edge_domain)
     secondary_edge_domain = f'edge.{SECONDARY_CLUSTER_NAME}.{DEFAULT_DOMAINS_SUFFIX}'
     secondary_edge_ip = socket.gethostbyname(secondary_edge_domain)
-    results = {}
+    requests = {}
     for domain in get_tenant(name)["domains"]:
         domain_name = domain["name"]
         insecure = domain["tlsStatus"]["mode"] == "provided"
-        results[domain_name + (' (insecure)' if insecure else '')] = test_tenant_request(domain_name, path, insecure=insecure)
-        results[f"{domain_name} - primary ({primary_edge_domain})"] = test_tenant_request(domain_name, path, primary_edge_ip)
-        results[f"{domain_name} - secondary ({secondary_edge_domain})"] = test_tenant_request(domain_name, path, secondary_edge_ip)
-    return results
+        requests[domain_name + (' (insecure)' if insecure else '')] = {"domain": domain_name, "path": path, "insecure": insecure}
+        requests[f"{domain_name} - primary ({primary_edge_domain})"] = {"domain": domain_name, "path": path, "ip": primary_edge_ip}
+        requests[f"{domain_name} - secondary ({secondary_edge_domain})"] = {"domain": domain_name, "path": path, "ip": secondary_edge_ip}
+    return requests
+
+
+def test_tenant_concurrent(name, concurrency, concurrent_requests, path=f"/anything/hello/world"):
+    with ProcessPoolExecutor(max_workers=concurrency) as executor:
+        domain_name_futures = {}
+        for i in range(concurrent_requests):
+            for domain_name, kwargs in test_tenant_get_requests(name, path).items():
+                domain_name_futures.setdefault(domain_name, list()).append(executor.submit(test_tenant_request, **kwargs))
+        executor.shutdown(wait=True)
+        return {domain_name: [f.result() for f in futures] for domain_name, futures in domain_name_futures.items()}
+
+
+def test_tenant(name, path=f"/anything/hello/world"):
+    return {
+        name: test_tenant_request(**kwargs)
+        for name, kwargs in test_tenant_get_requests(name, path).items()
+    }
 
 
 def delete_tenant(name, primary=False, secondary=False):

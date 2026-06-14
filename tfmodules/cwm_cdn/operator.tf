@@ -4,7 +4,7 @@ locals {
     kind: Kustomization
 
     resources:
-    - dist-install-${var.versions["cwm-cdn-operator-dist-install"]}.yaml
+    - dist-install-${replace(var.versions["cwm-cdn-operator-dist-install"], "/", "-")}.yaml
 
     images:
     - name: ghcr.io/cloudwebmanage/cwm-cdn-operator/operator
@@ -37,7 +37,7 @@ resource "null_resource" "cdn_operator_install" {
   triggers = {
     command = <<-EOT
       set -euo pipefail
-      DIST_INSTALL="${var.data_path}/operator/dist-install-${var.versions["cwm-cdn-operator-dist-install"]}.yaml"
+      DIST_INSTALL="${var.data_path}/operator/dist-install-${replace(var.versions["cwm-cdn-operator-dist-install"], "/", "-")}.yaml"
       if ! [ -f "$DIST_INSTALL" ]; then
         mkdir -p "${var.data_path}/operator"
         curl -L -o "$DIST_INSTALL" \
