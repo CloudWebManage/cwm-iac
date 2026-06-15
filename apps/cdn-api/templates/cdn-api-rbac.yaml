@@ -17,7 +17,10 @@ rules:
     apiGroups: [""]
   - verbs: [get, list, watch]
     apiGroups: [""]
-    resources: ["pods"]
+    resources: ["configmaps", "endpoints", "nodes", "pods", "services"]
+  - verbs: [get, list, watch]
+    apiGroups: ["apps"]
+    resources: ["daemonsets", "deployments", "replicasets"]
 ---
 apiVersion: v1
 kind: ServiceAccount

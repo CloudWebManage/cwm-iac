@@ -6,6 +6,19 @@ cacheServers:
   "cache3":
     nodeName: "cdn1"
 
+cacheAdmin:
+  enabled: true
+  port: 8081
+  tokenSecretName: cwm-cdn-cache-admin
+  tokenSecretKey: token
+  networkPolicy:
+    enabled: true
+    cdnApiNamespace: cdn-api
+    cdnApiPodSelector:
+      app: cdn-api
+    routerPodSelector:
+      app: router
+
 cwmCdnApi:
   cacheNginx:
     image: "ghcr.io/cloudwebmanage/cwm-cdn-api-cache-nginx:latest"

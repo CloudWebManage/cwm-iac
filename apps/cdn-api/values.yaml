@@ -1,9 +1,49 @@
 isPrimary: false
 allowedPrimaryKey: ""
+popId: ""
+
+cacheAdmin:
+  enabled: true
+  tokenSecretName: cwm-cdn-cache-admin
+  tokenSecretKey: token
+  endpoints:
+    - cache1=http://cache1.cdn-cache:8081
+    - cache2=http://cache2.cdn-cache:8081
+    - cache3=http://cache3.cdn-cache:8081
+
+secondaries:
+  jsonSecretName: cwm-cdn-tenants-config
+  jsonSecretKey: apiSecondaries.json
+
+policy:
+  enabled: false
+  trustedClientIp:
+    enabled: false
+    trustedProxyCidrs: []
+  captcha:
+    egressEnabled: false
+
+logs:
+  structured: true
+  platform: false
+
+popHealth:
+  enabled: true
+
+route53DnsAutomation:
+  enabled: false
+  dryRun: false
 
 cwmCdnApi:
   api:
     image: "ghcr.io/cloudwebmanage/cwm-cdn-api:latest"
+
+vmagent:
+  clusterLabel: ""
+  remoteWrite:
+    baseUrl: ""
+    username: ""
+    password: ""
 
 prometheus:
   server:

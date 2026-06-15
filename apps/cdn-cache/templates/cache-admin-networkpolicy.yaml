@@ -1,0 +1,33 @@
+{{- if and .Values.cacheAdmin.enabled .Values.cacheAdmin.networkPolicy.enabled }}
+{{- range $name, $server := .Values.cacheServers }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-cache-admin" $name | quote }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ $name | quote }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+{{ toYaml $.Values.cacheAdmin.networkPolicy.routerPodSelector | indent 14 }}
+      ports:
+        - port: 80
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ $.Values.cacheAdmin.networkPolicy.cdnApiNamespace | quote }}
+          podSelector:
+            matchLabels:
+{{ toYaml $.Values.cacheAdmin.networkPolicy.cdnApiPodSelector | indent 14 }}
+      ports:
+        - port: {{ $.Values.cacheAdmin.port }}
+    - ports:
+        - port: 9999
+---
+{{- end }}
+{{- end }}
