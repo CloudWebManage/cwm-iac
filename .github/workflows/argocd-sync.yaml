@@ -1,6 +1,8 @@
 name: ArgoCD Sync
 on:
   push:
+    branches:
+      - main
     paths:
       - apps/**
       - .github/workflows/argocd-sync.yaml
