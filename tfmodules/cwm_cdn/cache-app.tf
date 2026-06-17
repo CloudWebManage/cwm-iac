@@ -48,6 +48,8 @@ module "cache-app" {
   name             = "cdn-cache"
   create_namespace = false
   tools            = var.tools
+  versions         = var.versions
+  targetRevisionFromVersionByName = true
   kubeconfig_path  = var.kubeconfig_path
   depends_on       = [kubernetes_manifest.cache_admin_token_external_secret]
   values = merge(
