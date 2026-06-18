@@ -23,6 +23,20 @@ locals {
                 value: "ghcr.io/cloudwebmanage/cwm-cdn-api-tenant-nginx:${var.versions["cwm-cdn-api-tenant-nginx"]}"
               - name: CWM_CDN_IS_PRIMARY
                 value: "${var.is_primary}"
+              - name: CWM_CDN_POP_ID
+                value: "${local.cdn_pop_id}"
+              - name: CWM_CDN_POLICY_ENABLED
+                value: "${var.cdn_policy_enabled}"
+              - name: CWM_CDN_TRUSTED_CLIENT_IP_ENABLED
+                value: "${var.cdn_trusted_client_ip_enabled}"
+              - name: CWM_CDN_TRUSTED_PROXY_CIDRS
+                value: "${join(",", var.cdn_trusted_proxy_cidrs)}"
+              - name: CWM_CDN_CAPTCHA_EGRESS_ENABLED
+                value: "${var.cdn_captcha_egress_enabled}"
+              - name: CWM_CDN_TENANT_DEFAULT_POP_ID
+                value: "${local.cdn_pop_id}"
+              - name: CWM_CDN_TENANT_DEFAULT_ENABLE_PLATFORM_LOGS
+                value: "${var.cdn_platform_logs_enabled}"
           - op: replace
             path: /spec/template/spec/containers/0/args
             value:

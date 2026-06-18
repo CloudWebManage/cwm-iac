@@ -47,6 +47,27 @@ def get_tenant(**kwargs):
 
 
 @cdn.command()
+@click.argument("name", shell_complete=_complete_tenant_name)
+@click.option("--path", "paths", multiple=True, help="Exact path selector; may include a query string.")
+@click.option("--url", "urls", multiple=True, help="Absolute tenant URL selector.")
+@click.option("--prefix", "prefixes", multiple=True, help="Path prefix selector; query strings are ignored by the API.")
+@click.option("--primary", is_flag=True)
+@click.option("--secondary", is_flag=True)
+def purge_tenant(name, paths, urls, prefixes, primary, secondary):
+    if not paths and not urls and not prefixes:
+        raise click.UsageError("Provide at least one --path, --url, or --prefix selector")
+    click.echo(json.dumps(api.purge_tenant(name, paths, urls, prefixes, primary, secondary), indent=2))
+
+
+@cdn.command()
+@click.argument("name", shell_complete=_complete_tenant_name)
+@click.option("--primary", is_flag=True)
+@click.option("--secondary", is_flag=True)
+def purge_tenant_everything(name, primary, secondary):
+    click.echo(json.dumps(api.purge_tenant_everything(name, primary, secondary), indent=2))
+
+
+@cdn.command()
 @click.argument("specfile", type=click.File("r"))
 @click.option("--envsubst", is_flag=True)
 @click.option("--wait-for-failures", type=int, default=0)

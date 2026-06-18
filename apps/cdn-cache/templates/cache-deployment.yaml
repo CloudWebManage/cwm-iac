@@ -27,21 +27,45 @@ spec:
       containers:
         - name: cache
           image: {{ $.Values.cwmCdnApi.cacheNginx.image | quote }}
+          ports:
+            - name: http
+              containerPort: 80
+            {{- if $.Values.cacheAdmin.enabled }}
+            - name: admin
+              containerPort: {{ $.Values.cacheAdmin.port }}
+            {{- end }}
           volumeMounts:
             - name: cache
               mountPath: /var/cache/nginx
           env:
             - name: TYPE
               value: "cache"
+            {{- if $.Values.cacheAdmin.enabled }}
+            - name: ENABLE_PURGE_RUNTIME
+              value: "true"
+            - name: CWMCDN_CACHE_ADMIN_PORT
+              value: {{ $.Values.cacheAdmin.port | quote }}
+            - name: CWMCDN_CACHE_ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.cacheAdmin.tokenSecretName | quote }}
+                  key: {{ $.Values.cacheAdmin.tokenSecretKey | quote }}
+            {{- end }}
+            - name: NGINX_INIT_WORKER_BY_LUA_BLOCK
+              value: |
+                dofile("/etc/nginx/metrics_init.lua")
             - name: NGINX_HTTP_CONFIGS
               value: |
-                include /etc/nginx/metrics.conf;
+                include /etc/nginx/metrics_shared_dict.conf;
+                log_by_lua_block {
+                    dofile("/etc/nginx/metrics_log.lua")
+                }
                 proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=cwm:500m inactive=5d;
             - name: NGINX_LOCATION_CONFIGS
               value: |
                 error_log stderr debug;
                 proxy_cache cwm;
-                proxy_cache_key "$http_x_cwmcdn_tenant_name$request_uri";
+                proxy_cache_key "$http_x_cwmcdn_tenant_name$cwmcdn_purge_token$request_uri";
                 proxy_cache_valid any 1h;
 ---
 {{- end }}

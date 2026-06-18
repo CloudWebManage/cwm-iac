@@ -31,3 +31,36 @@ spec:
               value: "{{ if .Values.isPrimary }}true{{ else }}false{{ end }}"
             - name: ALLOWED_PRIMARY_KEY
               value: {{ .Values.allowedPrimaryKey | quote }}
+            - name: POP_ID
+              value: {{ default .Release.Namespace .Values.popId | quote }}
+            - name: CWM_CDN_POP_ID
+              value: {{ default .Release.Namespace .Values.popId | quote }}
+            - name: CWM_CDN_POLICY_ENABLED
+              value: {{ ternary "true" "false" .Values.policy.enabled | quote }}
+            - name: CWM_CDN_TRUSTED_CLIENT_IP_ENABLED
+              value: {{ ternary "true" "false" .Values.policy.trustedClientIp.enabled | quote }}
+            - name: TRUSTED_CLIENT_IP_ENABLED
+              value: {{ ternary "true" "false" .Values.policy.trustedClientIp.enabled | quote }}
+            - name: CWM_CDN_TRUSTED_PROXY_CIDRS
+              value: {{ join "," .Values.policy.trustedClientIp.trustedProxyCidrs | quote }}
+            - name: CWM_CDN_CAPTCHA_EGRESS_ENABLED
+              value: {{ ternary "true" "false" .Values.policy.captcha.egressEnabled | quote }}
+            {{- if .Values.cacheAdmin.enabled }}
+            - name: CACHE_PURGE_ENABLED
+              value: "true"
+            - name: CACHE_ADMIN_ENDPOINTS
+              value: {{ join "," .Values.cacheAdmin.endpoints | quote }}
+            - name: CACHE_ADMIN_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cacheAdmin.tokenSecretName | quote }}
+                  key: {{ .Values.cacheAdmin.tokenSecretKey | quote }}
+            {{- end }}
+            {{- if .Values.isPrimary }}
+            - name: SECONDARIES_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secondaries.jsonSecretName | quote }}
+                  key: {{ .Values.secondaries.jsonSecretKey | quote }}
+                  optional: true
+            {{- end }}

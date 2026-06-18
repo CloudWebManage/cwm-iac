@@ -7,6 +7,12 @@ spec:
   selector:
     app: {{ $name | quote }}
   ports:
-    - port: 80
+    - name: http
+      port: 80
+    {{- if $.Values.cacheAdmin.enabled }}
+    - name: admin
+      port: {{ $.Values.cacheAdmin.port }}
+      targetPort: admin
+    {{- end }}
 ---
 {{- end }}

@@ -4,6 +4,7 @@ import os
 import subprocess
 import socket
 import shlex
+from urllib.parse import urlencode
 from concurrent.futures import ProcessPoolExecutor
 
 import requests
@@ -66,6 +67,34 @@ def api_request(method, path, primary=False, secondary=False, return_res=False, 
 
 def create_tenant(name, spec, primary=False, secondary=False):
     return api_request("POST", f"apply?cdn_tenant_name={name}", json=spec, primary=primary, secondary=secondary)
+
+
+def purge_tenant(name, paths=None, urls=None, prefixes=None, primary=False, secondary=False):
+    body = {}
+    if paths:
+        body["paths"] = list(paths)
+    if urls:
+        body["urls"] = list(urls)
+    if prefixes:
+        body["prefixes"] = list(prefixes)
+    if not body:
+        raise ValueError("at least one purge selector is required")
+    return api_request(
+        "POST",
+        f"purge?{urlencode({'cdn_tenant_name': name})}",
+        json=body,
+        primary=primary,
+        secondary=secondary,
+    )
+
+
+def purge_tenant_everything(name, primary=False, secondary=False):
+    return api_request(
+        "POST",
+        f"purge-everything?{urlencode({'cdn_tenant_name': name})}",
+        primary=primary,
+        secondary=secondary,
+    )
 
 
 def get_tenant(name, primary=False, secondary=False, wait_for=None, progress=None, wait_for_num=0):
