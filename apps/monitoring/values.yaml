@@ -109,7 +109,7 @@ kube-prometheus-stack:
             storageClassName: longhorn
             resources:
               requests:
-                storage: 100Gi
+                storage: 150Gi
       podMonitorSelector:
         matchLabels: {}
   kubeEtcd:
