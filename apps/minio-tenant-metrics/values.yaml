@@ -8,6 +8,7 @@ prometheus:
 
     persistentVolume:
       storageClass: longhorn
+      size: 50Gi
 
     retention: "2d"
 

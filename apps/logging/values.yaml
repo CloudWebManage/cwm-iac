@@ -58,6 +58,8 @@ loki:
         effect: NoExecute
   write:
     replicas: 1
+    persistence:
+      size: 20Gi
     tolerations:
       - key: cwm-iac-worker-role
         operator: Equal
