@@ -19,7 +19,7 @@ resource "kamatera_server" "servers" {
   }
 
   network {
-    name = kamatera_network.private.full_name
+    name = try(kamatera_network.private[0].full_name, var.use_existing_private_network_full_name)
   }
 
   lifecycle {

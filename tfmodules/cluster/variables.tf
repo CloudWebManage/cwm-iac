@@ -77,3 +77,8 @@ variable "ingress_dns_zone_domain" {
 variable "ingress_dns_zone_id" {
   type = string
 }
+
+variable "use_existing_private_network_full_name" {
+  type = string
+  default = ""
+}
