@@ -77,11 +77,47 @@ module "minio_tenant_main" {
               ]
             }, pool)
           ],
+          additionalVolumes = [
+            {
+              name = "host-var-lab-vector"
+              hostPath = {
+                path = "/var/lib/vector/"
+                type = "DirectoryOrCreate"
+              }
+            },
+            {
+              name = "host-var-lib-minio"
+              hostPath = {
+                path = "/var/lib/minio/"
+                type = "DirectoryOrCreate"
+              }
+            }
+          ]
+          additionalVolumeMounts = [
+            {
+              name      = "host-var-lib-minio"
+              mountPath = "/host/var/lib/minio/"
+            }
+          ]
           sideCars = {
             containers = [
               {
                 name = "cwm-iac-minio-log-metrics"
                 image = var.log_metrics_sidecar_image
+                volumeMounts = [
+                  {
+                    name      = "host-var-lab-vector"
+                    mountPath = "/var/lib/vector/"
+                  }
+                ]
+              },
+              {
+                name = "cwm-minio-tierer-access-updater"
+                image = var.minio_tierer_access_updater_image
+                env = [
+                  {name = "REDIS_HOST", value = "access-data-redis"},
+                  {name = "REDIS_PORT", value = "6379"},
+                ]
               }
             ]
           }

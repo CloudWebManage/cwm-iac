@@ -12,13 +12,14 @@ resource "kubernetes_secret" "env-config" {
       export MINIO_STORAGE_CLASS_STANDARD="${var.erasure_code_standard}"
       export MINIO_STORAGE_CLASS_RRS="${var.erasure_code_reduced}"
       export MINIO_DOMAIN="${var.minio_domain}"
-      export MINIO_AUDIT_WEBHOOK_QUEUE_DIR_METRICS="/export/audit-queue/metrics"
-      export MINIO_AUDIT_WEBHOOK_QUEUE_SIZE_METRICS="1000000"
+      export MINIO_AUDIT_WEBHOOK_QUEUE_DIR_METRICS="/host/var/lib/minio/audit-queue/metrics"
+      export MINIO_AUDIT_WEBHOOK_QUEUE_SIZE_METRICS="100000000"
       export MINIO_AUDIT_WEBHOOK_ENABLE_METRICS="on"
       export MINIO_AUDIT_WEBHOOK_ENDPOINT_METRICS="http://localhost:8791"
       export MINIO_ETCD_ENDPOINTS=http://minio-main-etcd.minio-tenant-main:2379
       export MINIO_ETCD_PATH_PREFIX=/minio-tenant-${var.name}
       export MINIO_PUBLIC_IPS=localhost
+      export MINIO_API_OBJECT_MAX_VERSIONS=1000
     EOT
   }
 }

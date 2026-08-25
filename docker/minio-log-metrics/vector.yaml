@@ -83,6 +83,24 @@ transforms:
       # Total bytes sent = response body + response headers
       .tx = .tx + .txHeaders
 
+  get_object_accesses:
+    type: remap
+    inputs:
+      - parse_and_route
+    source: |
+      if !exists(.api.name) || !exists(.api.bucket) || !exists(.api.object) {
+        abort
+      }
+
+      api_name = string!(.api.name)
+      if api_name != "GetObject" {
+        abort
+      }
+
+      bucket = string!(.api.bucket)
+      object_name = string!(.api.object)
+      . = {"bucket": bucket, "object": object_name}
+
   to_metrics:
     type: log_to_metric
     inputs:
@@ -117,3 +135,21 @@ sinks:
       - to_metrics
     address: 0.0.0.0:8799
     flush_period_secs: 43200  # 12 hours - ensuring series are preserved over long periods
+
+  access_updater:
+    type: http
+    inputs:
+      - get_object_accesses
+    uri: http://localhost:8921/
+    method: post
+    framing:
+      method: newline_delimited
+    encoding:
+      codec: json
+    request:
+      headers:
+        Content-Type: application/x-ndjson
+    buffer:
+      type: disk
+      max_size: 5368709120  # 5 GiB
+      when_full: block
