@@ -107,3 +107,8 @@ variable "argocd_autosync" {
 variable "kubeconfig_path" {
   type = string
 }
+
+variable "minio_tierer_image" {
+  type    = string
+  default = "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454"
+}

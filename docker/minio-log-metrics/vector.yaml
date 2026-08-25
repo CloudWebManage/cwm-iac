@@ -144,12 +144,27 @@ sinks:
     method: post
     framing:
       method: newline_delimited
+    compression: none
     encoding:
       codec: json
+      only_fields:
+        - bucket
+        - object
     request:
+      concurrency: 1
+      timeout_secs: 720
+      retry_initial_backoff_secs: 1
+      retry_max_duration_secs: 30
       headers:
         Content-Type: application/x-ndjson
+    batch:
+      max_events: 1000
+      max_bytes: 900000
+      timeout_secs: 1
     buffer:
       type: disk
       max_size: 5368709120  # 5 GiB
       when_full: block
+    healthcheck:
+      enabled: true
+      uri: http://localhost:8921/readyz

@@ -113,10 +113,15 @@ module "minio_tenant_main" {
               },
               {
                 name = "cwm-minio-tierer-access-updater"
-                image = var.minio_tierer_access_updater_image
+                image = var.minio_tierer_image
                 env = [
-                  {name = "REDIS_HOST", value = "access-data-redis"},
-                  {name = "REDIS_PORT", value = "6379"},
+                  {name = "INSTANCE_ID", value = var.name},
+                  # Positive whole-second duration; operationally greater than `max(low,high)+1h`
+                  {name = "ACCESS_RETENTION", value = "266400"},  # 3 days + 2 hours
+                  {name = "UPDATER_LISTEN_ADDR", value = "127.0.0.1:8921"},
+                  {name = "REDIS_ADDR", value = "tierer-redis:6379"},
+                  {name = "UPDATER_MAX_BODY_BYTES", value = "999999999999"},  # arbitrary large value to avoid errors, we trust vector to handle the actual size
+                  {name = "UPDATER_MAX_RECORDS", value = "999999999999"},  # arbitrary large value to avoid errors, we trust vector to handle the actual size
                 ]
               }
             ]
