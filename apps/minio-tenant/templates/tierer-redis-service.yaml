@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cwm-minio-api
+  name: tierer-redis
 spec:
   selector:
-    app: cwm-minio-api
+    app: tierer-redis
   ports:
-    - port: 8000
+    - port: 6379
