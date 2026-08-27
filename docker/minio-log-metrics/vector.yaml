@@ -165,6 +165,7 @@ sinks:
       type: disk
       max_size: 5368709120  # 5 GiB
       when_full: block
-    healthcheck:
-      enabled: true
-      uri: http://127.0.0.1:8921/readyz
+# healthcheck fails because it does a HEAD request first, need to fix it
+#    healthcheck:
+#      enabled: true
+#      uri: http://127.0.0.1:8921/readyz
