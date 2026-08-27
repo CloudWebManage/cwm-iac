@@ -22,14 +22,15 @@ spec:
           image: {{ .Values.cwmMinioTierer.tierer.image | default "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454" | quote }}
           imagePullPolicy: IfNotPresent
           env:
-            - {name: "INSTANCE_ID", value: {{ .Values.tenant.tenant.name }}}  # must match the redis updater
-            - {name: "ACCESS_RETENTION", value: "266400s"}  # must match the redis updater
+            - {name: "INSTANCE_ID", value: {{ .Values.tenant.tenant.name| quote }}}
+            - {name: "ACCESS_RETENTION", value: {{ .Values.tierer.access_retention | quote }}}
+            - {name: "LOG_LEVEL", value: "debug"}
             - {name: "TIERER_MODE", value: "audit"}  # `audit` or `apply`
             - {name: "TIERER_APPLY", value: "false"}  # Must be `true` in addition to `TIERER_MODE=apply`
-            - {name: "TIERER_LOW_THRESHOLD", value: "3"}  # Non-negative integer `A`; low when completed-window sum is `< A`. |
-            - {name: "TIERER_LOW_WINDOW_HOURS", value: "72"}  # Positive whole hours `B`, maximum ten years. |
-            - {name: "TIERER_HIGH_THRESHOLD", value: "3"}  # Non-negative integer `C`; high when sum is `> C`. |
-            - {name: "TIERER_HIGH_WINDOW_HOURS", value: "72"}  # Positive whole hours `D`, maximum ten years. |
+            - {name: "TIERER_LOW_THRESHOLD", value: {{ .Values.tierer.low_threshold | quote }}}
+            - {name: "TIERER_LOW_WINDOW_HOURS", value: {{ .Values.tierer.low_hours | quote }}}
+            - {name: "TIERER_HIGH_THRESHOLD", value: {{ .Values.tierer.high_threshold | quote }}}
+            - {name: "TIERER_HIGH_WINDOW_HOURS", value: {{ .Values.tierer.high_hours | quote }}}
             - {name: "TIERER_HIGH_INCLUDE_CURRENT", value: "false"}  # Include current hour in the high window only. |
             - {name: "TIERER_RESTORE_DAYS", value: "1"}  # Positive MinIO calendar-day restore value `E`. |
             - {name: "TIERER_COVERAGE_ENABLED", value: "false"}  # don't look for coverage records to check if hour data is complete.
@@ -58,7 +59,7 @@ spec:
 #            - {name: "TIERER_DAILY_RESTORE_BYTES", value: ""}  # Positive UTC daily bytes for initial restores; renewals charge zero bytes. |
 #            - {name: "TIERER_EXCLUDE_BUCKETS", value: ""}  # Exact comma-separated names; no blanks/whitespace/duplicates. |
 #            - {name: "TIERER_EXCLUDE_BUCKET_PREFIXES", value: ""}  # Exact comma-separated prefixes with the same syntax. |
-            - {name: "TIERER_CHUNK_SIZE", value: "65"}  # Objects per work chunk; `chunk*(low+high)` may not exceed 10,000 Redis access keys. |
+            - {name: "TIERER_CHUNK_SIZE", value: {{ .Values.tierer.chunk_size | quote }}}  # Objects per work chunk; `chunk*(low+high)` may not exceed 10,000 Redis access keys. |
 #            - {name: "TIERER_COMPLETION_DELAY", value: "5m"}  # Delay after durable cursor reset at full traversal completion. |
 #            - {name: "TIERER_RETRY_DELAY", value: "30s"}  # Delay after fatal scan failure; resumes from durable cursor. |
 #            - {name: "TIERER_LISTEN_ADDR", value: ":8081"}  # Health/metrics listen address. |

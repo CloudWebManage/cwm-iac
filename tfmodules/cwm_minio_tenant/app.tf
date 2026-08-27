@@ -3,6 +3,16 @@ locals {
       (startswith(var.versions["cwm-minio-api"], "config/") ? ["${var.versions["cwm-minio-api"]}/cwm-minio-api/api.yaml"] : []),
       (startswith(var.versions["cwm-minio-tierer"], "config/") ? ["${var.versions["cwm-minio-tierer"]}/cwm-minio-tierer/tierer.yaml"] : []),
   )
+
+  tierer = {
+    low_hours = 72  # 3 days
+    low_threshold = 3
+    high_hours = 72  # 3 days
+    high_threshold = 3
+    access_retention_hours = max(local.tierer.low_hours, local.tierer.high_hours) + 5
+    access_retention = "${local.tierer.access_retention_hours}h"
+    chunk_size = floor(10000 / (local.tierer.low_threshold + local.tierer.high_threshold))
+  }
 }
 
 module "minio_tenant_main" {
@@ -148,8 +158,7 @@ module "minio_tenant_main" {
                 command = ["/usr/local/bin/redis-updater"]
                 env = [
                   {name = "INSTANCE_ID", value = var.name},
-                  # Positive whole-second duration; operationally greater than `max(low,high)+1h`
-                  {name = "ACCESS_RETENTION", value = "266400s"},  # 3 days + 2 hours
+                  {name = "ACCESS_RETENTION", value = local.tierer.access_retention},
                   {name = "UPDATER_LISTEN_ADDR", value = "127.0.0.1:8921"},
                   {name = "REDIS_ADDR", value = "tierer-redis:6379"},
                   {name = "UPDATER_MAX_BODY_BYTES", value = "1073741824"},
@@ -162,6 +171,7 @@ module "minio_tenant_main" {
           }
         }
       }
+      tierer = local.tierer
     },
     startswith(var.versions["cwm-minio-api"], "config/") ? {} : {
       cwmMinioApi = {
