@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tierer-server
+spec:
+  selector:
+    matchLabels:
+      app: tierer-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tierer-server
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
+      containers:
+        - name: tierer-server
+          image: {{ .Values.cwmMinioTierer.tierer.image | default "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454" | quote }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: "INSTANCE_ID", value: {{ .Values.tenant.tenant.name }}}  # must match the redis updater
+            - {name: "ACCESS_RETENTION", value: "266400s"}  # must match the redis updater
+            - {name: "TIERER_MODE", value: "audit"}  # `audit` or `apply`
+            - {name: "TIERER_APPLY", value: "false"}  # Must be `true` in addition to `TIERER_MODE=apply`
+            - {name: "TIERER_LOW_THRESHOLD", value: "3"}  # Non-negative integer `A`; low when completed-window sum is `< A`. |
+            - {name: "TIERER_LOW_WINDOW_HOURS", value: "72"}  # Positive whole hours `B`, maximum ten years. |
+            - {name: "TIERER_HIGH_THRESHOLD", value: "3"}  # Non-negative integer `C`; high when sum is `> C`. |
+            - {name: "TIERER_HIGH_WINDOW_HOURS", value: "72"}  # Positive whole hours `D`, maximum ten years. |
+            - {name: "TIERER_HIGH_INCLUDE_CURRENT", value: "false"}  # Include current hour in the high window only. |
+            - {name: "TIERER_RESTORE_DAYS", value: "1"}  # Positive MinIO calendar-day restore value `E`. |
+            - {name: "TIERER_COVERAGE_ENABLED", value: "false"}  # don't look for coverage records to check if hour data is complete.
+            - {name: "TIERER_COVERAGE_TEMPLATE", value: ""}  # Hour-varying Go time-format key template. |
+            - {name: "TIERER_COVERAGE_VALUE", value: ""}  # Exact non-empty complete value. |
+            - {name: "TIERER_MARKER_KEY", value: "cwm-tierer"}  # Reserved application tag key. |
+            - {name: "TIERER_MARKER_VALUE", value: "low"}  # Required marker value and lifecycle filter value. |
+            - {name: "REDIS_ADDR", value: "tierer-redis:6379"}  # Standalone Redis `host:port`. |
+            - {name: "MINIO_ENDPOINT", value: "http://minio-tenant-primary"}  # MinIO `host:port`, without URL scheme. |
+            - name: "MINIO_ACCESS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: cwm-minio-api-tenant-creds
+                  key: accesskey
+            - name: "MINIO_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: cwm-minio-api-tenant-creds
+                  key: secretkey
+            - {name: "MINIO_SECURE", value: "false"}  # Use HTTPS when true. |
+#            - {name: "MINIO_REGION` | empty | Optional MinIO region. |
+#            - {name: "MINIO_OPERATION_TIMEOUT` | `30s` | Per-operation timeout and listing inactivity timeout. |
+#            - {name: "TIERER_DAILY_TRANSITION_ATTEMPTS", value: ""}  # Positive UTC daily marker-attempt limit. |
+#            - {name: "TIERER_DAILY_TRANSITION_BYTES", value: ""}  # Positive UTC daily bytes represented by marker attempts. |
+#            - {name: "TIERER_DAILY_RESTORE_ATTEMPTS", value: ""}  # Positive UTC daily initial/renewal restore-attempt limit. |
+#            - {name: "TIERER_DAILY_RESTORE_BYTES", value: ""}  # Positive UTC daily bytes for initial restores; renewals charge zero bytes. |
+#            - {name: "TIERER_EXCLUDE_BUCKETS", value: ""}  # Exact comma-separated names; no blanks/whitespace/duplicates. |
+#            - {name: "TIERER_EXCLUDE_BUCKET_PREFIXES", value: ""}  # Exact comma-separated prefixes with the same syntax. |
+#            - {name: "TIERER_CHUNK_SIZE", value: "100"}  # Objects per work chunk; `chunk*(low+high)` may not exceed 10,000 Redis access keys. |
+#            - {name: "TIERER_COMPLETION_DELAY", value: "5m"}  # Delay after durable cursor reset at full traversal completion. |
+#            - {name: "TIERER_RETRY_DELAY", value: "30s"}  # Delay after fatal scan failure; resumes from durable cursor. |
+#            - {name: "TIERER_LISTEN_ADDR", value: ":8081"}  # Health/metrics listen address. |
+#            - {name: "TIERER_SHUTDOWN_TIMEOUT", value: "30s"}  # Whole-service shutdown deadline. |

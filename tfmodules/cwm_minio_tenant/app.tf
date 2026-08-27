@@ -94,9 +94,9 @@ module "minio_tenant_main" {
           ]
           initContainers = [
             {
-              name = "init-vector-data"
+              name = "init-host-perms"
               image = "busybox:1.37"
-              command = ["sh", "-c", "chown 1000:1000 /var/lib/vector"]
+              command = ["sh", "-c", "chown 1000:1000 /var/lib/vector /var/lib/minio"]
               securityContext = {
                 runAsUser  = 0
                 runAsGroup = 0
@@ -106,6 +106,10 @@ module "minio_tenant_main" {
                 {
                   name      = "host-var-lab-vector"
                   mountPath = "/var/lib/vector/"
+                },
+                {
+                  name      = "host-var-lib-minio"
+                  mountPath = "/var/lib/minio/"
                 }
               ]
             }
