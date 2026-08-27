@@ -140,7 +140,7 @@ sinks:
     type: http
     inputs:
       - get_object_accesses
-    uri: http://localhost:8921/
+    uri: http://127.0.0.1:8921/
     method: post
     framing:
       method: newline_delimited
@@ -167,4 +167,4 @@ sinks:
       when_full: block
     healthcheck:
       enabled: true
-      uri: http://localhost:8921/readyz
+      uri: http://127.0.0.1:8921/readyz
