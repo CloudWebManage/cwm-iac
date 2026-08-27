@@ -58,7 +58,7 @@ spec:
 #            - {name: "TIERER_DAILY_RESTORE_BYTES", value: ""}  # Positive UTC daily bytes for initial restores; renewals charge zero bytes. |
 #            - {name: "TIERER_EXCLUDE_BUCKETS", value: ""}  # Exact comma-separated names; no blanks/whitespace/duplicates. |
 #            - {name: "TIERER_EXCLUDE_BUCKET_PREFIXES", value: ""}  # Exact comma-separated prefixes with the same syntax. |
-#            - {name: "TIERER_CHUNK_SIZE", value: "100"}  # Objects per work chunk; `chunk*(low+high)` may not exceed 10,000 Redis access keys. |
+            - {name: "TIERER_CHUNK_SIZE", value: "65"}  # Objects per work chunk; `chunk*(low+high)` may not exceed 10,000 Redis access keys. |
 #            - {name: "TIERER_COMPLETION_DELAY", value: "5m"}  # Delay after durable cursor reset at full traversal completion. |
 #            - {name: "TIERER_RETRY_DELAY", value: "30s"}  # Delay after fatal scan failure; resumes from durable cursor. |
 #            - {name: "TIERER_LISTEN_ADDR", value: ":8081"}  # Health/metrics listen address. |
