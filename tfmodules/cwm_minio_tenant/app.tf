@@ -1,3 +1,10 @@
+locals {
+  configValueFiles = concat(
+      (startswith(var.versions["cwm-minio-api"], "config/") ? ["${var.versions["cwm-minio-api"]}/cwm-minio-api/api.yaml"] : []),
+      (startswith(var.versions["cwm-minio-tierer"], "config/") ? ["${var.versions["cwm-minio-tierer"]}/cwm-minio-tierer/tierer.yaml"] : []),
+  )
+}
+
 module "minio_tenant_main" {
   source = "../argocd-app"
   name = "minio-tenant-${var.name}"
@@ -165,8 +172,6 @@ module "minio_tenant_main" {
     }
   )
   configSource = var.argocdConfigSource
-  configValueFiles = startswith(var.versions["cwm-minio-api"], "config/") ? [
-    "${var.versions["cwm-minio-api"]}/cwm-minio-api/api.yaml"
-  ] : null
+  configValueFiles = length(local.configValueFiles) > 0 ? local.configValueFiles : null
   autosync = var.argocd_autosync
 }
