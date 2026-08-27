@@ -38,7 +38,7 @@ spec:
             - {name: "TIERER_MARKER_KEY", value: "cwm-tierer"}  # Reserved application tag key. |
             - {name: "TIERER_MARKER_VALUE", value: "low"}  # Required marker value and lifecycle filter value. |
             - {name: "REDIS_ADDR", value: "tierer-redis:6379"}  # Standalone Redis `host:port`. |
-            - {name: "MINIO_ENDPOINT", value: "http://minio-tenant-primary:80"}  # MinIO `host:port`, without URL scheme. |
+            - {name: "MINIO_ENDPOINT", value: "minio-tenant-primary:80"}  # MinIO `host:port`, without URL scheme. |
             - name: "MINIO_ACCESS_KEY"
               valueFrom:
                 secretKeyRef:
