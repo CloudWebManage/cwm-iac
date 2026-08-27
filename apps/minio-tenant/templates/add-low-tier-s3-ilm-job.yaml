@@ -6,6 +6,11 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      tolerations:
+        - key: "cwm-iac-worker-role"
+          operator: "Equal"
+          value: "system"
+          effect: "NoExecute"
       containers:
         - name: mc
           image: "{{ .Values.tenant.tenant.image.repository }}:{{ .Values.tenant.tenant.image.tag }}"
