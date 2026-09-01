@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-low-tier-s3-ilm
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      tolerations:
+        - key: "cwm-iac-worker-role"
+          operator: "Equal"
+          value: "system"
+          effect: "NoExecute"
+      containers:
+        - name: mc
+          image: "{{ .Values.tenant.tenant.image.repository }}:{{ .Values.tenant.tenant.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - -c
+            - |
+              set -euo pipefail
+              mc alias set tenant "${MINIO_URL}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+              mc ilm tier add s3 \
+                tenant \
+                low \
+                --endpoint "https://s3.{{ .Values.low_tier_s3.aws_region }}.amazonaws.com" \
+                --region "{{ .Values.low_tier_s3.aws_region }}" \
+                --bucket "{{ .Values.low_tier_s3.bucket_name }}" \
+                --prefix "{{ .Values.tenant.tenant.name }}" \
+                --access-key "${AWS_TIER_ACCESS_KEY}" \
+                --secret-key "${AWS_TIER_SECRET_KEY}"
+          env:
+            - name: "MINIO_URL"
+              value: "http://minio-tenant-primary:80"
+            - name: "MINIO_ACCESS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: cwm-minio-api-tenant-creds
+                  key: accesskey
+            - name: "MINIO_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: cwm-minio-api-tenant-creds
+                  key: secretkey
+            - name: "AWS_TIER_ACCESS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: low-tier-aws-s3
+                  key: access
+            - name: "AWS_TIER_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: low-tier-aws-s3
+                  key: secret

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tierer-redis
+spec:
+  selector:
+    matchLabels:
+      app: tierer-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tierer-redis
+    spec:
+      tolerations:
+        - key: cwm-iac-worker-role
+          operator: Equal
+          value: system
+          effect: NoExecute
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: tierer-redis
+      containers:
+        - name: tierer-redis
+          image: "redis:8-alpine"
+          imagePullPolicy: IfNotPresent
+          command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+          volumeMounts:
+            - name: redis-data
+              mountPath: "/data"

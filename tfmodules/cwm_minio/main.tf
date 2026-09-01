@@ -3,7 +3,18 @@ terraform {
     kubernetes = {
       source  = "hashicorp/kubernetes"
     }
+    aws = {
+      source = "hashicorp/aws"
+      configuration_aliases = [
+        aws.route53,
+        aws.default,
+      ]
+    }
   }
+}
+
+variable "cluster_name" {
+  type = string
 }
 
 variable "data_path" {
@@ -31,4 +42,8 @@ variable "versions" {
 variable "argocd_autosync" {
   type    = bool
   default = false
+}
+
+variable "low_tier_s3_region" {
+  type = string
 }

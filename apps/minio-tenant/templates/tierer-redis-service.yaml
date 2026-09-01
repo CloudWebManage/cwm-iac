@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tierer-redis
+spec:
+  selector:
+    app: tierer-redis
+  ports:
+    - port: 6379

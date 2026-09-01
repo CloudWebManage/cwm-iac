@@ -83,6 +83,24 @@ transforms:
       # Total bytes sent = response body + response headers
       .tx = .tx + .txHeaders
 
+  get_object_accesses:
+    type: remap
+    inputs:
+      - parse_and_route
+    source: |
+      if !exists(.api.name) || !exists(.api.bucket) || !exists(.api.object) {
+        abort
+      }
+
+      api_name = string!(.api.name)
+      if api_name != "GetObject" {
+        abort
+      }
+
+      bucket = string!(.api.bucket)
+      object_name = string!(.api.object)
+      . = {"bucket": bucket, "object": object_name}
+
   to_metrics:
     type: log_to_metric
     inputs:
@@ -117,3 +135,37 @@ sinks:
       - to_metrics
     address: 0.0.0.0:8799
     flush_period_secs: 43200  # 12 hours - ensuring series are preserved over long periods
+
+  access_updater:
+    type: http
+    inputs:
+      - get_object_accesses
+    uri: http://127.0.0.1:8921/
+    method: post
+    framing:
+      method: newline_delimited
+    compression: none
+    encoding:
+      codec: json
+      only_fields:
+        - bucket
+        - object
+    request:
+      concurrency: 1
+      timeout_secs: 720
+      retry_initial_backoff_secs: 1
+      retry_max_duration_secs: 30
+      headers:
+        Content-Type: application/x-ndjson
+    batch:
+      max_events: 1000
+      max_bytes: 900000
+      timeout_secs: 1
+    buffer:
+      type: disk
+      max_size: 5368709120  # 5 GiB
+      when_full: block
+# healthcheck fails because it does a HEAD request first, need to fix it
+#    healthcheck:
+#      enabled: true
+#      uri: http://127.0.0.1:8921/readyz
