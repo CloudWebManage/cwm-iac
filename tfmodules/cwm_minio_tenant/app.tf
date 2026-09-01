@@ -30,6 +30,7 @@ module "minio_tenant_main" {
       nodeLocal = {
         enabled = var.node_local_enabled
       }
+      clusterName = var.cluster_name
       tenant = {
         ingress = {
           api = {

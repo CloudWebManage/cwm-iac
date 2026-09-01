@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "low_tier" {
 }
 
 # manually:
-# create policy policy "${var.cluster_name}-low-tier-s3"
+# create iam policy "${var.cluster_name}-low-tier-s3"
 # paste aws_s3_low_tier_policy.json (replace <BUCKET> with the bucket name)
 # create user "${var.cluster_name}-low-tier-s3"
 # attach the policy to the user
