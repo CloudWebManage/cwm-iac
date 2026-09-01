@@ -24,7 +24,7 @@ spec:
           env:
             - {name: "INSTANCE_ID", value: {{ .Values.tenant.tenant.name| quote }}}
             - {name: "ACCESS_RETENTION", value: {{ .Values.tierer.access_retention | quote }}}
-            - {name: "LOG_LEVEL", value: "debug"}
+            # - {name: "LOG_LEVEL", value: "debug"}
             - {name: "TIERER_MODE", value: "apply"}  # `audit` or `apply`
             - {name: "TIERER_APPLY", value: "true"}  # Must be `true` in addition to `TIERER_MODE=apply`
             - {name: "TIERER_LOW_THRESHOLD", value: {{ .Values.tierer.low_threshold | quote }}}
