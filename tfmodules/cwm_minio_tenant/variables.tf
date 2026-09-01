@@ -112,3 +112,13 @@ variable "minio_tierer_image" {
   type    = string
   default = "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454"
 }
+
+variable "tierer_config" {
+  type = map(any)
+  default = {}
+}
+
+variable "low_tier_s3" {
+  type = map(any)
+  default = {}
+}

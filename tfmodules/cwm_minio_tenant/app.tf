@@ -3,15 +3,15 @@ locals {
       (startswith(var.versions["cwm-minio-api"], "config/") ? ["${var.versions["cwm-minio-api"]}/cwm-minio-api/api.yaml"] : []),
       (startswith(var.versions["cwm-minio-tierer"], "config/") ? ["${var.versions["cwm-minio-tierer"]}/cwm-minio-tierer/tierer.yaml"] : []),
   )
-
+  tiererAccessRetentionHours = max(var.tierer_config.low_hours, var.tierer_config.high_hours) + 5
   tierer = {
-    low_hours = 72  # 3 days
-    low_threshold = 3
-    high_hours = 72  # 3 days
-    high_threshold = 3
-    access_retention_hours = max(local.tierer.low_hours, local.tierer.high_hours) + 5
-    access_retention = "${local.tierer.access_retention_hours}h"
-    chunk_size = floor(10000 / (local.tierer.low_threshold + local.tierer.high_threshold))
+    low_hours = var.tierer_config.low_hours
+    low_threshold = var.tierer_config.low_threshold
+    high_hours = var.tierer_config.high_hours
+    high_threshold = var.tierer_config.high_threshold
+    access_retention_hours = local.tiererAccessRetentionHours
+    access_retention = "${local.tiererAccessRetentionHours}h"
+    chunk_size = floor(10000 / (var.tierer_config.low_hours + var.tierer_config.high_hours))
   }
 }
 
@@ -172,6 +172,7 @@ module "minio_tenant_main" {
         }
       }
       tierer = local.tierer
+      low_tier_s3 = var.low_tier_s3
     },
     startswith(var.versions["cwm-minio-api"], "config/") ? {} : {
       cwmMinioApi = {

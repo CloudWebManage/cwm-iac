@@ -25,18 +25,18 @@ spec:
             - {name: "INSTANCE_ID", value: {{ .Values.tenant.tenant.name| quote }}}
             - {name: "ACCESS_RETENTION", value: {{ .Values.tierer.access_retention | quote }}}
             - {name: "LOG_LEVEL", value: "debug"}
-            - {name: "TIERER_MODE", value: "audit"}  # `audit` or `apply`
-            - {name: "TIERER_APPLY", value: "false"}  # Must be `true` in addition to `TIERER_MODE=apply`
+            - {name: "TIERER_MODE", value: "apply"}  # `audit` or `apply`
+            - {name: "TIERER_APPLY", value: "true"}  # Must be `true` in addition to `TIERER_MODE=apply`
             - {name: "TIERER_LOW_THRESHOLD", value: {{ .Values.tierer.low_threshold | quote }}}
             - {name: "TIERER_LOW_WINDOW_HOURS", value: {{ .Values.tierer.low_hours | quote }}}
             - {name: "TIERER_HIGH_THRESHOLD", value: {{ .Values.tierer.high_threshold | quote }}}
             - {name: "TIERER_HIGH_WINDOW_HOURS", value: {{ .Values.tierer.high_hours | quote }}}
-            - {name: "TIERER_HIGH_INCLUDE_CURRENT", value: "false"}  # Include current hour in the high window only. |
+            - {name: "TIERER_HIGH_INCLUDE_CURRENT", value: "true"}  # Include current hour in the high window only. |
             - {name: "TIERER_RESTORE_DAYS", value: "1"}  # Positive MinIO calendar-day restore value `E`. |
             - {name: "TIERER_COVERAGE_ENABLED", value: "false"}  # don't look for coverage records to check if hour data is complete.
             - {name: "TIERER_COVERAGE_TEMPLATE", value: ""}  # Hour-varying Go time-format key template. |
             - {name: "TIERER_COVERAGE_VALUE", value: ""}  # Exact non-empty complete value. |
-            - {name: "TIERER_MARKER_KEY", value: "cwm-tierer"}  # Reserved application tag key. |
+            - {name: "TIERER_MARKER_KEY", value: "cwm-tier"}  # Reserved application tag key. |
             - {name: "TIERER_MARKER_VALUE", value: "low"}  # Required marker value and lifecycle filter value. |
             - {name: "REDIS_ADDR", value: "tierer-redis:6379"}  # Standalone Redis `host:port`. |
             - {name: "MINIO_ENDPOINT", value: "minio-tenant-primary:80"}  # MinIO `host:port`, without URL scheme. |
