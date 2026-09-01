@@ -8,6 +8,8 @@ initialize: false
 nodeLocal:
   enabled: false
 
+clusterName: ""
+
 tenant:
   # Root key for MinIO Tenant Chart
   tenant:
