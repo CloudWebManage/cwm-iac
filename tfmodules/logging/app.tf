@@ -51,7 +51,7 @@ module "app" {
             name             = "logging1"
             servers          = 1
             volumesPerServer = 1
-            volumeSize       = "999Gi"
+            size       = "999Gi"
             storageClassName = "directpv-min-io"
             tolerations = [
               {
