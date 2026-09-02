@@ -23,10 +23,9 @@ SEND_NSCA_DEBUG = os.getenv("SEND_NSCA_DEBUG") == 'yes'
 SEND_NSCA_DRY_RUN = os.getenv("SEND_NSCA_DRY_RUN") == 'yes'
 
 
-@functools.lru_cache()
 def get_instances():
     res = {}
-    for row_key, row_val in prom_vector_query("node_uname_info", ["instance", "nodename"], parse_instance=False):
+    for row_key, row_val in prom_vector_query("last_over_time(node_uname_info[5m])", ["instance", "nodename"], parse_instance=False):
         res[row_key['instance']] = row_key['nodename']
     return res
 
