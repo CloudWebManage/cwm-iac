@@ -1,5 +1,6 @@
 minio:
   enabled: false
+  objstoreMonitoring: false
   prometheusUrl: ""
   namespaces:
     tenant: ""

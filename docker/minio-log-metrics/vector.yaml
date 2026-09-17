@@ -1,4 +1,8 @@
 sources:
+  internal_metrics:
+    type: internal_metrics
+    namespace: vector
+    scrape_interval_secs: 15
   minio_audit:
     type: http_server
     address: 0.0.0.0:8791
@@ -85,6 +89,8 @@ transforms:
 
   get_object_accesses:
     type: remap
+    drop_on_abort: true
+    drop_on_error: true
     inputs:
       - parse_and_route
     source: |
@@ -95,6 +101,23 @@ transforms:
       api_name = string!(.api.name)
       if api_name != "GetObject" {
         abort
+      }
+
+      # Optional runtime lookups: missing env/Secret never makes Vector fail to start.
+      # Match either identity field; parentUser is used for STS attribution.
+      tierer_identity = get_env_var("CWM_TIERER_ACCESS_KEY") ?? ""
+      if tierer_identity != "" && (.accessKey == tierer_identity || .parentUser == tierer_identity) {
+        abort
+      }
+
+      # Opt-in contract: MinIO api.statusCode 200 (full GET) or 206 (range GET).
+      # Legacy behavior accepts GetObject regardless of status when unset/false.
+      success_only = get_env_var("CWM_ACCESS_SUCCESS_ONLY") ?? "false"
+      if success_only == "true" {
+        status = to_int(.api.statusCode) ?? 0
+        if status != 200 && status != 206 {
+          abort
+        }
       }
 
       bucket = string!(.api.bucket)
@@ -129,6 +152,12 @@ transforms:
         increment_by_value: true
 
 sinks:
+  internal_prom_exporter:
+    type: prometheus_exporter
+    inputs:
+      - internal_metrics
+    address: 0.0.0.0:9598
+
   prom_exporter:
     type: prometheus_exporter
     inputs:

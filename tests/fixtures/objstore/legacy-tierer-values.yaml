@@ -1,0 +1,5 @@
+# Config-file scanner selection matching the compatible release reviewed in R1.
+# Keep this fixture local: regressions must not depend on a sibling checkout.
+cwmMinioTierer:
+  tierer:
+    image: ghcr.io/cloudwebmanage/cwm-minio-tierer:34ef901cf197b7479e25714184a68d84ca0d0943

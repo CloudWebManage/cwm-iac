@@ -1,5 +1,5 @@
 resource "null_resource" "minio_tenant_mc_metrics_prometheus_config_vault" {
-  count = var.metrics ? 1 : 0
+  count      = var.metrics ? 1 : 0
   depends_on = [module.minio_tenant_main]
   triggers = {
     command = <<-EOT
@@ -10,27 +10,27 @@ resource "null_resource" "minio_tenant_mc_metrics_prometheus_config_vault" {
     EOT
   }
   provisioner "local-exec" {
-    command = self.triggers.command
+    command     = self.triggers.command
     interpreter = ["bash", "-c"]
   }
 }
 
 data "vault_kv_secret_v2" "minio_tenant_main_mc_metrics_prometheus_config" {
-  count = var.metrics ? 1 : 0
+  count      = var.metrics ? 1 : 0
   depends_on = [null_resource.minio_tenant_mc_metrics_prometheus_config_vault]
-  mount = var.vault_mount
-  name = "${var.vault_path}/mc_metrics_prometheus_config"
+  mount      = var.vault_mount
+  name       = "${var.vault_path}/mc_metrics_prometheus_config"
 }
 
 locals {
   cluster_scrape_config = var.metrics ? yamldecode(data.vault_kv_secret_v2.minio_tenant_main_mc_metrics_prometheus_config[0].data.config)["scrape_configs"][0] : null
-  metrics_bearer_token = var.metrics ? local.cluster_scrape_config["bearer_token"] : null
+  metrics_bearer_token  = var.metrics ? local.cluster_scrape_config["bearer_token"] : null
   base_scrape_configs = var.metrics ? [
     {
-      job_name = "minio-audit-metrics"
-      scheme = "http"
-      scrape_interval = "15s"
-      metrics_path = "/metrics"
+      job_name         = "minio-audit-metrics"
+      scheme           = "http"
+      scrape_interval  = "15s"
+      metrics_path     = "/metrics"
       honor_timestamps = false
       kubernetes_sd_configs = [
         {
@@ -43,21 +43,26 @@ locals {
       relabel_configs = [
         {
           source_labels = ["__meta_kubernetes_pod_label_cwm_minio_tenant"]
-          regex = "true"
-          action = "keep"
+          regex         = "true"
+          action        = "keep"
+        },
+        {
+          source_labels = ["__meta_kubernetes_pod_container_name", "__meta_kubernetes_pod_container_port_name"]
+          regex         = "cwm-iac-minio-log-metrics;audit-metrics"
+          action        = "keep"
         },
         {
           source_labels = ["__meta_kubernetes_pod_ip"]
-          target_label = "__address__"
-          replacement = "$1:8799"
+          target_label  = "__address__"
+          replacement   = "$1:8799"
         }
       ]
     },
     {
-      job_name = "cwm-minio-api"
-      scheme = "http"
-      scrape_interval = "15s"
-      metrics_path = "/metrics"
+      job_name         = "cwm-minio-api"
+      scheme           = "http"
+      scrape_interval  = "15s"
+      metrics_path     = "/metrics"
       honor_timestamps = false
       kubernetes_sd_configs = [
         {
@@ -70,13 +75,13 @@ locals {
       relabel_configs = [
         {
           source_labels = ["__meta_kubernetes_pod_label_app"]
-          regex = "cwm-minio-api"
-          action = "keep"
+          regex         = "cwm-minio-api"
+          action        = "keep"
         },
         {
           source_labels = ["__meta_kubernetes_pod_ip"]
-          target_label = "__address__"
-          replacement = "$1:8000"
+          target_label  = "__address__"
+          replacement   = "$1:8000"
         }
       ]
     }
@@ -111,13 +116,13 @@ locals {
         relabel_configs = [
           {
             source_labels = ["__meta_kubernetes_pod_label_v1_min_io_tenant"]
-            regex = var.name
-            action = "keep"
+            regex         = var.name
+            action        = "keep"
           },
           {
             source_labels = ["__meta_kubernetes_pod_ip"]
-            target_label = "__address__"
-            replacement = "$1:9000"
+            target_label  = "__address__"
+            replacement   = "$1:9000"
           }
         ]
       },
@@ -137,13 +142,13 @@ locals {
         relabel_configs = [
           {
             source_labels = ["__meta_kubernetes_pod_label_v1_min_io_tenant"]
-            regex = var.name
-            action = "keep"
+            regex         = var.name
+            action        = "keep"
           },
           {
             source_labels = ["__meta_kubernetes_pod_ip"]
-            target_label = "__address__"
-            replacement = "$1:9000"
+            target_label  = "__address__"
+            replacement   = "$1:9000"
           }
         ]
       },
@@ -163,43 +168,59 @@ locals {
         relabel_configs = [
           {
             source_labels = ["__meta_kubernetes_pod_label_v1_min_io_tenant"]
-            regex = var.name
-            action = "keep"
+            regex         = var.name
+            action        = "keep"
           },
           {
             source_labels = ["__meta_kubernetes_pod_ip"]
-            target_label = "__address__"
-            replacement = "$1:9000"
+            target_label  = "__address__"
+            replacement   = "$1:9000"
           }
         ]
       }
     ]
   ) : null
+  # Keep exactly the MinIO S3 container port, not every sidecar/console port.
+  tenant_scrape_configs = var.metrics ? [for config in local.scrape_configs : merge(config, {
+    relabel_configs = concat(lookup(config, "relabel_configs", []),
+      contains(["minio-job-node", "minio-job-bucket", "minio-job-resource"], config.job_name) ? [{
+        source_labels = ["__meta_kubernetes_pod_container_name", "__meta_kubernetes_pod_container_port_number"]
+        action        = "keep"
+        regex         = "minio;9000"
+      }] : [],
+      [
+        { target_label = "cluster", replacement = var.cluster_name },
+        { target_label = "tenant", replacement = var.name },
+        { source_labels = ["__meta_kubernetes_pod_name"], target_label = "pod", regex = "(.+)" }
+      ]
+    )
+  })] : []
 }
 
 module "metrics_app" {
-  count = var.metrics ? 1 : 0
-  depends_on = [kubernetes_namespace.minio-tenant-metrics]
-  source = "../argocd-app"
-  name = "minio-tenant-${var.name}-metrics"
-  autosync = var.argocd_autosync
+  count            = var.metrics ? 1 : 0
+  depends_on       = [kubernetes_namespace.minio-tenant-metrics]
+  source           = "../argocd-app"
+  name             = "minio-tenant-${var.name}-metrics"
+  autosync         = var.argocd_autosync
   create_namespace = false
-  path = "apps/minio-tenant-metrics"
-  tools = var.tools
-  kubeconfig_path = var.kubeconfig_path
-  targetRevision = var.metrics_app_target_revision
+  path             = "apps/minio-tenant-metrics"
+  tools            = var.tools
+  kubeconfig_path  = var.kubeconfig_path
+  targetRevision   = var.metrics_app_target_revision
   values = {
     vmagent = {
-      remoteWrite = var.vmagentRemoteWriteConfig
+      enabled      = true
+      remoteWrite  = var.vmagentRemoteWriteConfig
       clusterLabel = var.vmagent_cluster_label == "" ? var.cluster_name : var.vmagent_cluster_label
-      tenantLabel = var.name
+      tenantLabel  = var.name
     }
-    prometheus = {
-      serverFiles = {
+    prometheus = merge(local.objstore_metrics_values.prometheus, {
+      serverFiles = merge(local.objstore_metrics_values.prometheus.serverFiles, {
         "prometheus.yml" = {
-          scrape_configs = local.scrape_configs
+          scrape_configs = concat(local.tenant_scrape_configs, local.objstore_scrape_configs)
         }
-      }
-    }
+      })
+    })
   }
 }
