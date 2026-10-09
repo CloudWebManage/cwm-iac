@@ -1,0 +1,42 @@
+{{- if and .Values.minio.enabled .Values.minio.objstoreMonitoring }}
+{{- $tenantID := .Values.minio.namespaces.tenant | sha256sum | trunc 8 }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-objstore-datasource-{{ $tenantID }}
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+data:
+  objstore-datasource-{{ $tenantID }}.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Objstore {{ .Values.minio.namespaces.tenant }}
+        uid: objstore-prometheus-{{ $tenantID }}
+        type: prometheus
+        access: proxy
+        url: {{ .Values.minio.prometheusUrl | quote }}
+        isDefault: false
+        editable: false
+        jsonData:
+          httpMethod: GET
+          timeInterval: 15s
+---
+{{- range $path, $file := .Files.Glob "dashboards/objstore-*.json" }}
+{{- $dashboard := $file | toString | replace "__TENANT_UID__" $tenantID | fromJson }}
+{{- $_ := set $dashboard "title" (printf "%s - %s" $dashboard.title $.Values.minio.namespaces.tenant) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-{{ base $path | trimSuffix ".json" }}-{{ $tenantID }}
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: {{ $.Values.minio.grafanaFolder | quote }}
+data:
+  {{ base $path | trimSuffix ".json" }}-{{ $tenantID }}.json: |-
+{{ $dashboard | toPrettyJson | indent 4 }}
+---
+{{- end }}
+{{- end }}

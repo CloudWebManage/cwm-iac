@@ -7,6 +7,8 @@ spec:
     matchLabels:
       app: tierer-redis
   replicas: 1
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -25,7 +27,40 @@ spec:
         - name: tierer-redis
           image: "redis:8-alpine"
           imagePullPolicy: IfNotPresent
-          command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+          command:
+            - redis-server
+            - --save
+            - "60"
+            - "1"
+            - --loglevel
+            - warning
+            - --appendonly
+            - {{ ternary "yes" "no" .Values.tiererRedis.appendonly | quote }}
+            - --appendfsync
+            - {{ .Values.tiererRedis.appendfsync | quote }}
+            - --maxmemory-policy
+            - {{ .Values.tiererRedis.maxmemory_policy | quote }}
+            - --maxmemory
+            - {{ .Values.tiererRedis.maxmemory | quote }}
+          resources: {{ .Values.tiererRedis.resources | toYaml | nindent 12 }}
+          ports:
+            - {name: redis, containerPort: 6379}
+          readinessProbe:
+            exec: {command: [redis-cli, ping]}
+            periodSeconds: 10
+            timeoutSeconds: 3
           volumeMounts:
             - name: redis-data
               mountPath: "/data"
+        {{- if .Values.tiererRedis.exporter_enabled }}
+        - name: redis-exporter
+          image: {{ .Values.tiererRedis.exporter_image | quote }}
+          args: ["--redis.addr=redis://127.0.0.1:6379"]
+          resources: {{ .Values.tiererRedis.exporter_resources | toYaml | nindent 12 }}
+          ports:
+            - {name: redis-metrics, containerPort: 9121}
+          readinessProbe:
+            httpGet: {path: /metrics, port: redis-metrics}
+            periodSeconds: 30
+            timeoutSeconds: 5
+        {{- end }}
