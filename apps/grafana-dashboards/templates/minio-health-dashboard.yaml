@@ -57,7 +57,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_erasure_set_overall_health",
+              "expr": "minio_cluster_health_status",
               "legendFormat": "Health",
               "refId": "A"
             }
@@ -91,7 +91,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_nodes_online_count",
+              "expr": "minio_cluster_nodes_online_total",
               "legendFormat": "Online",
               "refId": "A"
             }
@@ -131,7 +131,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_nodes_offline_count",
+              "expr": "minio_cluster_nodes_offline_total",
               "legendFormat": "Offline",
               "refId": "A"
             }
@@ -165,7 +165,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_drives_online_count",
+              "expr": "minio_cluster_drive_online_total",
               "legendFormat": "Online",
               "refId": "A"
             }
@@ -205,7 +205,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_drives_offline_count",
+              "expr": "minio_cluster_drive_offline_total",
               "legendFormat": "Offline",
               "refId": "A"
             }
@@ -248,7 +248,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "(1 - (minio_cluster_health_capacity_usable_free_bytes / minio_cluster_health_capacity_usable_total_bytes)) * 100",
+              "expr": "(1 - (minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes)) * 100",
               "legendFormat": "Utilization",
               "refId": "A"
             }
@@ -282,7 +282,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_process_uptime_seconds",
+              "expr": "minio_node_process_uptime_seconds",
               "legendFormat": "Uptime",
               "refId": "A"
             }
@@ -316,7 +316,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_capacity_usable_free_bytes",
+              "expr": "minio_cluster_capacity_usable_free_bytes",
               "legendFormat": "Free",
               "refId": "A"
             }
@@ -356,7 +356,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_errors_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_errors_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Errors/s",
               "refId": "A"
             }
@@ -390,7 +390,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Requests/s",
               "refId": "A"
             }
@@ -446,13 +446,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_process_resident_memory_bytes",
+              "expr": "minio_node_process_resident_memory_bytes",
               "legendFormat": "Resident Memory",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_memory_used",
+              "expr": "minio_node_mem_used",
               "legendFormat": "System Memory Used",
               "refId": "B"
             }
@@ -500,7 +500,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_cpu_load_perc",
+              "expr": "minio_node_cpu_avg_load1_perc",
               "legendFormat": "CPU Load %",
               "refId": "A"
             }
@@ -548,7 +548,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_process_file_descriptor_open_total",
+              "expr": "minio_node_file_descriptor_open_total",
               "legendFormat": "Open FDs",
               "refId": "A"
             }
@@ -596,7 +596,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_process_go_routine_total",
+              "expr": "minio_node_go_routine_total",
               "legendFormat": "Goroutines",
               "refId": "A"
             }
@@ -636,7 +636,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_erasure_set_health",
+              "expr": "minio_cluster_health_erasure_set_status",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
