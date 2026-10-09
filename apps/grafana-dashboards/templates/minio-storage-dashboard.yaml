@@ -63,7 +63,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "1 - (minio_cluster_health_capacity_usable_free_bytes / minio_cluster_health_capacity_usable_total_bytes)",
+              "expr": "1 - (minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes)",
               "legendFormat": "Utilization",
               "refId": "A"
             }
@@ -97,7 +97,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_capacity_usable_total_bytes",
+              "expr": "minio_cluster_capacity_usable_total_bytes",
               "legendFormat": "Total Usable",
               "refId": "A"
             }
@@ -131,7 +131,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_capacity_usable_free_bytes",
+              "expr": "minio_cluster_capacity_usable_free_bytes",
               "legendFormat": "Free",
               "refId": "A"
             }
@@ -165,7 +165,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_objects_total_bytes",
+              "expr": "minio_cluster_usage_total_bytes",
               "legendFormat": "Used",
               "refId": "A"
             }
@@ -199,7 +199,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_capacity_raw_total_bytes",
+              "expr": "minio_cluster_capacity_raw_total_bytes",
               "legendFormat": "Total Raw",
               "refId": "A"
             }
@@ -233,7 +233,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_objects_count",
+              "expr": "minio_cluster_usage_object_total",
               "legendFormat": "Objects",
               "refId": "A"
             }
@@ -267,7 +267,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_objects_buckets_count",
+              "expr": "minio_cluster_bucket_total",
               "legendFormat": "Buckets",
               "refId": "A"
             }
@@ -315,19 +315,19 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_capacity_usable_total_bytes",
+              "expr": "minio_cluster_capacity_usable_total_bytes",
               "legendFormat": "Total",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_objects_total_bytes",
+              "expr": "minio_cluster_usage_total_bytes",
               "legendFormat": "Used",
               "refId": "B"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_capacity_usable_free_bytes",
+              "expr": "minio_cluster_capacity_usable_free_bytes",
               "legendFormat": "Free",
               "refId": "C"
             }
@@ -375,13 +375,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_objects_count",
+              "expr": "minio_cluster_usage_object_total",
               "legendFormat": "Objects",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_objects_buckets_count",
+              "expr": "minio_cluster_bucket_total",
               "legendFormat": "Buckets",
               "refId": "B"
             }
@@ -437,7 +437,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "topk(10, minio_cluster_usage_buckets_total_bytes{bucket=~\"$bucket\"})",
+              "expr": "topk(10, max by (bucket) (minio_bucket_usage_total_bytes{bucket=~\"$bucket\"}))",
               "legendFormat": "{{ `{{bucket}}` }}",
               "refId": "A"
             }
@@ -485,7 +485,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "topk(10, minio_cluster_usage_buckets_objects_count{bucket=~\"$bucket\"})",
+              "expr": "topk(10, max by (bucket) (minio_bucket_usage_object_total{bucket=~\"$bucket\"}))",
               "legendFormat": "{{ `{{bucket}}` }}",
               "refId": "A"
             }
@@ -527,7 +527,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_drives_online_count",
+              "expr": "minio_cluster_drive_online_total",
               "legendFormat": "Online",
               "refId": "A"
             }
@@ -567,7 +567,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_drives_offline_count",
+              "expr": "minio_cluster_drive_offline_total",
               "legendFormat": "Offline",
               "refId": "A"
             }
@@ -601,7 +601,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_health_drives_count",
+              "expr": "minio_cluster_drive_total",
               "legendFormat": "Total",
               "refId": "A"
             }
@@ -614,12 +614,8 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
-              "mappings": [
-                { "options": { "0": { "color": "red", "index": 2, "text": "Offline" } }, "type": "value" },
-                { "options": { "1": { "color": "green", "index": 0, "text": "Healthy" } }, "type": "value" },
-                { "options": { "2": { "color": "yellow", "index": 1, "text": "Healing" } }, "type": "value" }
-              ],
-              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
               "unit": "short"
             },
             "overrides": []
@@ -634,14 +630,14 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_system_drive_health",
+              "expr": "minio_node_drive_offline_total",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
               "refId": "A"
             }
           ],
-          "title": "Drive Health Status",
+          "title": "Offline Drives by Node",
           "transformations": [
             { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true }, "indexByName": {}, "renameByName": {} } }
           ],
@@ -695,13 +691,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_traffic_sent_bytes[5m]))",
+              "expr": "sum(rate(minio_s3_traffic_sent_bytes{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Sent",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_traffic_received_bytes[5m]))",
+              "expr": "sum(rate(minio_s3_traffic_received_bytes{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Received",
               "refId": "B"
             }
@@ -749,13 +745,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_system_network_internode_sent_bytes_total[5m]))",
+              "expr": "sum(rate(minio_inter_node_traffic_sent_bytes{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Inter-node Sent",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_system_network_internode_recv_bytes_total[5m]))",
+              "expr": "sum(rate(minio_inter_node_traffic_received_bytes{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Inter-node Received",
               "refId": "B"
             }
@@ -788,14 +784,14 @@ data:
             "allValue": ".*",
             "current": { "selected": true, "text": "All", "value": "$__all" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(minio_cluster_usage_buckets_total_bytes, bucket)",
+            "definition": "label_values(minio_bucket_usage_total_bytes, bucket)",
             "hide": 0,
             "includeAll": true,
             "label": "Bucket",
             "multi": true,
             "name": "bucket",
             "options": [],
-            "query": { "qryType": 1, "query": "label_values(minio_cluster_usage_buckets_total_bytes, bucket)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "query": { "qryType": 1, "query": "label_values(minio_bucket_usage_total_bytes, bucket)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
             "refresh": 2,
             "regex": "",
             "skipUrlSync": false,
