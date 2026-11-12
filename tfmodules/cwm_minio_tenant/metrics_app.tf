@@ -181,7 +181,8 @@ locals {
     ]
   ) : null
   # Keep exactly the MinIO S3 container port, not every sidecar/console port.
-  tenant_scrape_configs = var.metrics ? [for config in local.scrape_configs : merge(config, {
+  # A null-safe splat avoids unifying heterogeneous scrape objects with [].
+  tenant_scrape_configs = [for config in local.scrape_configs[*] : merge(config, {
     relabel_configs = concat(lookup(config, "relabel_configs", []),
       contains(["minio-job-node", "minio-job-bucket", "minio-job-resource"], config.job_name) ? [{
         source_labels = ["__meta_kubernetes_pod_container_name", "__meta_kubernetes_pod_container_port_number"]
@@ -194,7 +195,7 @@ locals {
         { source_labels = ["__meta_kubernetes_pod_name"], target_label = "pod", regex = "(.+)" }
       ]
     )
-  })] : []
+  })]
 }
 
 module "metrics_app" {
