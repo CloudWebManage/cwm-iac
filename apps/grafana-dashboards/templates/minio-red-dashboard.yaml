@@ -68,7 +68,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Total Requests",
               "refId": "A"
             }
@@ -116,8 +116,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_total{name=~\"$operation\"}[5m])) by (name)",
-              "legendFormat": "{{ `{{name}}` }}",
+              "expr": "sum(rate(minio_s3_requests_total{job=\"minio-job-node\",api=~\"$operation\"}[5m])) by (api)",
+              "legendFormat": "{{ `{{api}}` }}",
               "refId": "A"
             }
           ],
@@ -164,7 +164,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_total{bucket=~\"$bucket\"}[5m])) by (bucket)",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_total{bucket=~\"$bucket\"}[5m]))) by (bucket)",
               "legendFormat": "{{ `{{bucket}}` }}",
               "refId": "A"
             }
@@ -212,13 +212,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(minio_api_requests_inflight_total)",
+              "expr": "sum(minio_s3_requests_inflight_total{job=\"minio-job-node\"})",
               "legendFormat": "In Flight",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(minio_api_requests_waiting_total)",
+              "expr": "sum(minio_s3_requests_waiting_total{job=\"minio-job-node\"})",
               "legendFormat": "Waiting",
               "refId": "B"
             }
@@ -277,13 +277,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_4xx_errors_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_4xx_errors_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "4xx Errors",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_5xx_errors_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_5xx_errors_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "5xx Errors",
               "refId": "B"
             }
@@ -326,7 +326,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "100 * sum(rate(minio_api_requests_errors_total[5m])) / sum(rate(minio_api_requests_total[5m]))",
+              "expr": "100 * sum(rate(minio_s3_requests_errors_total{job=\"minio-job-node\"}[5m])) / sum(rate(minio_s3_requests_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Error %",
               "refId": "A"
             }
@@ -374,25 +374,25 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_rejected_auth_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_rejected_auth_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Auth Rejected",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_rejected_header_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_rejected_header_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Header Rejected",
               "refId": "B"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_rejected_timestamp_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_rejected_timestamp_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Timestamp Rejected",
               "refId": "C"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_rejected_invalid_total[5m]))",
+              "expr": "sum(rate(minio_s3_requests_rejected_invalid_total{job=\"minio-job-node\"}[5m]))",
               "legendFormat": "Invalid Rejected",
               "refId": "D"
             }
@@ -440,8 +440,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_api_requests_errors_total{name=~\"$operation\"}[5m])) by (name)",
-              "legendFormat": "{{ `{{name}}` }}",
+              "expr": "sum(rate(minio_s3_requests_errors_total{job=\"minio-job-node\",api=~\"$operation\"}[5m])) by (api)",
+              "legendFormat": "{{ `{{api}}` }}",
               "refId": "A"
             }
           ],
@@ -488,13 +488,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_4xx_errors_total{bucket=~\"$bucket\"}[5m])) by (bucket)",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_4xx_errors_total{bucket=~\"$bucket\"}[5m]))) by (bucket)",
               "legendFormat": "{{ `{{bucket}}` }} 4xx",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_5xx_errors_total{bucket=~\"$bucket\"}[5m])) by (bucket)",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_5xx_errors_total{bucket=~\"$bucket\"}[5m]))) by (bucket)",
               "legendFormat": "{{ `{{bucket}}` }} 5xx",
               "refId": "B"
             }
@@ -550,25 +550,25 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.50, sum(rate(minio_api_requests_ttfb_seconds_distribution[5m])) by (le))",
+              "expr": "histogram_quantile(0.50, sum(rate(minio_s3_requests_ttfb_seconds_distribution{job=\"minio-job-node\"}[5m])) by (le))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.90, sum(rate(minio_api_requests_ttfb_seconds_distribution[5m])) by (le))",
+              "expr": "histogram_quantile(0.90, sum(rate(minio_s3_requests_ttfb_seconds_distribution{job=\"minio-job-node\"}[5m])) by (le))",
               "legendFormat": "p90",
               "refId": "B"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.95, sum(rate(minio_api_requests_ttfb_seconds_distribution[5m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(minio_s3_requests_ttfb_seconds_distribution{job=\"minio-job-node\"}[5m])) by (le))",
               "legendFormat": "p95",
               "refId": "C"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.99, sum(rate(minio_api_requests_ttfb_seconds_distribution[5m])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(rate(minio_s3_requests_ttfb_seconds_distribution{job=\"minio-job-node\"}[5m])) by (le))",
               "legendFormat": "p99",
               "refId": "D"
             }
@@ -616,8 +616,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.99, sum(rate(minio_api_requests_ttfb_seconds_distribution{name=~\"$operation\"}[5m])) by (le, name))",
-              "legendFormat": "{{ `{{name}}` }}",
+              "expr": "histogram_quantile(0.99, sum(rate(minio_s3_requests_ttfb_seconds_distribution{job=\"minio-job-node\",api=~\"$operation\"}[5m])) by (le, api))",
+              "legendFormat": "{{ `{{api}}` }}",
               "refId": "A"
             }
           ],
@@ -649,14 +649,14 @@ data:
             "allValue": ".*",
             "current": { "selected": true, "text": "All", "value": "$__all" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(minio_api_requests_total, name)",
+            "definition": "label_values(minio_s3_requests_total{job=\"minio-job-node\"}, api)",
             "hide": 0,
             "includeAll": true,
             "label": "Operation",
             "multi": true,
             "name": "operation",
             "options": [],
-            "query": { "qryType": 1, "query": "label_values(minio_api_requests_total, name)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "query": { "qryType": 1, "query": "label_values(minio_s3_requests_total{job=\"minio-job-node\"}, api)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
             "refresh": 2,
             "regex": "",
             "skipUrlSync": false,
@@ -667,14 +667,14 @@ data:
             "allValue": ".*",
             "current": { "selected": true, "text": "All", "value": "$__all" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(minio_bucket_api_total, bucket)",
+            "definition": "label_values(minio_bucket_requests_total, bucket)",
             "hide": 0,
             "includeAll": true,
             "label": "Bucket",
             "multi": true,
             "name": "bucket",
             "options": [],
-            "query": { "qryType": 1, "query": "label_values(minio_bucket_api_total, bucket)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "query": { "qryType": 1, "query": "label_values(minio_bucket_requests_total, bucket)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
             "refresh": 2,
             "regex": "",
             "skipUrlSync": false,

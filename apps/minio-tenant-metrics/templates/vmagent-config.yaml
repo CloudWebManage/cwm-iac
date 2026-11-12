@@ -1,3 +1,4 @@
+{{- if and .Values.vmagent.enabled .Values.vmagent.remoteWrite }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -53,3 +54,4 @@ data:
       interval: 1h
       outputs: [increase_prometheus, increase]
       by: [cluster, tenant, bucket, access_key, direction]
+{{- end }}

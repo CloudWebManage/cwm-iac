@@ -1,0 +1,186 @@
+%{ if enabled ~}
+groups:
+  - name: objstore-pipeline
+    interval: 15s
+    rules:
+      - alert: ObjstoreTargetDown
+        expr: up{job=~"objstore-(tierer|updater|vector|redis)"} == 0
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Objstore pipeline scrape target is down
+%{ for job, config in jobs ~}
+      - alert: ObjstoreTargetsMissing
+        expr: (count(count by (pod) (up{job="${job}"})) or vector(0)) < ${config.expected}
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}, job: ${jsonencode(job)}}
+        annotations:
+          summary: Fewer pipeline pods discovered than configured
+%{ endfor ~}
+      - alert: ObjstoreUpdaterMetricsMissing
+        expr: up{job="objstore-updater"} == 1 unless on (job, instance) cwm_minio_tierer_updater_queue_depth
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Updater endpoint lacks the required Go metrics
+      - alert: ObjstoreScanStale
+        expr: (time() - cwm_minio_tierer_last_successful_scan_timestamp_seconds > ${stale_scan_seconds}) and (cwm_minio_tierer_last_successful_scan_timestamp_seconds > 0)
+        for: 15m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: No recent completed full tierer traversal
+      - alert: ObjstoreInitialScanOverdue
+        expr: (cwm_minio_tierer_last_successful_scan_timestamp_seconds == 0) and on (job, instance) (up{job="objstore-tierer"} == 1)
+        for: ${initial_scan_grace}
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Initial full tierer traversal has exceeded its grace period
+      - alert: ObjstoreIngestErrors
+        expr: sum by (cluster, tenant, pod) (rate(cwm_minio_tierer_updater_batch_errors_total[5m])) > 0 or sum by (cluster, tenant, pod) (rate(cwm_minio_tierer_updater_http_rejections_total[5m])) > 0 or sum by (cluster, tenant, pod) (rate(cwm_minio_tierer_updater_http_requests_total{result="failed"}[5m])) > 0
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Updater batches or ingestion requests are failing
+      - alert: ObjstoreRiskOverride
+        expr: cwm_minio_tierer_updater_risk_override > 0
+        for: 1m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Updater status-code risk override is active
+      - alert: ObjstoreBudgetExhausted
+        expr: increase(cwm_minio_tierer_budget_exhaustions_total[15m]) > 0
+        for: 1m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Tierer actions are being skipped by a UTC daily budget
+      - alert: ObjstoreUpdaterQueueSaturated
+        expr: cwm_minio_tierer_updater_queue_depth / ${queue_size} > ${saturation_ratio}
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Updater request queue is near capacity
+      - alert: ObjstoreRedisUnavailable
+        expr: redis_up{job="objstore-redis"} == 0
+        for: 1m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Redis exporter cannot reach Redis
+      - alert: ObjstoreRedisMemorySaturated
+        expr: (redis_memory_used_bytes{job="objstore-redis"} / redis_memory_max_bytes{job="objstore-redis"} > ${saturation_ratio}) and (redis_memory_max_bytes{job="objstore-redis"} > 0)
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Redis memory is near configured maxmemory
+      - alert: ObjstoreRedisEvictions
+        expr: increase(redis_evicted_keys_total{job="objstore-redis"}[5m]) > 0
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Redis has evicted access or control state
+      - alert: ObjstoreVectorBufferSaturated
+        expr: vector_buffer_byte_size{job="objstore-vector",component_id="access_updater"} / vector_buffer_max_byte_size{job="objstore-vector",component_id="access_updater"} > ${saturation_ratio}
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Vector access-updater disk buffer is near capacity
+      - alert: ObjstoreVectorDeliveryErrors
+        expr: sum by (cluster, tenant, pod) (rate(vector_http_client_errors_total{job="objstore-vector",component_id="access_updater"}[5m])) > 0 or sum by (cluster, tenant, pod) (rate(vector_component_errors_total{job="objstore-vector",component_id=~"access_updater|minio_audit"}[5m])) > 0
+        for: 5m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
+        annotations:
+          summary: Vector audit ingestion or updater delivery is failing
+%{ if length(campaign_targets) > 0 ~}
+  - name: objstore-campaign
+    interval: 15s
+    rules:
+      # The producer creates each errors_total label set at its first error.
+      # Record a stable stage total (zero only while requests are observed) BEFORE
+      # rate(), so new error-label sets contribute their initial counts.
+      - record: cwm_objstore_loadtest:stage_requests_total
+        expr: sum by (job, cluster, tenant, run_id, instance, stage) (cwm_objstore_loadtest_requests_total{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},operation!~".*[.]expected-negative"})
+      - record: cwm_objstore_loadtest:stage_errors_total
+        expr: >-
+          sum by (job, cluster, tenant, run_id, instance, stage) (cwm_objstore_loadtest_errors_total{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},operation!~".*[.]expected-negative"})
+          or (0 * cwm_objstore_loadtest:stage_requests_total)
+      # A first positive snapshot has no known preceding zero. Require a boundary
+      # sample plus all 20 evaluations in the fixed 5m/15s window, not a fake zero
+      # rate while history is warming or has gaps. Cumulative errors stay visible.
+      - record: cwm_objstore_loadtest:stage_error_rate_window_ready
+        expr: >-
+          (
+            (0 * cwm_objstore_loadtest:stage_requests_total + 1)
+            and cwm_objstore_loadtest:stage_requests_total offset 5m
+            and cwm_objstore_loadtest:stage_errors_total offset 5m
+            and (count_over_time(cwm_objstore_loadtest:stage_requests_total[5m]) >= 20)
+            and (count_over_time(cwm_objstore_loadtest:stage_errors_total[5m]) >= 20)
+          ) or (0 * cwm_objstore_loadtest:stage_requests_total)
+      - record: cwm_objstore_loadtest:stage_error_ratio5m
+        expr: >-
+          (rate(cwm_objstore_loadtest:stage_errors_total[5m]) / rate(cwm_objstore_loadtest:stage_requests_total[5m]))
+          and (cwm_objstore_loadtest:stage_error_rate_window_ready == 1)
+          and (rate(cwm_objstore_loadtest:stage_requests_total[5m]) > 0)
+      # Latest flag per stage, not max_over_time: an observed idle/completed flag
+      # must suppress alerts immediately. Preserve known activity through outages.
+%{ for target in campaign_targets ~}
+      - record: cwm_objstore_loadtest:target_current_active
+        expr: >-
+          max by (cluster, tenant, run_id, instance) (cwm_objstore_loadtest_stage_status{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)},status="running"})
+          and on (cluster, tenant, run_id, instance) (up{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}} == 1)
+        labels: {instance: ${jsonencode(target)}}
+      - record: cwm_objstore_loadtest:target_active
+        expr: max by (cluster, tenant, run_id, instance) (last_over_time(cwm_objstore_loadtest_stage_status{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)},status="running"}[24h]))
+        labels: {instance: ${jsonencode(target)}}
+      - record: cwm_objstore_loadtest:target_last_refresh_timestamp_seconds
+        expr: last_over_time(cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}}[24h])
+        labels: {instance: ${jsonencode(target)}}
+%{ endfor ~}
+      # Multiple monitors can expose one aggregate run. A fresher completed
+      # snapshot must override an unavailable monitor's historical running flag.
+      # Current activity from a successfully scraped but incomplete/stale target
+      # cannot be discarded because an idle peer has a refresh timestamp. Historical
+      # activity still follows snapshot ordering, preserving completed-run suppression.
+      - record: cwm_objstore_loadtest:run_active
+        expr: >-
+          max by (cluster, tenant, run_id) (
+            (cwm_objstore_loadtest:target_active
+              and on (cluster, tenant, run_id, instance)
+                topk by (cluster, tenant, run_id) (1, cwm_objstore_loadtest:target_last_refresh_timestamp_seconds))
+            or (cwm_objstore_loadtest:target_active
+              unless on (cluster, tenant, run_id) cwm_objstore_loadtest:target_last_refresh_timestamp_seconds)
+            or (cwm_objstore_loadtest:target_current_active
+              unless on (cluster, tenant, run_id, instance)
+                ((time() - cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)}} <= 120)
+                  and (cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)}} > 0)))
+          )
+%{ for target in campaign_targets ~}
+      - alert: ObjstoreCampaignTargetDown
+        expr: (up{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}} == 0) and on (cluster, tenant, run_id) (cwm_objstore_loadtest:run_active == 1)
+        for: 2m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}, run_id: ${jsonencode(campaign_run_id)}}
+        annotations:
+          summary: Active campaign monitor scrape target is down
+      - alert: ObjstoreCampaignTargetMissing
+        expr: (cwm_objstore_loadtest:run_active{run_id=${jsonencode(campaign_run_id)}} == 1) unless on (cluster, tenant, run_id) up{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}}
+        for: 2m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}, run_id: ${jsonencode(campaign_run_id)}, job: objstore-campaign, instance: ${jsonencode(target)}}
+        annotations:
+          summary: Active campaign monitor target is missing
+      - alert: ObjstoreCampaignMonitorStale
+        expr: >-
+          ((time() - cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}} > 120)
+          or (up{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}} == 1 unless on (cluster, tenant, run_id, instance) cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}}))
+          and on (cluster, tenant, run_id, instance) (up{job="objstore-campaign",run_id=${jsonencode(campaign_run_id)},instance=${jsonencode(target)}} == 1)
+          and on (cluster, tenant, run_id, instance) (
+            (cwm_objstore_loadtest:target_current_active == 1)
+            or ((cwm_objstore_loadtest:target_active == 1)
+              and on (cluster, tenant, run_id) (cwm_objstore_loadtest:run_active == 1)
+              unless on (cluster, tenant, run_id, instance) cwm_objstore_loadtest:target_current_active)
+          )
+        for: 2m
+        labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}, run_id: ${jsonencode(campaign_run_id)}}
+        annotations:
+          summary: Active campaign monitor snapshot is stale or missing
+%{ endfor ~}
+%{ endif ~}
+%{ else ~}
+groups: []
+%{ endif ~}

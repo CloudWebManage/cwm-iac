@@ -1,3 +1,8 @@
+vmagent:
+  enabled: true
+  # Existing callers supply remoteWrite. Omit it for standalone/offline renders.
+  remoteWrite: {}
+
 prometheus:
   server:
     tolerations:
@@ -23,6 +28,9 @@ prometheus:
             - source_labels: [__meta_kubernetes_pod_label_cwm_minio_tenant]
               action: keep
               regex: "true"
+            - source_labels: [__meta_kubernetes_pod_container_name, __meta_kubernetes_pod_container_port_number]
+              action: keep
+              regex: "minio;9000"
             - source_labels: [__meta_kubernetes_pod_ip]
               action: replace
               target_label: __address__

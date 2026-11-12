@@ -1,0 +1,75 @@
+rule_files: [/etc/config/alerting_rules.yml]
+evaluation_interval: 15s
+tests:
+  - name: active run retains alert gating through a scrape failure
+    interval: 1m
+    input_series:
+      - series: 'cwm_objstore_loadtest_stage_status{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910",stage="mixed",status="running"}'
+        values: '1+0x2 stale _x12'
+      - series: 'up{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '1+0x2 0+0x6 1+0x5'
+    alert_rule_test:
+      - {eval_time: 4m, alertname: ObjstoreCampaignTargetDown, exp_alerts: []}
+      - eval_time: 7m
+        alertname: ObjstoreCampaignTargetDown
+        exp_alerts:
+          - exp_labels: {job: objstore-campaign, cluster: test-cluster, tenant: test, run_id: campaign-test, instance: '10.20.30.40:9910', severity: warning}
+            exp_annotations: {summary: Active campaign monitor scrape target is down}
+      - {eval_time: 11m, alertname: ObjstoreCampaignTargetDown, exp_alerts: []}
+      - {eval_time: 7m, alertname: ObjstoreCampaignTargetMissing, exp_alerts: []}
+  - name: missing target during a known active run
+    interval: 1m
+    input_series:
+      - series: 'cwm_objstore_loadtest_stage_status{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910",stage="mixed",status="running"}'
+        values: '1+0x2 stale _x12'
+      - series: 'up{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '1+0x2 stale _x12'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: ObjstoreCampaignTargetMissing
+        exp_alerts:
+          - exp_labels: {job: objstore-campaign, cluster: test-cluster, tenant: test, run_id: campaign-test, instance: '10.20.30.40:9910', severity: warning}
+            exp_annotations: {summary: Active campaign monitor target is missing}
+  - name: idle and completed stages suppress stale down and missing alerts
+    interval: 1m
+    input_series:
+      - series: 'cwm_objstore_loadtest_stage_status{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910",stage="mixed",status="running"}'
+        values: '1+0x2 0+0x10'
+      - series: 'up{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '1+0x3 0+0x3 stale _x5'
+      - series: 'cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '1+0x12'
+    alert_rule_test:
+      - {eval_time: 7m, alertname: ObjstoreCampaignTargetDown, exp_alerts: []}
+      - {eval_time: 11m, alertname: ObjstoreCampaignTargetMissing, exp_alerts: []}
+      - {eval_time: 7m, alertname: ObjstoreCampaignMonitorStale, exp_alerts: []}
+  - name: never started campaign does not alert
+    interval: 1m
+    input_series:
+      - series: 'up{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '0+0x10'
+    alert_rule_test:
+      - {eval_time: 7m, alertname: ObjstoreCampaignTargetDown, exp_alerts: []}
+      - {eval_time: 7m, alertname: ObjstoreCampaignTargetMissing, exp_alerts: []}
+      - {eval_time: 7m, alertname: ObjstoreCampaignMonitorStale, exp_alerts: []}
+  - name: stale and missing refresh timestamp while active with recovery
+    interval: 1m
+    input_series:
+      - series: 'cwm_objstore_loadtest_stage_status{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910",stage="mixed",status="running"}'
+        values: '1+0x20'
+      - series: 'up{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '1+0x20'
+      - series: 'cwm_objstore_loadtest_monitor_last_refresh_timestamp_seconds{job="objstore-campaign",cluster="test-cluster",tenant="test",run_id="campaign-test",instance="10.20.30.40:9910"}'
+        values: '1+0x6 420+60x3 stale _x10'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: ObjstoreCampaignMonitorStale
+        exp_alerts:
+          - exp_labels: {job: objstore-campaign, cluster: test-cluster, tenant: test, run_id: campaign-test, instance: '10.20.30.40:9910', severity: warning}
+            exp_annotations: {summary: Active campaign monitor snapshot is stale or missing}
+      - {eval_time: 8m, alertname: ObjstoreCampaignMonitorStale, exp_alerts: []}
+      - eval_time: 16m
+        alertname: ObjstoreCampaignMonitorStale
+        exp_alerts:
+          - exp_labels: {job: objstore-campaign, cluster: test-cluster, tenant: test, run_id: campaign-test, instance: '10.20.30.40:9910', severity: warning}
+            exp_annotations: {summary: Active campaign monitor snapshot is stale or missing}

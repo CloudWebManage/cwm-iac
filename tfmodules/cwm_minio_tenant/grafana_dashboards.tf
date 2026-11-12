@@ -1,21 +1,22 @@
 module "tenant-grafana-dashboards-app" {
-  source           = "../argocd-app"
-  name             = "minio-tenant-${var.name}-grafana-dashboards"
-  namespace        = "monitoring"
-  create_namespace = false
-  versions = var.versions
+  source                          = "../argocd-app"
+  name                            = "minio-tenant-${var.name}-grafana-dashboards"
+  namespace                       = "monitoring"
+  create_namespace                = false
+  versions                        = var.versions
   targetRevisionFromVersionByName = true
-  path = "apps/grafana-dashboards"
-  tools = var.tools
-  kubeconfig_path = var.kubeconfig_path
-  autosync = var.argocd_autosync
+  path                            = "apps/grafana-dashboards"
+  tools                           = var.tools
+  kubeconfig_path                 = var.kubeconfig_path
+  autosync                        = var.argocd_autosync
   values = {
     minio = {
-      enabled = true
-      prometheusUrl = "http://minio-tenant-${var.name}-metrics-prometheus-server.minio-tenant-${var.name}-metrics:80"
+      enabled            = true
+      objstoreMonitoring = var.objstore_monitoring.enabled
+      prometheusUrl      = "http://minio-tenant-${var.name}-metrics-prometheus-server.minio-tenant-${var.name}-metrics:80"
       namespaces = {
-        tenant   = "minio-tenant-${var.name}"
-        metrics  = "minio-tenant-${var.name}-metrics"
+        tenant  = "minio-tenant-${var.name}"
+        metrics = "minio-tenant-${var.name}-metrics"
       }
     }
   }

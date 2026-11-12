@@ -10,6 +10,47 @@ nodeLocal:
 
 clusterName: ""
 
+cwmMinioTierer:
+  tierer:
+    image: ghcr.io/cloudwebmanage/cwm-minio-tierer:latest
+
+tierer:
+  mode: apply
+  apply: true
+  low_hours: 72
+  low_threshold: 3
+  high_hours: 72
+  high_threshold: 3
+  high_include_current: true
+  restore_days: 1
+  access_retention: 77h
+  coverage_enabled: false
+  coverage_template: ""
+  coverage_value: ""
+  daily_transition_attempts: ""
+  daily_transition_bytes: ""
+  daily_restore_attempts: ""
+  daily_restore_bytes: ""
+  exclude_buckets: ""
+  exclude_bucket_prefixes: ""
+  chunk_size: 69
+  completion_delay: 5m
+  retry_delay: 30s
+  resources: {}
+  probes_enabled: true
+
+tiererRedis:
+  appendonly: false
+  appendfsync: everysec
+  maxmemory_policy: noeviction
+  maxmemory: "0"
+  resources: {}
+  exporter_enabled: false
+  exporter_image: oliver006/redis_exporter:v1.80.1
+  exporter_resources: {}
+
+low_tier_s3: {}
+
 tenant:
   # Root key for MinIO Tenant Chart
   tenant:

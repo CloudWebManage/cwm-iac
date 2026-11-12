@@ -54,7 +54,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_buckets_total_bytes{bucket=\"$bucket\"}",
+              "expr": "max by (bucket) (minio_bucket_usage_total_bytes{bucket=\"$bucket\"})",
               "legendFormat": "Size",
               "refId": "A"
             }
@@ -88,7 +88,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_buckets_objects_count{bucket=\"$bucket\"}",
+              "expr": "max by (bucket) (minio_bucket_usage_object_total{bucket=\"$bucket\"})",
               "legendFormat": "Objects",
               "refId": "A"
             }
@@ -122,7 +122,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_total{bucket=\"$bucket\"}[5m]))",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_total{bucket=\"$bucket\"}[5m])))",
               "legendFormat": "Requests/s",
               "refId": "A"
             }
@@ -162,7 +162,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_4xx_errors_total{bucket=\"$bucket\"}[5m])) + sum(rate(minio_bucket_api_5xx_errors_total{bucket=\"$bucket\"}[5m]))",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_4xx_errors_total{bucket=\"$bucket\"}[5m]))) + sum(max without (job, instance, pod) (rate(minio_bucket_requests_5xx_errors_total{bucket=\"$bucket\"}[5m])))",
               "legendFormat": "Errors/s",
               "refId": "A"
             }
@@ -210,7 +210,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_buckets_total_bytes{bucket=\"$bucket\"}",
+              "expr": "max by (bucket) (minio_bucket_usage_total_bytes{bucket=\"$bucket\"})",
               "legendFormat": "Size",
               "refId": "A"
             }
@@ -258,7 +258,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_cluster_usage_buckets_objects_count{bucket=\"$bucket\"}",
+              "expr": "max by (bucket) (minio_bucket_usage_object_total{bucket=\"$bucket\"})",
               "legendFormat": "Objects",
               "refId": "A"
             }
@@ -314,8 +314,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_total{bucket=\"$bucket\"}[5m])) by (name)",
-              "legendFormat": "{{ `{{name}}` }}",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_total{bucket=\"$bucket\"}[5m]))) by (api)",
+              "legendFormat": "{{ `{{api}}` }}",
               "refId": "A"
             }
           ],
@@ -365,14 +365,14 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_4xx_errors_total{bucket=\"$bucket\"}[5m])) by (name)",
-              "legendFormat": "{{ `{{name}}` }} 4xx",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_4xx_errors_total{bucket=\"$bucket\"}[5m]))) by (api)",
+              "legendFormat": "{{ `{{api}}` }} 4xx",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_5xx_errors_total{bucket=\"$bucket\"}[5m])) by (name)",
-              "legendFormat": "{{ `{{name}}` }} 5xx",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_requests_5xx_errors_total{bucket=\"$bucket\"}[5m]))) by (api)",
+              "legendFormat": "{{ `{{api}}` }} 5xx",
               "refId": "B"
             }
           ],
@@ -419,19 +419,19 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.50, sum(rate(minio_bucket_api_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m])) by (le))",
+              "expr": "histogram_quantile(0.50, sum(max without (job, instance, pod) (rate(minio_bucket_requests_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m]))) by (le))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.90, sum(rate(minio_bucket_api_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m])) by (le))",
+              "expr": "histogram_quantile(0.90, sum(max without (job, instance, pod) (rate(minio_bucket_requests_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m]))) by (le))",
               "legendFormat": "p90",
               "refId": "B"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.99, sum(rate(minio_bucket_api_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(max without (job, instance, pod) (rate(minio_bucket_requests_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m]))) by (le))",
               "legendFormat": "p99",
               "refId": "C"
             }
@@ -479,8 +479,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.99, sum(rate(minio_bucket_api_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m])) by (le, name))",
-              "legendFormat": "{{ `{{name}}` }}",
+              "expr": "histogram_quantile(0.99, sum(max without (job, instance, pod) (rate(minio_bucket_requests_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m]))) by (le, api))",
+              "legendFormat": "{{ `{{api}}` }}",
               "refId": "A"
             }
           ],
@@ -538,13 +538,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_traffic_sent_bytes{bucket=\"$bucket\"}[5m]))",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_traffic_sent_bytes{bucket=\"$bucket\"}[5m])))",
               "legendFormat": "Download",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(minio_bucket_api_traffic_received_bytes{bucket=\"$bucket\"}[5m]))",
+              "expr": "sum(max without (job, instance, pod) (rate(minio_bucket_traffic_received_bytes{bucket=\"$bucket\"}[5m])))",
               "legendFormat": "Upload",
               "refId": "B"
             }
@@ -578,7 +578,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_bucket_api_traffic_sent_bytes{bucket=\"$bucket\"}",
+              "expr": "sum(max without (job, instance, pod) (minio_bucket_traffic_sent_bytes{bucket=\"$bucket\"}))",
               "legendFormat": "Total Sent",
               "refId": "A"
             }
@@ -612,7 +612,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "minio_bucket_api_traffic_received_bytes{bucket=\"$bucket\"}",
+              "expr": "sum(max without (job, instance, pod) (minio_bucket_traffic_received_bytes{bucket=\"$bucket\"}))",
               "legendFormat": "Total Received",
               "refId": "A"
             }
@@ -652,7 +652,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "topk(10, sum(rate(minio_bucket_api_total{bucket=\"$bucket\"}[5m])) by (name))",
+              "expr": "topk(10, sum(max without (job, instance, pod) (rate(minio_bucket_requests_total{bucket=\"$bucket\"}[5m]))) by (api))",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
@@ -689,7 +689,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "topk(10, histogram_quantile(0.99, sum(rate(minio_bucket_api_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m])) by (le, name)))",
+              "expr": "topk(10, histogram_quantile(0.99, sum(max without (job, instance, pod) (rate(minio_bucket_requests_ttfb_seconds_distribution{bucket=\"$bucket\"}[5m]))) by (le, api)))",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
@@ -727,14 +727,14 @@ data:
             "allValue": "",
             "current": { "selected": false, "text": "", "value": "" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(minio_cluster_usage_buckets_total_bytes, bucket)",
+            "definition": "label_values(minio_bucket_usage_total_bytes, bucket)",
             "hide": 0,
             "includeAll": false,
             "label": "Bucket",
             "multi": false,
             "name": "bucket",
             "options": [],
-            "query": { "qryType": 1, "query": "label_values(minio_cluster_usage_buckets_total_bytes, bucket)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "query": { "qryType": 1, "query": "label_values(minio_bucket_usage_total_bytes, bucket)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
             "refresh": 2,
             "regex": "",
             "skipUrlSync": false,

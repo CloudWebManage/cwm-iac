@@ -1,22 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_MINIO_PROMETHEUS",
-      "label": "MinIO Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    },
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
   "__elements": {},
   "__requires": [
     {
@@ -82,7 +64,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -162,7 +144,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -193,7 +175,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -277,7 +259,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -297,7 +279,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -381,7 +363,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -401,7 +383,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -485,7 +467,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -505,7 +487,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -589,7 +571,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -609,7 +591,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -693,7 +675,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -726,7 +708,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -810,7 +792,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -830,7 +812,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -914,7 +896,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -934,7 +916,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1018,7 +1000,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1038,7 +1020,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1122,7 +1104,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1142,7 +1124,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1226,7 +1208,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1259,7 +1241,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1343,7 +1325,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1363,7 +1345,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1447,7 +1429,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1467,7 +1449,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1551,7 +1533,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1571,7 +1553,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1655,7 +1637,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1675,7 +1657,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1759,7 +1741,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1779,7 +1761,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1863,7 +1845,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1883,7 +1865,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1967,7 +1949,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1987,7 +1969,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -2071,7 +2053,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2091,7 +2073,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_MINIO_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -2175,7 +2157,7 @@
           "adhocFilters": [],
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2205,7 +2187,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2289,7 +2271,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2309,7 +2291,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2393,7 +2375,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2427,7 +2409,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2511,7 +2493,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2531,7 +2513,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2615,7 +2597,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2635,7 +2617,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2689,7 +2671,7 @@
                   }
                 ]
               },
-              "unit": "µs"
+              "unit": "\u00b5s"
             },
             "overrides": []
           },
@@ -2719,7 +2701,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2739,7 +2721,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2823,7 +2805,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2843,7 +2825,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2927,7 +2909,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -2947,7 +2929,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3031,7 +3013,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -3051,7 +3033,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_MINIO_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3135,7 +3117,7 @@
               "adhocFilters": [],
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_MINIO_PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -3172,7 +3154,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3260,7 +3242,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3270,7 +3252,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3358,7 +3340,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3368,7 +3350,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3456,7 +3438,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3466,7 +3448,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3554,7 +3536,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3564,7 +3546,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3652,7 +3634,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3675,7 +3657,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3763,7 +3745,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3773,7 +3755,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3861,7 +3843,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3871,7 +3853,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3959,7 +3941,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -3969,7 +3951,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -4057,7 +4039,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -4067,7 +4049,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -4155,7 +4137,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -4165,7 +4147,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${ingress_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -4253,7 +4235,7 @@
           "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${ingress_datasource}"
           }
         }
       ],
@@ -4264,11 +4246,40 @@
   "schemaVersion": 41,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "datasource",
+        "label": "MinIO data source",
+        "type": "datasource",
+        "query": "prometheus",
+        "regex": "/MinIO.*/",
+        "refresh": 1,
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "options": []
+      },
+      {
+        "name": "ingress_datasource",
+        "label": "Ingress data source",
+        "type": "datasource",
+        "query": "prometheus",
+        "regex": "/^Prometheus$/",
+        "refresh": 1,
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "options": []
+      }
+    ]
   },
   "time": {
-    "from": "2026-02-11T08:00:00.000Z",
-    "to": "2026-02-11T09:00:00.000Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",

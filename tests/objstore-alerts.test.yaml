@@ -1,0 +1,108 @@
+rule_files: [/etc/config/alerting_rules.yml]
+evaluation_interval: 15s
+tests:
+  - name: initial scan is not stale but eventually becomes overdue
+    interval: 1m
+    input_series:
+      - series: 'cwm_minio_tierer_last_successful_scan_timestamp_seconds{job="objstore-tierer",instance="scanner:8081",pod="scanner"}'
+        values: '0+0x1560'
+      - series: 'up{job="objstore-tierer",instance="scanner:8081",pod="scanner"}'
+        values: '1+0x1560'
+    alert_rule_test:
+      - {eval_time: 1h, alertname: ObjstoreScanStale, exp_alerts: []}
+      - {eval_time: 1h, alertname: ObjstoreInitialScanOverdue, exp_alerts: []}
+      - eval_time: 25h
+        alertname: ObjstoreInitialScanOverdue
+        exp_alerts:
+          - exp_labels: {job: objstore-tierer, instance: 'scanner:8081', pod: scanner, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Initial full tierer traversal has exceeded its grace period}
+  - name: completed scan staleness and recovery
+    interval: 1m
+    input_series:
+      - series: 'cwm_minio_tierer_last_successful_scan_timestamp_seconds{job="objstore-tierer",pod="scanner"}'
+        values: '1+0x1460 87660+60x20'
+    alert_rule_test:
+      - {eval_time: 24h, alertname: ObjstoreScanStale, exp_alerts: []}
+      - eval_time: 24h20m
+        alertname: ObjstoreScanStale
+        exp_alerts:
+          - exp_labels: {job: objstore-tierer, pod: scanner, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: No recent completed full tierer traversal}
+      - {eval_time: 24h25m, alertname: ObjstoreScanStale, exp_alerts: []}
+  - name: partially missing updater fleet and total disappearance
+    interval: 1m
+    input_series:
+      - {series: 'up{job="objstore-updater",pod="one"}', values: '1+0x10'}
+      - {series: 'up{job="objstore-updater",pod="two"}', values: '1+0x10'}
+      - {series: 'up{job="objstore-vector",pod="one"}', values: '1+0x10'}
+      - {series: 'up{job="objstore-vector",pod="two"}', values: '1+0x10'}
+      - {series: 'up{job="objstore-vector",pod="three"}', values: '1+0x10'}
+      - {series: 'up{job="objstore-redis",pod="redis"}', values: '1+0x10'}
+    alert_rule_test:
+      - {eval_time: 4m, alertname: ObjstoreTargetsMissing, exp_alerts: []}
+      - eval_time: 6m
+        alertname: ObjstoreTargetsMissing
+        exp_alerts:
+          - exp_labels: {job: objstore-updater, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Fewer pipeline pods discovered than configured}
+          - exp_labels: {job: objstore-tierer, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Fewer pipeline pods discovered than configured}
+  - name: down target is distinct from missing target
+    interval: 1m
+    input_series:
+      - {series: 'up{job="objstore-tierer",pod="scanner"}', values: '0+0x10'}
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: ObjstoreTargetDown
+        exp_alerts:
+          - exp_labels: {job: objstore-tierer, pod: scanner, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Objstore pipeline scrape target is down}
+  - name: ingest error and risk override
+    interval: 1m
+    input_series:
+      - {series: 'cwm_minio_tierer_updater_batch_errors_total{pod="one",cluster="test-cluster",tenant="test"}', values: '0+1x10 10+0x10'}
+      - {series: 'cwm_minio_tierer_updater_risk_override{pod="one",risk="data_loss"}', values: '1+0x10'}
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: ObjstoreIngestErrors
+        exp_alerts:
+          - exp_labels: {pod: one, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Updater batches or ingestion requests are failing}
+      - {eval_time: 17m, alertname: ObjstoreIngestErrors, exp_alerts: []}
+      - eval_time: 2m
+        alertname: ObjstoreRiskOverride
+        exp_alerts:
+          - exp_labels: {pod: one, risk: data_loss, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Updater status-code risk override is active}
+  - name: budget and saturation thresholds
+    interval: 1m
+    input_series:
+      - {series: 'cwm_minio_tierer_budget_exhaustions_total{kind="transition"}', values: '0+1x10'}
+      - {series: 'cwm_minio_tierer_updater_queue_depth{pod="one"}', values: '110+0x10'}
+      - {series: 'redis_memory_used_bytes{job="objstore-redis",pod="redis"}', values: '900+0x10'}
+      - {series: 'redis_memory_max_bytes{job="objstore-redis",pod="redis"}', values: '1000+0x10'}
+      - {series: 'redis_memory_used_bytes{job="objstore-redis",pod="unlimited"}', values: '900+0x10'}
+      - {series: 'redis_memory_max_bytes{job="objstore-redis",pod="unlimited"}', values: '0+0x10'}
+      - {series: 'vector_buffer_byte_size{job="objstore-vector",component_id="access_updater",pod="one"}', values: '5000000000+0x10'}
+      - {series: 'vector_buffer_max_byte_size{job="objstore-vector",component_id="access_updater",pod="one"}', values: '5368709120+0x10'}
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: ObjstoreBudgetExhausted
+        exp_alerts:
+          - exp_labels: {kind: transition, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Tierer actions are being skipped by a UTC daily budget}
+      - eval_time: 7m
+        alertname: ObjstoreUpdaterQueueSaturated
+        exp_alerts:
+          - exp_labels: {pod: one, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Updater request queue is near capacity}
+      - eval_time: 7m
+        alertname: ObjstoreRedisMemorySaturated
+        exp_alerts:
+          - exp_labels: {job: objstore-redis, pod: redis, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Redis memory is near configured maxmemory}
+      - eval_time: 7m
+        alertname: ObjstoreVectorBufferSaturated
+        exp_alerts:
+          - exp_labels: {job: objstore-vector, component_id: access_updater, pod: one, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Vector access-updater disk buffer is near capacity}
