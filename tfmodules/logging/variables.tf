@@ -28,3 +28,9 @@ variable "loki_write_storage_size" {
   type = string
   default = "20Gi"
 }
+
+variable "minio_init_image" {
+  description = "Original image of a completed logging initialization Job; null uses the chart default for new installations."
+  type = string
+  default = null
+}

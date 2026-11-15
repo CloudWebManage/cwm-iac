@@ -9,6 +9,7 @@ module "app" {
   values = {
     "prometheusNagiosSender" = var.prometheusNagiosSenderConfigValues
     "kube-prometheus-stack" = {
+      additionalPrometheusRulesMap = var.cdn_capacity_alerts_enabled ? yamldecode(file("${path.module}/cdn-capacity-rules.yaml")) : {}
       alertmanager = {
         alertmanagerSpec = {
           externalUrl = "https://alertmanager.${var.ingress_star_domain}"

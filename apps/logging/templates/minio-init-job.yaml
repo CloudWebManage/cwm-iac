@@ -17,7 +17,7 @@ spec:
               secretName: tenant-env-configuration
         containers:
           - name: minio-init
-            image: docker.io/pgsty/mc:RELEASE.2026-11-12T00-00-00Z@sha256:b532278b7a3747dbab6fe45eebb40a653efa704e6758e24e9d9ec54fc96c1800
+            image: {{ .Values.minioInitImage | quote }}
             volumeMounts:
               - name: tenant-env-configuration
                 mountPath: /etc/tenant-env-configuration

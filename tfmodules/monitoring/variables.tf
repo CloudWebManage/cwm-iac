@@ -85,3 +85,9 @@ variable "prometheus_storage_size" {
   type = string
   default = "150Gi"
 }
+
+variable "cdn_capacity_alerts_enabled" {
+  description = "Enable cache filesystem capacity alerts only for CDN clusters."
+  type = bool
+  default = false
+}

@@ -7,7 +7,7 @@ module "app" {
   targetRevisionFromVersionByName = true
   tools = var.tools
   kubeconfig_path = var.kubeconfig_path
-  values = {
+  values = merge(var.minio_init_image == null ? {} : { minioInitImage = var.minio_init_image }, {
     tenant = {
       ingress = {
         api = {
@@ -75,5 +75,5 @@ module "app" {
         }
       }
     }
-  }
+  })
 }
