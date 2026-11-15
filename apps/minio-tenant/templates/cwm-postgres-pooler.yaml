@@ -24,7 +24,8 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: cwm-minio-api-pooler
+  # CNPG 1.26 deletes same-name PodMonitors when its monitoring is disabled.
+  name: cwm-minio-api-pooler-metrics
 spec:
   selector:
     matchLabels:
