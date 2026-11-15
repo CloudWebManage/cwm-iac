@@ -294,3 +294,9 @@ variable "low_tier_s3" {
   type    = map(any)
   default = {}
 }
+
+variable "low_tier_init_image" {
+  description = "Preserve the image of an existing completed tier initialization Job; null uses the tenant image for new installations."
+  type = string
+  default = null
+}

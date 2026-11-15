@@ -577,3 +577,6 @@ tenant:
   #      config.env: |-
   #        export MINIO_ROOT_USER='minio'
   #        export MINIO_ROOT_PASSWORD='minio123'
+
+# Set to the original image for an already completed initialization Job.
+lowTierInitImage: null

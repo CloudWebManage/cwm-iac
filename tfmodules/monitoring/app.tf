@@ -62,6 +62,11 @@ module "app" {
       prometheus = {
         prometheusSpec = {
           externalUrl = "https://prometheus.${var.ingress_star_domain}"
+          storageSpec = {
+            volumeClaimTemplate = {
+              spec = { resources = { requests = { storage = var.prometheus_storage_size } } }
+            }
+          }
         }
       }
     }

@@ -17,6 +17,7 @@ module "minio_tenant_main" {
   values = merge(
     {
       initialize = var.initialize
+      lowTierInitImage = var.low_tier_init_image
       nodeLocal = {
         enabled = var.node_local_enabled
       }

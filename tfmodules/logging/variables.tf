@@ -19,3 +19,12 @@ variable "tools" {
 variable "kubeconfig_path" {
   type = string
 }
+variable "minio_storage_size" {
+  type = string
+  default = "999Gi"
+}
+
+variable "loki_write_storage_size" {
+  type = string
+  default = "20Gi"
+}

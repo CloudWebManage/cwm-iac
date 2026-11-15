@@ -80,3 +80,8 @@ variable "slack_alerts_watchdog_channel" {
   type = string
   default = "cwm-watchdog"
 }
+
+variable "prometheus_storage_size" {
+  type = string
+  default = "150Gi"
+}

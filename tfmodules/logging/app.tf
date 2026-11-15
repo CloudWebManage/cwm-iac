@@ -51,7 +51,7 @@ module "app" {
             name             = "logging1"
             servers          = 1
             volumesPerServer = 1
-            size       = "999Gi"
+            size       = var.minio_storage_size
             storageClassName = "directpv-min-io"
             tolerations = [
               {
@@ -66,6 +66,7 @@ module "app" {
       }
     }
     loki = {
+      write = { persistence = { size = var.loki_write_storage_size } }
       loki = {
         storage_config = {
           aws = {

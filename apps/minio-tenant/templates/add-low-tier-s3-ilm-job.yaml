@@ -13,7 +13,7 @@ spec:
           effect: "NoExecute"
       containers:
         - name: mc
-          image: "{{ .Values.tenant.tenant.image.repository }}:{{ .Values.tenant.tenant.image.tag }}"
+          image: {{ default (printf "%s:%s" .Values.tenant.tenant.image.repository .Values.tenant.tenant.image.tag) .Values.lowTierInitImage | quote }}
           imagePullPolicy: IfNotPresent
           command:
             - bash
