@@ -2,7 +2,7 @@ services:
   minio:
     depends_on:
       - minio-log-metrics
-    image: quay.io/minio/minio:RELEASE.2025-07-23T15-54-02Z
+    image: docker.io/pgsty/silo:RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329
     command:
       - server
       - /data

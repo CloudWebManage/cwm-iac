@@ -56,6 +56,7 @@ module "minio_tenant_main" {
         tenant = {
           name = var.name
           image = {
+            repository = "docker.io/pgsty/silo"
             tag = var.minio_image_tag
           }
           configSecret = {

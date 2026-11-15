@@ -8,7 +8,7 @@ variable "ingress_star_domain" {
 
 variable "minio_image_tag" {
   type    = string
-  default = "RELEASE.2025-07-23T15-54-02Z"
+  default = "RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329"
 }
 
 variable "pools" {

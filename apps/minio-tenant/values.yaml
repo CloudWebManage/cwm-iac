@@ -62,14 +62,14 @@ tenant:
     ###
     # Specify the Operator container image to use for the deployment.
     # ``image.tag``
-    # For example, the following sets the image to the ``quay.io/minio/operator`` repo and the v7.1.1 tag.
+    # For example, the following sets the image to the ``docker.io/pgsty/silo`` repository and a pinned release.
     # The container pulls the image if not already present:
     #
     # .. code-block:: yaml
     #
     #    image:
-    #       repository: quay.io/minio/minio
-    #       tag: RELEASE.2025-04-08T15-41-24Z
+    #       repository: docker.io/pgsty/silo
+    #       tag: RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329
     #       pullPolicy: IfNotPresent
     #
     # The chart also supports specifying an image based on digest value:
@@ -77,14 +77,14 @@ tenant:
     # .. code-block:: yaml
     #
     #    image:
-    #       repository: quay.io/minio/minio@sha256
-    #       digest: 28c80b379c75242c6fe793dfbf212f43c602140a0de5ebe3d9c2a3a7b9f9f983
+    #       repository: docker.io/pgsty/silo@sha256
+    #       digest: c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329
     #       pullPolicy: IfNotPresent
     #
     #
     image:
-      repository: quay.io/minio/minio
-      tag: RELEASE.2025-04-08T15-41-24Z
+      repository: docker.io/pgsty/silo
+      tag: RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329
       pullPolicy: IfNotPresent
     ###
     #

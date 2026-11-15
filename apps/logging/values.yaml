@@ -2,8 +2,8 @@ tenant:
   tenant:
     name: ""
     image:
-      repository: quay.io/minio/minio
-      tag: RELEASE.2025-04-08T15-41-24Z
+      repository: docker.io/pgsty/silo
+      tag: RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329
       pullPolicy: IfNotPresent
     configSecret:
       name: ""
