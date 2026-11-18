@@ -120,6 +120,7 @@ resource "kubernetes_ingress_v1" "argocd-server" {
 resource "tls_private_key" "argocd_github_repo_deploy_keys" {
   for_each = var.argocd_github_repo_deploy_keys
   algorithm = "RSA"
+  rsa_bits = 4096
 }
 
 resource "kubernetes_secret" "argocd_github_repo_deploy_keys" {

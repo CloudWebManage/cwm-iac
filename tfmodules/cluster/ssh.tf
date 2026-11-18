@@ -36,7 +36,7 @@ resource "null_resource" "init_ssh_bastion" {
   for_each = {for name, server in var.servers : name => server if server.role == "bastion"}
   depends_on = [kamatera_server.servers]
   triggers = {
-    v = 3
+    v = 6
     command = replace(
       local.init_ssh_script_template,
       "__LISTEN_ADDR__",
@@ -46,7 +46,7 @@ resource "null_resource" "init_ssh_bastion" {
   provisioner "local-exec" {
     command = <<-EOF
       set -euo pipefail
-      SSHCMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${local.server_public_ip[each.key]}"
+      SSHCMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 root@${local.server_public_ip[each.key]}"
       if $SSHCMD -p ${random_integer.bastion_ssh_port.result} true; then
         $SSHCMD -p ${random_integer.bastion_ssh_port.result} "${self.triggers.command}"
       else
@@ -61,6 +61,7 @@ resource "null_resource" "init_ssh_servers" {
   for_each = {for name, server in var.servers : name => server if server.role != "bastion"}
   depends_on = [null_resource.init_ssh_bastion]
   triggers = {
+    v = 6
     command = replace(
       local.init_ssh_script_template,
       "__LISTEN_ADDR__",
@@ -75,6 +76,7 @@ resource "null_resource" "init_ssh_servers" {
       echo 'Host *' > "$TMPFILE"
       echo '  StrictHostKeyChecking no' >> "$TMPFILE"
       echo '  UserKnownHostsFile /dev/null' >> "$TMPFILE"
+      echo '  ConnectTimeout 10' >> "$TMPFILE"
       SSHCMD="ssh -F $TMPFILE root@${local.server_private_ip[each.key]}"
       SSHCMD+=" -J root@${local.server_public_ip[local.bastion_server_name]}:${random_integer.bastion_ssh_port.result}"
       if $SSHCMD -p ${random_integer.servers_ssh_port.result} true; then
@@ -94,7 +96,7 @@ data "external" "ssh_known_hosts" {
     "bash", "-c", <<-EOT
       set -euo pipefail
       FILENAME="${var.data_path}/servers/${each.key}/ssh_known_hosts"
-      if ! [ -f "$FILENAME" ]; then
+      if ! [ -f "$FILENAME" ] || [ "${var.refresh_known_hosts}" = "true" ] ; then
         mkdir -p "$(dirname "$FILENAME")"
         SERVER_ROLE="${each.value.role}"
         if [ "$SERVER_ROLE" = "bastion" ]; then

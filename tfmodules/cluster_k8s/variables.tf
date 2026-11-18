@@ -77,3 +77,8 @@ variable "rke2_ingress_nginx_http_snippet" {
   type = string
   default = ""
 }
+
+variable "monitoring_enabled" {
+  type = bool
+  default = true
+}

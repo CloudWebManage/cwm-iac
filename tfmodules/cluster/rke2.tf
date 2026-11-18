@@ -31,7 +31,7 @@ resource "null_resource" "rke2_node_settings" {
         [Service]
         Type=oneshot
         ExecStart=/bin/sh -c '\
-        for q in /sys/class/net/eth*/queues/rx-*; do \
+        for q in /sys/class/net/e*/queues/rx-*; do \
           echo ff > \$q/rps_cpus; \
           echo 32768 > \$q/rps_flow_cnt; \
         done'
@@ -49,10 +49,6 @@ resource "null_resource" "rke2_node_settings" {
       echo 'export CONTAINERD_ADDRESS=/run/k3s/containerd/containerd.sock' >> /etc/profile.d/00-cwm.sh
       echo 'export CONTAINERD_NAMESPACE=k8s.io' >> /etc/profile.d/00-cwm.sh
       echo 'export KUBECONFIG="/etc/rancher/rke2/rke2.yaml"' >> /etc/profile.d/00-cwm.sh
-      if ! ip addr show eth1 | grep '172\.16\.'; then
-          echo "Error: eth1 must have the internal IP"
-          exit 1
-      fi
     EOF
   }
   provisioner "local-exec" {

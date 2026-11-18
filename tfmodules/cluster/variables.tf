@@ -82,3 +82,18 @@ variable "use_existing_private_network_full_name" {
   type = string
   default = ""
 }
+
+variable "cloudcli_api_client_id" {
+  type = string
+  sensitive = true
+}
+
+variable "cloudcli_api_secret" {
+  type = string
+  sensitive = true
+}
+
+variable "refresh_known_hosts" {
+  type    = bool
+  default = false
+}

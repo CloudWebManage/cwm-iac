@@ -13,7 +13,7 @@ resource "kubernetes_manifest" "rke2-canal-helm-chart-config" {
       valuesContent = <<-EOT
         flannel:
           backend: "vxlan"
-          iface: "eth1"
+          regexIface: "^(eth1|enp6s19)$"
         calico:
           felixDefaultEndpointToHostAction: ACCEPT
           # calico inbound failsafe ports. Empty string means defaults. Use 'none' to disable failsafe if you have your own rules.
@@ -126,7 +126,7 @@ resource "kubernetes_manifest" "rke2-ingress-nginx-helm-chart-config" {
           metrics:
             enabled: true
             serviceMonitor:
-              enabled: true
+              enabled: ${var.monitoring_enabled ? "true" : "false"}
               namespace: monitoring
               additionalLabels:
                 release: monitoring

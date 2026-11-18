@@ -29,10 +29,10 @@ resource "kamatera_server" "servers" {
 
 locals {
   server_public_ip = {
-    for name, _ in var.servers : name => kamatera_server.servers[name].public_ips[0]
+    for name, _ in var.servers : name => try(kamatera_server.servers[name].public_ips[0], null)
   }
   server_private_ip = {
-    for name, _ in var.servers : name => kamatera_server.servers[name].private_ips[0]
+    for name, _ in var.servers : name => try(kamatera_server.servers[name].private_ips[0], null)
   }
   bastion_server_name = [
     for name, server in var.servers : name if server.role == "bastion"
