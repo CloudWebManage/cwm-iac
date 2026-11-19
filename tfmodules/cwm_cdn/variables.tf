@@ -38,11 +38,6 @@ variable "versions" {
   type = any
 }
 
-variable "geolocation_routing_policy" {
-  type    = any
-  default = {}
-}
-
 variable "geolocation_routing_policies" {
   type    = any
   default = {}
@@ -78,6 +73,11 @@ variable "argocdConfigSource" {
 variable "geo_prefix" {
   type    = string
   default = "geo"
+}
+
+variable "additional_geo_prefixes" {
+  type    = any
+  default = {}
 }
 
 variable "vmagentRemoteWriteConfig" {

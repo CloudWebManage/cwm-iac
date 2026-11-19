@@ -24,10 +24,7 @@ output "geo_dns_records" {
   value = {
     name       = "${var.geo_prefix}.${var.zone_domain}"
     edge_cname = aws_route53_record.edge.name
-    records = concat(
-      [for record in aws_route53_record.geo : record.fqdn],
-      [for record in aws_route53_record.geos : record.fqdn]
-    )
+    records = [for record in aws_route53_record.geos : record.fqdn]
   }
 }
 

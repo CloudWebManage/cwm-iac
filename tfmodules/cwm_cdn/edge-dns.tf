@@ -10,3 +10,13 @@ resource "aws_route53_record" "edge" {
 output "edge_dns" {
   value = aws_route53_record.edge.name
 }
+
+resource "aws_route53_record" "edge_additional_geo_prefixes" {
+  for_each = var.additional_geo_prefixes
+  provider = aws.route53
+  name    = "${each.value}.${var.zone_domain}"
+  type    = "A"
+  zone_id = var.zone_id
+  records = var.edge_server_public_ips
+  ttl = 300
+}
