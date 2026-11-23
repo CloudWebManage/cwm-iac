@@ -1,4 +1,15 @@
+moved {
+  from = random_password.low_tier_bucket_suffix
+  to   = random_password.low_tier_bucket_suffix[0]
+}
+
+moved {
+  from = aws_s3_bucket.low_tier
+  to   = aws_s3_bucket.low_tier[0]
+}
+
 resource "random_password" "low_tier_bucket_suffix" {
+  count            = var.create_low_tier_s3 ? 1 : 0
   length           = 16
   special          = false
   upper = false
@@ -6,8 +17,9 @@ resource "random_password" "low_tier_bucket_suffix" {
 
 
 resource "aws_s3_bucket" "low_tier" {
+  count    = var.create_low_tier_s3 ? 1 : 0
   provider = aws.default
-  bucket = "${var.cluster_name}-low-tier-${random_password.low_tier_bucket_suffix.result}"
+  bucket = "${var.cluster_name}-low-tier-${random_password.low_tier_bucket_suffix[0].result}"
   region = var.low_tier_s3_region
 }
 
@@ -22,8 +34,8 @@ resource "aws_s3_bucket" "low_tier" {
 # set keys "access" and "secret"
 
 output "low_tier_s3" {
-  value = {
+  value = var.create_low_tier_s3 ? {
     aws_region = var.low_tier_s3_region
-    bucket_name = aws_s3_bucket.low_tier.bucket
-  }
+    bucket_name = aws_s3_bucket.low_tier[0].bucket
+  } : null
 }

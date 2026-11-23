@@ -6,6 +6,17 @@ variable "ingress_star_domain" {
   type = string
 }
 
+variable "postgres_major" {
+  description = "PostgreSQL major version. Upgrade existing tenants to the current 17.x minor before selecting 19 for an offline major upgrade."
+  type        = number
+  default     = 17
+
+  validation {
+    condition     = contains([17, 19], var.postgres_major)
+    error_message = "Select a major version available in the cwm PostgreSQL image catalog (17 or 19)."
+  }
+}
+
 variable "minio_image_tag" {
   type    = string
   default = "RELEASE.2026-11-12T00-00-00Z@sha256:c20d112390b9a9ce8c11b8af95ad35bcaa62f4759663c09c936cd8d2b511f329"
@@ -81,7 +92,7 @@ variable "metrics_app_target_revision" {
 
 variable "log_metrics_sidecar_image" {
   type    = string
-  default = "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:c6a5bfff6872857b257d93e8b83d9dd719eea5f1"
+  default = null
 }
 
 variable "vmagent_cluster_label" {
@@ -200,7 +211,7 @@ variable "tierer_redis_config" {
     maxmemory          = optional(string, "0")
     resources          = optional(object({ requests = optional(map(string), {}), limits = optional(map(string), {}) }), {})
     exporter_enabled   = optional(bool, false)
-    exporter_image     = optional(string, "oliver006/redis_exporter:v1.80.1")
+    exporter_image     = optional(string, "oliver006/redis_exporter:v1.98.0")
     exporter_resources = optional(object({ requests = optional(map(string), {}), limits = optional(map(string), {}) }), {})
   })
   default = {}
@@ -255,7 +266,7 @@ variable "objstore_monitoring" {
         "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454",
         "ghcr.io/cloudwebmanage/cwm-minio-tierer:34ef901cf197b7479e25714184a68d84ca0d0943"
       ], var.minio_tierer_image)) &&
-      var.log_metrics_sidecar_image != "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:c6a5bfff6872857b257d93e8b83d9dd719eea5f1"
+      (var.log_metrics_sidecar_image == null ? false : !contains(["", "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:c6a5bfff6872857b257d93e8b83d9dd719eea5f1"], trimspace(var.log_metrics_sidecar_image)))
     )
     error_message = "Objstore monitoring requires metrics=true, Redis exporter enabled, and explicitly selected newly built tierer/updater AND Vector images."
   }

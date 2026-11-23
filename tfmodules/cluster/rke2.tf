@@ -71,7 +71,13 @@ output "controlplane1_node_name" {
 
 locals {
   controlplane1_ssh_command = local.controlplane1_server_name != "" ? local.servers_ssh_command[local.controlplane1_server_name] : ""
+  # Existing CWM Ingress resources use nginx annotations and configuration snippets.
+  # RKE2 1.36 changes the default controller for fresh installations.
+  rke2_ingress_config = startswith(var.rke2_version, "v1.36.") ? "ingress-controller: [ingress-nginx]" : ""
+  rke2_check_upgrade = "bash -s -- '${var.rke2_version}'"
+  rke2_check_script = filebase64("${path.module}/check-rke2-upgrade.sh")
   rke2_install_controlplane1_config = <<-EOF
+    ${local.rke2_ingress_config}
     node-name: controlplane1
     node-ip: ${local.controlplane1_private_ip}
     node-external-ip: ${local.controlplane1_public_ip}
@@ -85,6 +91,7 @@ locals {
   EOF
   rke2_install_controlplane1_command = <<-EOT
     set -euo pipefail
+    echo '${local.rke2_check_script}' | base64 -d | ${local.controlplane1_ssh_command} "${local.rke2_check_upgrade}"
     ${local.controlplane1_ssh_command} "mkdir -p /etc/rancher/rke2"
     echo "${local.rke2_install_controlplane1_config}" | ${local.controlplane1_ssh_command} "cat > /etc/rancher/rke2/config.yaml"
     ${local.controlplane1_ssh_command} "
@@ -120,6 +127,7 @@ resource "null_resource" "rke2_install_secondary_controlplanes" {
       node-name: ${each.key}
       node-ip: ${local.server_private_ip[each.key]}
       node-external-ip: ${local.server_public_ip[each.key]}
+      ${local.rke2_ingress_config}
       advertise-address: ${local.server_private_ip[each.key]}
       tls-san:
         - 0.0.0.0
@@ -141,6 +149,7 @@ resource "null_resource" "rke2_install_secondary_controlplanes" {
   provisioner "local-exec" {
     command = <<-EOT
       set -euo pipefail
+      echo '${local.rke2_check_script}' | base64 -d | ${local.servers_ssh_command[each.key]} "${local.rke2_check_upgrade}"
       ${local.servers_ssh_command[each.key]} "mkdir -p /etc/rancher/rke2"
       echo "${self.triggers.config}" | ${local.servers_ssh_command[each.key]} "cat > /etc/rancher/rke2/config.yaml"
       ${local.servers_ssh_command[local.controlplane1_server_name]} "cat /var/lib/rancher/rke2/server/node-token" \
@@ -175,6 +184,7 @@ resource "null_resource" "rke2_install_workers" {
   provisioner "local-exec" {
     command = <<-EOT
       set -euo pipefail
+      echo '${local.rke2_check_script}' | base64 -d | ${local.servers_ssh_command[each.key]} "${local.rke2_check_upgrade}"
       ${local.servers_ssh_command[each.key]} "mkdir -p /etc/rancher/rke2"
       echo "${self.triggers.config}" | ${local.servers_ssh_command[each.key]} "cat > /etc/rancher/rke2/config.yaml"
       ${local.servers_ssh_command[local.controlplane1_server_name]} "cat /var/lib/rancher/rke2/server/node-token" \

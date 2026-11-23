@@ -66,7 +66,8 @@ resource "null_resource" "argocd_install" {
           https://raw.githubusercontent.com/argoproj/argo-cd/v${var.versions["argocd"]}/manifests/install.yaml
       fi
       echo '${local.argocd_kustomization_yaml}' > "${var.data_path}/argocd/kustomization.yaml"
-      ${local.kubectl} apply -n argocd -k "${var.data_path}/argocd"
+      # The ApplicationSet CRD exceeds the client-side apply annotation limit.
+      ${local.kubectl} apply --server-side -n argocd -k "${var.data_path}/argocd"
     EOT
   }
   provisioner "local-exec" {

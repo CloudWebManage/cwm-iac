@@ -1,3 +1,6 @@
+# Existing tenants stay on PostgreSQL 17 until their offline upgrade is scheduled.
+postgresMajor: 17
+
 cwmMinioApi:
   api:
     image: "ghcr.io/cloudwebmanage/cwm-minio-api:latest"
@@ -46,7 +49,7 @@ tiererRedis:
   maxmemory: "0"
   resources: {}
   exporter_enabled: false
-  exporter_image: oliver006/redis_exporter:v1.80.1
+  exporter_image: oliver006/redis_exporter:v1.98.0
   exporter_resources: {}
 
 low_tier_s3: {}

@@ -21,6 +21,7 @@ module "minio_tenant_main" {
       nodeLocal = {
         enabled = var.node_local_enabled
       }
+      postgresMajor = var.postgres_major
       clusterName = var.cluster_name
       tenant = {
         ingress = {
@@ -105,7 +106,7 @@ module "minio_tenant_main" {
           initContainers = [
             {
               name    = "init-host-perms"
-              image   = "busybox:1.37"
+              image   = "busybox:1.36.1@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662"
               command = ["sh", "-c", "chown 1000:1000 /var/lib/vector /var/lib/minio"]
               securityContext = {
                 runAsUser    = 0

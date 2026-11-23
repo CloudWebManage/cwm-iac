@@ -1,11 +1,8 @@
-# Generated from kubectl directpv install -o yaml
+# Generated with kubectl-directpv v4.1.6 install -o yaml --kube-version 1.36.6
 
 apiVersion: v1
 kind: Namespace
 metadata:
-  annotations:
-    directpv.min.io/plugin-version: v4.0.10
-  creationTimestamp: null
   finalizers:
   - foregroundDeletion
   labels:
@@ -22,9 +19,6 @@ status: {}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  annotations:
-    directpv.min.io/plugin-version: v4.0.10
-  creationTimestamp: null
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -38,9 +32,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    directpv.min.io/plugin-version: v4.0.10
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: null
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -99,20 +91,6 @@ rules:
   - update
   - watch
 - apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshots
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshotcontents
-  verbs:
-  - get
-  - list
-- apiGroups:
   - storage.k8s.io
   resources:
   - csinodes
@@ -160,10 +138,8 @@ rules:
   - watch
 - apiGroups:
   - apiextensions.k8s.io
-  - directpv.min.io
   resources:
   - customresourcedefinitions
-  - customresourcedefinition
   verbs:
   - create
   - delete
@@ -190,7 +166,6 @@ rules:
   - ""
   resources:
   - pods
-  - pod
   verbs:
   - get
   - list
@@ -199,7 +174,6 @@ rules:
   - ""
   resources:
   - secrets
-  - secret
   verbs:
   - get
   - list
@@ -210,9 +184,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    directpv.min.io/plugin-version: v4.0.10
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: null
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -233,9 +205,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    directpv.min.io/plugin-version: v4.0.10
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: null
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -261,9 +231,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    directpv.min.io/plugin-version: v4.0.10
     rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: null
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -285,8 +253,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.20.1
   labels:
     directpv.min.io/version: v1beta1
   name: directpvdrives.directpv.min.io
@@ -307,14 +274,19 @@ spec:
         description: DirectPVDrive denotes drive CRD object.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -334,43 +306,35 @@ spec:
                 type: integer
               conditions:
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource. --- This struct is intended for direct
-                    use as an array at the field path .status.conditions.  For example,
-                    \n type FooStatus struct{ // Represents the observations of a
-                    foo's current state. // Known .status.conditions.type are: \"Available\",
-                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
-                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
-                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
-                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
-                      description: lastTransitionTime is the last time the condition
-                        transitioned from one status to another. This should be when
-                        the underlying condition changed.  If that is not known, then
-                        using the time when the API field changed is acceptable.
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
                       format: date-time
                       type: string
                     message:
-                      description: message is a human readable message indicating
-                        details about the transition. This may be an empty string.
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
                       maxLength: 32768
                       type: string
                     observedGeneration:
-                      description: observedGeneration represents the .metadata.generation
-                        that the condition was set based upon. For instance, if .metadata.generation
-                        is currently 12, but the .status.conditions[x].observedGeneration
-                        is 9, the condition is out of date with respect to the current
-                        state of the instance.
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
                       format: int64
                       minimum: 0
                       type: integer
                     reason:
-                      description: reason contains a programmatic identifier indicating
-                        the reason for the condition's last transition. Producers
-                        of specific condition types may define expected values and
-                        meanings for this field, and whether the values are considered
-                        a guaranteed API. The value should be a CamelCase string.
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
                         This field may not be empty.
                       maxLength: 1024
                       minLength: 1
@@ -385,10 +349,6 @@ spec:
                       type: string
                     type:
                       description: type of condition in CamelCase or in foo.example.com/CamelCase.
-                        --- Many .condition.type values are consistent across resources
-                        like Available, but because arbitrary conditions can be useful
-                        (see .node.status.conditions), the ability to deconflict is
-                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -446,8 +406,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.20.1
   labels:
     directpv.min.io/version: v1beta1
   name: directpvvolumes.directpv.min.io
@@ -468,14 +427,19 @@ spec:
         description: DirectPVVolume denotes volume CRD object.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -487,43 +451,35 @@ spec:
                 type: integer
               conditions:
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource. --- This struct is intended for direct
-                    use as an array at the field path .status.conditions.  For example,
-                    \n type FooStatus struct{ // Represents the observations of a
-                    foo's current state. // Known .status.conditions.type are: \"Available\",
-                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
-                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
-                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
-                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
-                      description: lastTransitionTime is the last time the condition
-                        transitioned from one status to another. This should be when
-                        the underlying condition changed.  If that is not known, then
-                        using the time when the API field changed is acceptable.
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
                       format: date-time
                       type: string
                     message:
-                      description: message is a human readable message indicating
-                        details about the transition. This may be an empty string.
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
                       maxLength: 32768
                       type: string
                     observedGeneration:
-                      description: observedGeneration represents the .metadata.generation
-                        that the condition was set based upon. For instance, if .metadata.generation
-                        is currently 12, but the .status.conditions[x].observedGeneration
-                        is 9, the condition is out of date with respect to the current
-                        state of the instance.
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
                       format: int64
                       minimum: 0
                       type: integer
                     reason:
-                      description: reason contains a programmatic identifier indicating
-                        the reason for the condition's last transition. Producers
-                        of specific condition types may define expected values and
-                        meanings for this field, and whether the values are considered
-                        a guaranteed API. The value should be a CamelCase string.
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
                         This field may not be empty.
                       maxLength: 1024
                       minLength: 1
@@ -538,10 +494,6 @@ spec:
                       type: string
                     type:
                       description: type of condition in CamelCase or in foo.example.com/CamelCase.
-                        --- Many .condition.type values are consistent across resources
-                        like Available, but because arbitrary conditions can be useful
-                        (see .node.status.conditions), the ability to deconflict is
-                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -601,8 +553,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.20.1
   labels:
     directpv.min.io/version: v1beta1
   name: directpvnodes.directpv.min.io
@@ -623,14 +574,19 @@ spec:
         description: DirectPVNode denotes Node CRD object.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -645,43 +601,35 @@ spec:
             properties:
               conditions:
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource. --- This struct is intended for direct
-                    use as an array at the field path .status.conditions.  For example,
-                    \n type FooStatus struct{ // Represents the observations of a
-                    foo's current state. // Known .status.conditions.type are: \"Available\",
-                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
-                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
-                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
-                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
-                      description: lastTransitionTime is the last time the condition
-                        transitioned from one status to another. This should be when
-                        the underlying condition changed.  If that is not known, then
-                        using the time when the API field changed is acceptable.
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
                       format: date-time
                       type: string
                     message:
-                      description: message is a human readable message indicating
-                        details about the transition. This may be an empty string.
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
                       maxLength: 32768
                       type: string
                     observedGeneration:
-                      description: observedGeneration represents the .metadata.generation
-                        that the condition was set based upon. For instance, if .metadata.generation
-                        is currently 12, but the .status.conditions[x].observedGeneration
-                        is 9, the condition is out of date with respect to the current
-                        state of the instance.
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
                       format: int64
                       minimum: 0
                       type: integer
                     reason:
-                      description: reason contains a programmatic identifier indicating
-                        the reason for the condition's last transition. Producers
-                        of specific condition types may define expected values and
-                        meanings for this field, and whether the values are considered
-                        a guaranteed API. The value should be a CamelCase string.
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
                         This field may not be empty.
                       maxLength: 1024
                       minLength: 1
@@ -696,10 +644,6 @@ spec:
                       type: string
                     type:
                       description: type of condition in CamelCase or in foo.example.com/CamelCase.
-                        --- Many .condition.type values are consistent across resources
-                        like Available, but because arbitrary conditions can be useful
-                        (see .node.status.conditions), the ability to deconflict is
-                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -764,8 +708,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.20.1
   labels:
     directpv.min.io/version: v1beta1
   name: directpvinitrequests.directpv.min.io
@@ -786,14 +729,19 @@ spec:
         description: DirectPVInitRequest denotes DirectPVInitRequest CRD object.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -861,9 +809,6 @@ status:
 apiVersion: storage.k8s.io/v1
 kind: CSIDriver
 metadata:
-  annotations:
-    directpv.min.io/plugin-version: v4.0.10
-  creationTimestamp: null
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -887,9 +832,6 @@ allowedTopologies:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  annotations:
-    directpv.min.io/plugin-version: v4.0.10
-  creationTimestamp: null
   finalizers:
   - foregroundDeletion
   labels:
@@ -909,9 +851,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    directpv.min.io/image-tag: v4.0.10
-    directpv.min.io/plugin-version: v4.0.10
-  creationTimestamp: null
+    directpv.min.io/image-tag: v4.1.6
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -922,14 +862,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      selector.directpv.min.io: directpv-min-io-3qktl
+      selector.directpv.min.io: directpv-min-io-node-server
   template:
     metadata:
       annotations:
         created-by: kubectl-directpv
-      creationTimestamp: null
       labels:
-        selector.directpv.min.io: directpv-min-io-3qktl
+        selector.directpv.min.io: directpv-min-io-node-server
         selector.directpv.min.io.service: enabled
       name: node-server
       namespace: directpv
@@ -945,7 +884,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: quay.io/minio/csi-node-driver-registrar@sha256:c805fdc166761218dc9478e7ac8e0ad0e42ad442269e75608823da3eb761e67e
+        image: quay.io/minio/csi-node-driver-registrar@sha256:183b3ac969d133457595fa2abfd9d81d20e83a6bc4606375662d036f56462dde
         name: node-driver-registrar
         resources: {}
         terminationMessagePath: /var/log/driver-registrar-termination-log
@@ -973,7 +912,7 @@ spec:
               fieldPath: spec.nodeName
         - name: CSI_ENDPOINT
           value: unix:///csi/csi.sock
-        image: quay.io/minio/directpv:v4.0.10
+        image: quay.io/minio/directpv:v4.1.6
         livenessProbe:
           failureThreshold: 5
           httpGet:
@@ -1020,6 +959,9 @@ spec:
         - mountPath: /var/lib/directpv/
           mountPropagation: Bidirectional
           name: directpv-common-root
+        - mountPath: /var/lib/direct-csi/
+          mountPropagation: Bidirectional
+          name: direct-csi-common-root
         - mountPath: /sys
           mountPropagation: Bidirectional
           name: sysfs
@@ -1031,9 +973,6 @@ spec:
           mountPropagation: Bidirectional
           name: run-udev-data-dir
           readOnly: true
-        - mountPath: /var/lib/direct-csi/
-          mountPropagation: Bidirectional
-          name: direct-csi-common-root
       - args:
         - node-controller
         - -v=3
@@ -1044,7 +983,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: quay.io/minio/directpv:v4.0.10
+        image: quay.io/minio/directpv:v4.1.6
         name: node-controller
         resources: {}
         securityContext:
@@ -1064,6 +1003,9 @@ spec:
         - mountPath: /var/lib/directpv/
           mountPropagation: Bidirectional
           name: directpv-common-root
+        - mountPath: /var/lib/direct-csi/
+          mountPropagation: Bidirectional
+          name: direct-csi-common-root
         - mountPath: /sys
           mountPropagation: Bidirectional
           name: sysfs
@@ -1075,13 +1017,10 @@ spec:
           mountPropagation: Bidirectional
           name: run-udev-data-dir
           readOnly: true
-        - mountPath: /var/lib/direct-csi/
-          mountPropagation: Bidirectional
-          name: direct-csi-common-root
       - args:
         - --csi-address=/csi/csi.sock
         - --health-port=9898
-        image: quay.io/minio/livenessprobe@sha256:f3bc9a84f149cd7362e4bd0ae8cd90b26ad020c2591bfe19e63ff97aacf806c3
+        image: quay.io/minio/livenessprobe@sha256:af8bac7b24bbfcc064e58d45c1c2ebaf75b9ac71315a604e0870100fa6aed8da
         name: liveness-probe
         resources: {}
         terminationMessagePath: /var/log/driver-liveness-termination-log
@@ -1114,6 +1053,10 @@ spec:
           type: DirectoryOrCreate
         name: directpv-common-root
       - hostPath:
+          path: /var/lib/direct-csi/
+          type: DirectoryOrCreate
+        name: direct-csi-common-root
+      - hostPath:
           path: /sys
           type: DirectoryOrCreate
         name: sysfs
@@ -1125,10 +1068,6 @@ spec:
           path: /run/udev/data
           type: DirectoryOrCreate
         name: run-udev-data-dir
-      - hostPath:
-          path: /var/lib/direct-csi/
-          type: DirectoryOrCreate
-        name: direct-csi-common-root
   updateStrategy:
     type: RollingUpdate
 status:
@@ -1142,9 +1081,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    directpv.min.io/image-tag: v4.0.10
-    directpv.min.io/plugin-version: v4.0.10
-  creationTimestamp: null
+    directpv.min.io/image-tag: v4.1.6
   labels:
     application-name: directpv.min.io
     application-type: CSIDriver
@@ -1156,16 +1093,15 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      selector.directpv.min.io: controller-ziyqa
+      selector.directpv.min.io: controller-controller
   strategy:
     type: Recreate
   template:
     metadata:
       annotations:
         created-by: kubectl-directpv
-      creationTimestamp: null
       labels:
-        selector.directpv.min.io: controller-ziyqa
+        selector.directpv.min.io: controller-controller
       name: controller
       namespace: directpv
     spec:
@@ -1180,7 +1116,7 @@ spec:
         env:
         - name: CSI_ENDPOINT
           value: unix:///csi/csi.sock
-        image: quay.io/minio/csi-provisioner@sha256:7b5c070ec70d30b0895d91b10c39a0e6cc81c18e0d1566c77aeff2a3587fa316
+        image: quay.io/minio/csi-provisioner@sha256:f83e880ce4290b1ef4fa15a588138eafecdb40106208a5295c0b24d03cbaddbd
         name: csi-provisioner
         resources: {}
         securityContext:
@@ -1199,7 +1135,7 @@ spec:
         env:
         - name: CSI_ENDPOINT
           value: unix:///csi/csi.sock
-        image: quay.io/minio/csi-resizer@sha256:819f68a4daf75acec336302843f303cf360d4941249f9f5019ffbb690c8ac7c0
+        image: quay.io/minio/csi-resizer@sha256:cb338f5c5a9f781f289b6f25fedebbeeb4eec9fda2aeb2c0a1eaa8529c4c9738
         name: csi-resizer
         resources: {}
         securityContext:
@@ -1225,7 +1161,7 @@ spec:
               fieldPath: spec.nodeName
         - name: CSI_ENDPOINT
           value: unix:///csi/csi.sock
-        image: quay.io/minio/directpv:v4.0.10
+        image: quay.io/minio/directpv:v4.1.6
         name: controller
         ports:
         - containerPort: 30443

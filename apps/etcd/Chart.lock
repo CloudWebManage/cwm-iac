@@ -1,6 +1,6 @@
 dependencies:
 - name: etcd
   repository: https://groundhog2k.github.io/helm-charts/
-  version: 1.1.4
-digest: sha256:d43f2289ea141cb5de09a79c5bc86c3f0f7573e8e04202579eae95ff85ab5086
-generated: "2026-02-03T13:40:50.241270447+02:00"
+  version: 1.1.16
+digest: sha256:c813ffcef6cff37b2612145e702b5f6131e76d17abcc14bfa2228b3876e336b5
+generated: "2026-11-23T07:26:53.287826799+02:00"

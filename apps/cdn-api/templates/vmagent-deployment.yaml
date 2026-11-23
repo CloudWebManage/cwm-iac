@@ -19,7 +19,7 @@ spec:
           effect: NoExecute
       containers:
         - name: vmagent
-          image: victoriametrics/vmagent:v1.129.1-scratch
+          image: victoriametrics/vmagent:v1.156.0-scratch@sha256:f7f92a02c66b637e553f48958248800363ea95fbe181aa15b7caea9982705c53
           args:
             - -promscrape.config=/etc/vmagent/config/promscrape.yaml
             - -remoteWrite.url={{ .Values.vmagent.remoteWrite.baseUrl }}/api/v1/write
