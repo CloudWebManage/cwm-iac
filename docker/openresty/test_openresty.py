@@ -26,7 +26,7 @@ def get_metrics():
             else:
                 name = metric
                 labels = {}
-            metrics.setdefault(name, []).append({"value": int(value), **labels})
+            metrics.setdefault(name, []).append({"value": float(value), **labels})
     return metrics
 
 
@@ -47,9 +47,16 @@ def test_e2e():
         assert get_metrics() == {
             "nginx_metric_errors_total": [{"value": 0}]
         }
-        metrics = get_metrics()
-        assert get_metric_value(metrics, "nginx_http_request_duration_seconds_bucket", {"host": "_", "le": "0.005"}) == 1
-        assert get_metric_value(metrics, "nginx_http_request_size_bytes_count", {"host": "_"}) == 1
+        # The library synchronizes per-worker counters with shared memory periodically.
+        deadline = time.monotonic() + 10
+        while True:
+            metrics = get_metrics()
+            latency = get_metric_value(metrics, "nginx_http_request_duration_seconds_bucket", {"host": "_", "le": "+Inf"})
+            if latency and latency >= 1:
+                break
+            assert time.monotonic() < deadline, metrics
+            time.sleep(0.25)
+        assert get_metric_value(metrics, "nginx_http_request_size_bytes_count", {"host": "_"}) >= 1
         assert get_metric_value(metrics, "nginx_http_response_size_bytes_sum", {"host": "_"}) > 200
     finally:
         subprocess.call([

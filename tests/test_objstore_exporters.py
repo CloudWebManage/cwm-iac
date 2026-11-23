@@ -50,10 +50,10 @@ def test_pinned_vector_exports_real_buffer_and_delivery_error_metrics():
         assert observed[0].value > 0
         source_errors = [s for s in samples(metrics_url) if s.name == "vector_component_errors_total" and s.labels.get("component_id") == "minio_audit"]
         assert source_errors and source_errors[0].value > 0
-        buffer = [s for s in samples(metrics_url) if s.name == "vector_buffer_byte_size" and s.labels.get("component_id") == "access_updater"]
+        buffer = [s for s in samples(metrics_url) if s.name == "vector_buffer_size_bytes" and s.labels.get("component_id") == "access_updater"]
         assert len(buffer) == 1
         assert buffer[0].value > 0
-        capacity = [s for s in samples(metrics_url) if s.name == "vector_buffer_max_byte_size" and s.labels.get("component_id") == "access_updater"]
+        capacity = [s for s in samples(metrics_url) if s.name == "vector_buffer_max_size_bytes" and s.labels.get("component_id") == "access_updater"]
         assert capacity[0].value == 5368709120
         assert not any(s.name.startswith("minio_audit_") for s in samples(metrics_url))
 

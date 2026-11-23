@@ -10,7 +10,8 @@ def test_cdn_edge_routes_http_and_acme_challenge_paths():
     assert "listen 80;" in configmap
     assert "location ^~ /.well-known/acme-challenge/" in configmap
     assert "proxy_set_header Host $host;" in configmap
-    assert "{{ .Values.acmeHttp01.upstreamHost }}:{{ .Values.acmeHttp01.upstreamPort }}" in configmap
+    assert "set $acme_upstream {{ .Values.acmeHttp01.upstreamHost }};" in configmap
+    assert "proxy_pass {{ .Values.acmeHttp01.upstreamScheme }}://$acme_upstream:{{ .Values.acmeHttp01.upstreamPort }};" in configmap
     assert "proxy_pass http://$host:80;" in configmap
 
 

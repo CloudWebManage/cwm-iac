@@ -3,10 +3,10 @@ dependencies:
   repository: https://operator.min.io
   version: 7.1.1
 - name: loki
-  repository: https://grafana.github.io/helm-charts
-  version: 6.40.0
+  repository: https://grafana-community.github.io/helm-charts
+  version: 21.4.3
 - name: alloy
   repository: https://grafana.github.io/helm-charts
-  version: 1.2.1
-digest: sha256:634125123dcc9af79c717c91195b97b15209a1309d0074d1e0872146cc12e3bd
-generated: "2025-09-21T17:27:55.465132706+03:00"
+  version: 1.16.0
+digest: sha256:5bd550b42078e59df2988f9bd965ca24ada7d22f2c1e1b664a3d013bb5fe4d7f
+generated: "2026-11-23T07:26:52.829950978+02:00"

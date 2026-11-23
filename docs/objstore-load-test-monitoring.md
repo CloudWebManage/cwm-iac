@@ -19,9 +19,9 @@ Use Terraform >= 1.9 (cross-variable input validation), Helm 3 and Python/uv.
   image**, default **`null`**. When omitted/null, Terraform emits **no scanner
   image override**: the existing `versions["cwm-minio-tierer"] = "config/..."`
   value-file image remains selected. Without a config-file image, the chart uses
-  `ghcr.io/cloudwebmanage/cwm-minio-tierer:34ef901cf197b7479e25714184a68d84ca0d0943`,
+  `ghcr.io/cloudwebmanage/cwm-minio-tierer:60f07721d9fc1fbaf5c1db2a4a037c8d0faca6ff`,
   which supports disabled coverage and omitted/unlimited apply budgets. The
-  updater retains its existing `aa0cbe581d39be5f88c12c57f3d6d9075beea454` fallback.
+  updater uses the same published image as its fallback.
 * Only an explicit nonempty `minio_tierer_image` writes both
   `cwmMinioTierer.tierer.image` and
   `tenant.tenant.sideCars.containers[name=cwm-minio-tierer-access-updater].image`
@@ -30,12 +30,12 @@ Use Terraform >= 1.9 (cross-variable input validation), Helm 3 and Python/uv.
   updating the scanner config file alone does not select a new updater image.
 * Monitoring **requires a newly built** `cwm-minio-tierer` image containing both
   binaries and the Go `UPDATER_METRICS_LISTEN_ADDR` implementation. Omitted/null,
-  empty, and both known pre-monitoring image values above are rejected when
+  empty, and known pre-monitoring image selections are rejected when
   enabling the profile; selecting another tag is not proof of its contents. The
   scanner histogram must include finite buckets through 86400 seconds.
 * `log_metrics_sidecar_image` must be a new build of
   `docker/minio-log-metrics/Dockerfile` from this revision. Its base is
-  `timberio/vector:0.51.1-distroless-static`. The known old default is rejected for
+  `timberio/vector:0.62.0-distroless-static`. The known old default is rejected for
   monitoring. A new image is also required when enabling the Vector filters alone.
 * `objstore_monitoring.enabled = true` requires `metrics = true`,
   `tierer_redis_config.exporter_enabled = true`, and both explicit new images.
@@ -129,7 +129,7 @@ The sample sizes are initial test allocations, not established capacity limits.
 | `maxmemory` | `"0"` | `--maxmemory`, Redis size syntax; 0 means unlimited |
 | `resources` | empty requests/limits | Redis resources |
 | `exporter_enabled` | `false` | Add exporter sidecar to Redis pod |
-| `exporter_image` | `oliver006/redis_exporter:v1.80.1` | Pinned exporter image |
+| `exporter_image` | `oliver006/redis_exporter:v1.98.0` | Pinned exporter image |
 | `exporter_resources` | empty requests/limits | Exporter resources |
 
 The existing `--save 60 1 --loglevel warning`, Redis image, PVC name and `/data`
@@ -299,13 +299,13 @@ outage beyond the 24h evidence window needs independent operator supervision.
 Clear targets when retiring a monitor, and change `campaign_run_id` for each new
 run. No `run_active` metric is assumed to exist in the producer.
 
-Validated in disposable containers with Vector **0.51.1**:
-`vector_buffer_byte_size`, `vector_buffer_max_byte_size` (5368709120 for this
+Validated in disposable containers with Vector **0.62.0**:
+`vector_buffer_size_bytes`, `vector_buffer_max_size_bytes` (5368709120 for this
 config), `vector_http_client_errors_total` during connection retries and
 `vector_component_errors_total` during invalid audit JSON. The buffer/error
 series have `component_id`, with the disk queue identified as `access_updater`.
 HTTP retries do **not** necessarily increment `component_errors_total`, so both
-error paths are covered. Redis exporter **v1.80.1** was checked against Redis for
+error paths are covered. Redis exporter **v1.98.0** was checked against Redis for
 `redis_up`, `redis_memory_used_bytes`, `redis_memory_max_bytes`, and
 `redis_evicted_keys_total`. An unlimited maxmemory value does not fire the memory
 ratio alert.
@@ -404,7 +404,7 @@ jobs plus the private campaign job (**1+3+3+1+1 = 9 targets**); replace its synt
 MinIO/API/audit jobs and their existing credential handling. It never reads Vault
 or cluster state and does not emit credential values.
 
-Tests run the bundled chart, Prometheus v3.5.0 `promtool` config/rule checks and
+Tests run the bundled chart, Prometheus v3.16.0 `promtool` config/rule checks and
 time-series rule cases, Vector's real VRL tests/config validation, and disposable
 Vector/Redis/exporter containers. Scanner image regressions additionally run the
 selected registry binary with rendered policy settings and external networking

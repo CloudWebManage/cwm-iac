@@ -25,7 +25,7 @@ def prometheus_data(tmp_path, values):
 
 
 def promtool(files, *command):
-    with container("quay.io/prometheus/prometheus:v3.5.0", list(command), files, ["--entrypoint", "/bin/promtool"]) as identifier:
+    with container("quay.io/prometheus/prometheus:v3.16.0", list(command), files, ["--entrypoint", "/bin/promtool"]) as identifier:
         result = subprocess.run(["docker", "start", "-a", identifier], text=True, capture_output=True)
         assert result.returncode == 0, result.stdout + result.stderr
 

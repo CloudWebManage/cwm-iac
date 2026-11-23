@@ -6,13 +6,13 @@ on:
       - docker/minio-log-metrics/**
       - tests/minio_log_metrics/**
 env:
-  PYTHON_VERSION: "3.12"
+  UV_PYTHON: "3.15.2"
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.4.0
       - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
         with:
           test_script: |

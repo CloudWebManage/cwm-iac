@@ -11,6 +11,22 @@ tenant:
       enabled: false
 
 loki:
+  # Keep the existing backend/write StatefulSets, headless Services and data PVCs.
+  fullnameOverride: loki
+  extraObjects:
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: logging-loki-gateway
+      spec:
+        ports:
+          - name: http-metrics
+            port: 80
+            targetPort: 8080
+        selector:
+          app.kubernetes.io/name: loki
+          app.kubernetes.io/instance: "{{ .Release.Name }}"
+          app.kubernetes.io/component: gateway
   loki:
     auth_enabled: false
     schemaConfig:

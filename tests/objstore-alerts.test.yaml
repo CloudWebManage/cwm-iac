@@ -85,6 +85,8 @@ tests:
       - {series: 'redis_memory_max_bytes{job="objstore-redis",pod="unlimited"}', values: '0+0x10'}
       - {series: 'vector_buffer_byte_size{job="objstore-vector",component_id="access_updater",pod="one"}', values: '5000000000+0x10'}
       - {series: 'vector_buffer_max_byte_size{job="objstore-vector",component_id="access_updater",pod="one"}', values: '5368709120+0x10'}
+      - {series: 'vector_buffer_size_bytes{job="objstore-vector",component_id="access_updater",pod="upgraded"}', values: '5000000000+0x10'}
+      - {series: 'vector_buffer_max_size_bytes{job="objstore-vector",component_id="access_updater",pod="upgraded"}', values: '5368709120+0x10'}
     alert_rule_test:
       - eval_time: 7m
         alertname: ObjstoreBudgetExhausted
@@ -105,4 +107,6 @@ tests:
         alertname: ObjstoreVectorBufferSaturated
         exp_alerts:
           - exp_labels: {job: objstore-vector, component_id: access_updater, pod: one, cluster: test-cluster, tenant: test, severity: warning}
+            exp_annotations: {summary: Vector access-updater disk buffer is near capacity}
+          - exp_labels: {job: objstore-vector, component_id: access_updater, pod: upgraded, cluster: test-cluster, tenant: test, severity: warning}
             exp_annotations: {summary: Vector access-updater disk buffer is near capacity}

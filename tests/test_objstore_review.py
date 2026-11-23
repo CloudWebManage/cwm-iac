@@ -58,7 +58,7 @@ def test_fallback_scanner_binary_accepts_legacy_policy_defaults(tmp_path, monkey
     assert settings["TIERER_COVERAGE_ENABLED"] == "false"
     assert not any(key.startswith("TIERER_DAILY_") for key in settings)
     assert_scanner_accepts_configuration(scanner, monkeypatch)
-    assert scanner["image"] == COMPATIBLE_SCANNER
+    assert scanner["image"] == "ghcr.io/cloudwebmanage/cwm-minio-tierer:60f07721d9fc1fbaf5c1db2a4a037c8d0faca6ff"
 
 
 @pytest.mark.parametrize("image", [None, "", LEGACY_UPDATER, COMPATIBLE_SCANNER])

@@ -36,7 +36,7 @@ spec:
       containers:
         - name: coredns
           # Pulled Sep 9, 2025
-          image: "coredns/coredns@sha256:986f04c2e15e147d00bdd51e8c51bcef3644b13ff806be7d2ff1b261d6dfbae1"
+          image: "coredns/coredns:1.15.0@sha256:0a9d8c8ddf34347eb59aad9a8784f0710de88d6d112726d11d271f9bc6daca26"
           args: ["-conf", "/etc/coredns/Corefile"]
           volumeMounts:
             - name: coredns-conf

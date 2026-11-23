@@ -77,7 +77,12 @@ groups:
         annotations:
           summary: Redis has evicted access or control state
       - alert: ObjstoreVectorBufferSaturated
-        expr: vector_buffer_byte_size{job="objstore-vector",component_id="access_updater"} / vector_buffer_max_byte_size{job="objstore-vector",component_id="access_updater"} > ${saturation_ratio}
+        expr: |
+          (
+            vector_buffer_size_bytes{job="objstore-vector",component_id="access_updater"} / vector_buffer_max_size_bytes{job="objstore-vector",component_id="access_updater"}
+            or
+            vector_buffer_byte_size{job="objstore-vector",component_id="access_updater"} / vector_buffer_max_byte_size{job="objstore-vector",component_id="access_updater"}
+          ) > ${saturation_ratio}
         for: 5m
         labels: {severity: warning, cluster: ${jsonencode(cluster)}, tenant: ${jsonencode(tenant)}}
         annotations:

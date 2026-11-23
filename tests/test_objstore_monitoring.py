@@ -73,7 +73,7 @@ def test_existing_policy_and_redis_defaults_with_singleton_rollouts(tmp_path):
     assert len(containers) == 1
     assert containers[0]["command"] == ["redis-server", "--save", "60", "1", "--loglevel", "warning", "--appendonly", "no", "--appendfsync", "everysec", "--maxmemory-policy", "noeviction", "--maxmemory", "0"]
     updater = next(c for c in config["sidecars"]["containers"] if c["name"] == "cwm-minio-tierer-access-updater")
-    assert updater["image"] == "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454"
+    assert updater["image"] == "ghcr.io/cloudwebmanage/cwm-minio-tierer:60f07721d9fc1fbaf5c1db2a4a037c8d0faca6ff"
     assert "cwmMinioTierer" not in config["tierer"]
     assert env(updater)["UPDATER_MAX_RECORDS"] == "1000000"
     assert env(updater)["UPDATER_QUEUE_SIZE"] == "128"
@@ -98,7 +98,7 @@ def test_enabled_profile_has_bounded_policy_separate_metrics_and_evaluated_rules
     assert len([v for k, v in settings.items() if k.startswith("TIERER_DAILY_") and int(v) > 0]) == 4
     redis = resource(docs, "Deployment", "tierer-redis")["spec"]["template"]["spec"]["containers"]
     assert redis[0]["command"][-8:] == ["--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory-policy", "noeviction", "--maxmemory", "1073741824"]
-    assert redis[1]["image"] == "oliver006/redis_exporter:v1.80.1"
+    assert redis[1]["image"] == "oliver006/redis_exporter:v1.98.0"
     assert scanner["resources"]["limits"]["memory"] == "512Mi"
     tenant = resource(docs, "Tenant", "test")
     assert sum(pool["servers"] for pool in tenant["spec"]["pools"]) == 3
@@ -217,7 +217,7 @@ def test_prometheus_config_rules_and_dashboard_promql(tmp_path):
         ["check", "rules", "/etc/config/alerting_rules.yml", "/tmp/dashboard-expressions.yml"],
         ["test", "rules", "/tmp/alerts.test.yaml"],
     ):
-        with container("quay.io/prometheus/prometheus:v3.5.0", command, files, ["--entrypoint", "/bin/promtool"]) as identifier:
+        with container("quay.io/prometheus/prometheus:v3.16.0", command, files, ["--entrypoint", "/bin/promtool"]) as identifier:
             result = subprocess.run(["docker", "start", "-a", identifier], text=True, capture_output=True)
             assert result.returncode == 0, result.stdout + result.stderr
 

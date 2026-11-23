@@ -45,7 +45,7 @@ locals {
     containers = [
       {
         name         = "cwm-iac-minio-log-metrics"
-        image        = var.log_metrics_sidecar_image
+        image        = coalesce(var.log_metrics_sidecar_image, "ghcr.io/cloudwebmanage/cwm-iac-minio-log-metrics:312e57aa58d222115075aa4247ff7e57d6f05c90")
         resources    = var.vector_resources
         volumeMounts = [{ name = "host-var-lab-vector", mountPath = "/var/lib/vector/" }]
         ports        = concat([{ name = "audit-metrics", containerPort = 8799 }], var.objstore_monitoring.enabled ? [{ name = "vector-metrics", containerPort = 9598 }] : [])
@@ -63,7 +63,7 @@ locals {
       },
       {
         name      = "cwm-minio-tierer-access-updater"
-        image     = coalesce(var.minio_tierer_image, "ghcr.io/cloudwebmanage/cwm-minio-tierer:aa0cbe581d39be5f88c12c57f3d6d9075beea454")
+        image     = coalesce(var.minio_tierer_image, "ghcr.io/cloudwebmanage/cwm-minio-tierer:60f07721d9fc1fbaf5c1db2a4a037c8d0faca6ff")
         command   = ["/usr/local/bin/redis-updater"]
         resources = var.updater_resources
         ports     = var.objstore_monitoring.enabled ? [{ name = "updater-metrics", containerPort = 8922 }] : []

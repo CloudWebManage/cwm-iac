@@ -47,3 +47,9 @@ variable "argocd_autosync" {
 variable "low_tier_s3_region" {
   type = string
 }
+
+variable "create_low_tier_s3" {
+  description = "Create the external S3 tier for object-store tenants."
+  type        = bool
+  default     = true
+}

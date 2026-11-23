@@ -8,7 +8,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
       - uses: CloudWebManage/cwm-iac/actions/docker-build-push@main
         with:
           image_suffix: cwm-iac-prometheus-nagios-checks-sender

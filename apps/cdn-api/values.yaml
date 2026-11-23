@@ -46,6 +46,8 @@ vmagent:
     password: ""
 
 prometheus:
+  # The chart supplies additional built-in jobs unless this map is cleared.
+  scrapeConfigs: null
   server:
     tolerations:
       - key: "cwm-iac-worker-role"
