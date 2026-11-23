@@ -15,7 +15,7 @@ clusterName: ""
 
 cwmMinioTierer:
   tierer:
-    image: ghcr.io/cloudwebmanage/cwm-minio-tierer:latest
+    image: ghcr.io/cloudwebmanage/cwm-minio-tierer:60f07721d9fc1fbaf5c1db2a4a037c8d0faca6ff
 
 tierer:
   mode: apply
